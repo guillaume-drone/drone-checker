@@ -502,7 +502,7 @@ function useGPS(mode){
       const msg={1:'Permission refusée — va dans Paramètres > Applis > Chrome > Autorisations > Localisation',2:'Position indisponible — active le GPS dans les paramètres du téléphone',3:'Délai dépassé — réessaie en extérieur ou avec le WiFi activé'}[e.code]||'Erreur GPS inconnue (code '+e.code+')';
       document.getElementById(mode==='zones'?'zone-result':'meteo-result').innerHTML=`<div class="empty"><span class="empty-icon">🚫</span><p>${msg}</p></div>`;
     },
-    {enableHighAccuracy:true,timeout:10000}
+    {enableHighAccuracy:false,timeout:20000,maximumAge:60000}
   );
 }
 async function geo(q){
