@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Drone 22">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0f172a">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f172a'/%3E%3Ctext x='50' y='65' font-size='55' text-anchor='middle'%3E%F0%9F%9A%81%3C/text%3E%3C/svg%3E">
+<title>Drone Checker — DJI Air 3S</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap');
+:root{--sky:#0ea5e9;--sky-dark:#0369a1;--green:#16a34a;--orange:#ea580c;--red:#dc2626;--g400:#94a3b8;--g600:#475569;--g900:#0f172a;--r:12px;--rs:8px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height:100vh;padding-bottom:3rem}
+.header{background:linear-gradient(160deg,#0c1a2e 0%,#0f2d4a 100%);padding:1.25rem 1rem 1rem;border-bottom:1px solid rgba(14,165,233,0.2);display:flex;align-items:center;gap:12px}
+.header-icon{width:44px;height:44px;background:rgba(14,165,233,0.15);border:1px solid rgba(14,165,233,0.3);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.header h1{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:600}
+.header p{font-size:12px;color:var(--sky);margin-top:2px}
+.tabs{display:flex;border-bottom:1px solid rgba(255,255,255,0.08);background:rgba(0,0,0,0.2)}
+.tab{flex:1;padding:12px;font-size:13px;font-weight:500;text-align:center;cursor:pointer;color:var(--g400);border:none;background:none;border-bottom:2px solid transparent}
+.tab.active{color:var(--sky);border-bottom-color:var(--sky)}
+.content{padding:1rem;max-width:480px;margin:0 auto}
+.section{display:none}.section.active{display:block}
+.btn-gps{width:100%;padding:14px;background:var(--sky);color:#fff;border:none;border-radius:var(--r);font-family:'Inter',sans-serif;font-size:15px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:1rem}
+.divider{display:flex;align-items:center;gap:10px;margin-bottom:1rem;color:var(--g400);font-size:12px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.08)}
+.search-row{display:flex;gap:8px;margin-bottom:1.25rem}
+.search-row input{flex:1;padding:12px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:var(--rs);color:#fff;font-family:'Inter',sans-serif;font-size:14px;outline:none}
+.search-row input::placeholder{color:var(--g400)}
+.search-row input:focus{border-color:var(--sky)}
+.search-row button{padding:12px 16px;background:rgba(14,165,233,0.15);border:1px solid rgba(14,165,233,0.3);border-radius:var(--rs);color:var(--sky);font-size:18px;cursor:pointer}
+.spots-title{font-size:11px;font-weight:500;color:var(--g400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.spots-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1.25rem}
+.spot-btn{padding:10px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:var(--rs);color:rgba(255,255,255,0.8);font-family:'Inter',sans-serif;font-size:12px;cursor:pointer;text-align:left;line-height:1.4}
+.spot-btn:hover{background:rgba(14,165,233,0.1);border-color:rgba(14,165,233,0.2)}
+.spot-btn .si{display:block;font-size:15px;margin-bottom:3px}
+.result-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:var(--r);overflow:hidden;margin-bottom:1rem}
+.status-banner{padding:1.25rem;display:flex;align-items:flex-start;gap:14px}
+.status-banner.green{background:rgba(22,163,74,0.15);border-bottom:1px solid rgba(22,163,74,0.2)}
+.status-banner.orange{background:rgba(234,88,12,0.15);border-bottom:1px solid rgba(234,88,12,0.2)}
+.status-banner.red{background:rgba(220,38,38,0.15);border-bottom:1px solid rgba(220,38,38,0.2)}
+.s-emoji{font-size:30px;line-height:1;flex-shrink:0}
+.s-title{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:600;margin-bottom:4px}
+.s-title.green{color:#4ade80}.s-title.orange{color:#fb923c}.s-title.red{color:#f87171}
+.s-loc{font-size:12px;color:var(--g400)}
+.explain-box{padding:1rem 1.25rem;font-size:13px;line-height:1.7;color:rgba(255,255,255,0.75);border-bottom:1px solid rgba(255,255,255,0.06)}
+.explain-box strong{color:#fff;font-weight:500}
+.rules-list{padding:.75rem 1.25rem}
+.rule-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px;line-height:1.5;color:rgba(255,255,255,0.7)}
+.rule-item:last-child{border-bottom:none}
+.rule-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:6px}
+.rule-dot.green{background:#4ade80}.rule-dot.orange{background:#fb923c}.rule-dot.red{background:#f87171}
+.meteo-score{border-radius:var(--r);padding:1.25rem;margin-bottom:1rem;display:flex;align-items:center;gap:16px}
+.meteo-score.green{background:rgba(22,163,74,0.15);border:1px solid rgba(22,163,74,0.25)}
+.meteo-score.orange{background:rgba(234,88,12,0.15);border:1px solid rgba(234,88,12,0.25)}
+.meteo-score.red{background:rgba(220,38,38,0.15);border:1px solid rgba(220,38,38,0.25)}
+.score-icon{font-size:36px;flex-shrink:0}
+.score-label{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:600}
+.score-label.green{color:#4ade80}.score-label.orange{color:#fb923c}.score-label.red{color:#f87171}
+.score-sub{font-size:12px;color:var(--g400);margin-top:3px;line-height:1.5}
+.meteo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem}
+.meteo-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:var(--rs);padding:.875rem}
+.mc-label{font-size:11px;color:var(--g400);margin-bottom:6px}
+.mc-value{font-size:22px;font-weight:600;font-family:'Space Grotesk',sans-serif}
+.mc-value.green{color:#4ade80}.mc-value.orange{color:#fb923c}.mc-value.red{color:#f87171}
+.mc-unit{font-size:11px;color:var(--g400);margin-top:2px}
+.mc-bar{height:4px;border-radius:2px;margin-top:8px;background:rgba(255,255,255,0.08);overflow:hidden}
+.mc-bar-fill{height:100%;border-radius:2px}
+.mc-bar-fill.green{background:#4ade80}.mc-bar-fill.orange{background:#fb923c}.mc-bar-fill.red{background:#f87171}
+.note-card{border-radius:var(--rs);padding:1rem;margin-bottom:1rem;font-size:13px;line-height:1.6;color:rgba(255,255,255,0.75)}
+.note-card.green{background:rgba(22,163,74,0.1);border:1px solid rgba(22,163,74,0.2)}
+.note-card.orange{background:rgba(234,88,12,0.1);border:1px solid rgba(234,88,12,0.2)}
+.note-card.red{background:rgba(220,38,38,0.1);border:1px solid rgba(220,38,38,0.2)}
+.note-card strong{color:#fff;font-weight:500}
+.note-header{font-size:12px;font-weight:500;margin-bottom:5px}
+.note-header.green{color:#4ade80}.note-header.orange{color:#fb923c}.note-header.red{color:#f87171}
+.link-btn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:13px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:var(--rs);color:#fff;font-family:'Inter',sans-serif;font-size:14px;cursor:pointer;margin-bottom:8px;text-decoration:none}
+.link-btn:hover{background:rgba(255,255,255,0.08)}
+.link-btn span{color:var(--g400);font-size:12px}
+.links-title{font-size:11px;font-weight:500;color:var(--g400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;margin-top:.5rem}
+.drone-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.2);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--sky);margin-bottom:1rem}
+.empty{text-align:center;padding:3rem 1rem;color:var(--g400)}
+.empty-icon{font-size:48px;display:block;margin-bottom:1rem}
+.empty p{font-size:14px;line-height:1.7}
+.loading{text-align:center;padding:2.5rem;color:var(--g400);font-size:14px}
+.spinner{width:28px;height:28px;border:2px solid rgba(255,255,255,0.1);border-top-color:var(--sky);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.footer{text-align:center;font-size:11px;color:var(--g400);margin-top:1.5rem;line-height:1.6}
+.map-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:var(--rs);color:#fff;font-family:'Inter',sans-serif;font-size:14px;cursor:pointer;margin-bottom:8px}
+.map-btn:hover{background:rgba(255,255,255,0.08)}
+.map-container{display:none;border-radius:var(--rs);overflow:hidden;margin-bottom:1rem;border:1px solid rgba(255,255,255,0.08)}
+.map-container.active{display:block}
+.map-container .map-inner{width:100%;height:280px}
+.iframe-container{display:none;border-radius:var(--rs);overflow:hidden;margin-bottom:1rem;border:1px solid rgba(255,255,255,0.08)}
+.iframe-container.active{display:block}
+.iframe-container iframe{width:100%;height:320px;display:block;border:none}
+.iframe-caption{padding:8px 12px;background:rgba(0,0,0,0.3);font-size:11px;color:rgba(255,255,255,0.6)}
+.map-legend{display:flex;gap:12px;padding:8px 12px;background:rgba(0,0,0,0.3);font-size:11px;color:rgba(255,255,255,0.7);flex-wrap:wrap}
+.map-legend span{display:flex;align-items:center;gap:5px}
+.map-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.map-dot.red{background:#dc2626}.map-dot.orange{background:#ea580c}.map-dot.you{background:#0ea5e9}
+.signal-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:11px;background:none;border:1px dashed rgba(255,255,255,0.15);border-radius:var(--rs);color:var(--g400);font-family:'Inter',sans-serif;font-size:12px;cursor:pointer;margin-top:1rem}
+.signal-btn:hover{color:#fff;border-color:rgba(255,255,255,0.3)}
+.sun-card{display:flex;justify-content:space-around;align-items:center;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:var(--rs);padding:1rem;margin-bottom:1rem}
+.sun-item{text-align:center}
+.sun-item .si-emoji{font-size:24px;display:block;margin-bottom:4px}
+.sun-item .si-time{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:600}
+.sun-item .si-label{font-size:11px;color:var(--g400);margin-top:2px}
+.forecast-row{display:flex;gap:8px;margin-bottom:1rem}
+.forecast-card{flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:var(--rs);padding:.75rem;text-align:center}
+.forecast-card .fc-time{font-size:11px;color:var(--g400);margin-bottom:6px}
+.forecast-card .fc-icon{font-size:18px;margin-bottom:4px}
+.forecast-card .fc-wind{font-size:13px;font-weight:600;font-family:'Space Grotesk',sans-serif}
+.forecast-card .fc-rain{font-size:10px;color:var(--g400);margin-top:2px}
+.compass{display:inline-block;transition:transform 0.3s}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-icon">🚁</div>
+  <div><h1>Drone Checker</h1><p>DJI Air 3S — Côtes-d'Armor</p></div>
+</div>
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('zones')">🗺️ Zones</button>
+  <button class="tab" onclick="switchTab('meteo')">🌤️ Météo drone</button>
+</div>
+<div class="content">
+
+<!-- ZONES -->
+<div id="tab-zones" class="section active">
+  <br>
+  <div id="notam-banner"></div>
+  <button class="btn-gps" onclick="useGPS('zones')">📍 Ma position GPS</button>
+  <div class="divider">ou recherche un lieu</div>
+  <div class="search-row">
+    <input type="text" id="zoneInput" placeholder="Cap Fréhel, Lannion, Ploumanac'h..." onkeydown="if(event.key==='Enter')searchZone()"/>
+    <button onclick="searchZone()">🔍</button>
+  </div>
+  <p class="spots-title">Mes spots</p>
+  <div class="spots-grid">
+    <button class="spot-btn" onclick="spotZ(0)"><span class="si">🟢</span>Pointe du Roselier</button>
+    <button class="spot-btn" onclick="spotZ(1)"><span class="si">🟢</span>Lac de Guérlédan</button>
+    <button class="spot-btn" onclick="spotZ(2)"><span class="si">🟢</span>Château Hunaudaye</button>
+    <button class="spot-btn" onclick="spotZ(3)"><span class="si">🟢</span>Sillon de Talbert</button>
+    <button class="spot-btn" onclick="spotZ(4)"><span class="si">🟡</span>Cap Fréhel</button>
+    <button class="spot-btn" onclick="spotZ(5)"><span class="si">🟡</span>Fort La Latte</button>
+    <button class="spot-btn" onclick="spotZ(6)"><span class="si">🟡</span>Plougrescant</button>
+    <button class="spot-btn" onclick="spotZ(7)"><span class="si">🟡</span>Ploumanac'h</button>
+    <button class="spot-btn" onclick="spotZ(8)"><span class="si">🟡</span>Île de Bréhat</button>
+    <button class="spot-btn" onclick="spotZ(9)"><span class="si">🟡</span>Cap d'Erquy</button>
+  </div>
+  <div id="zone-result"><div class="empty"><span class="empty-icon">🗺️</span><p>Indique ta position ou choisis un spot pour voir les restrictions.</p></div></div>
+</div>
+
+<!-- MÉTÉO -->
+<div id="tab-meteo" class="section">
+  <br>
+  <div class="drone-badge">🚁 Calibré DJI Air 3S — limite vent : 43 km/h</div>
+  <button class="btn-gps" onclick="useGPS('meteo')">📍 Météo à ma position</button>
+  <div class="divider">ou recherche un lieu</div>
+  <div class="search-row">
+    <input type="text" id="meteoInput" placeholder="Cap Fréhel, Lannion, Ploumanac'h..." onkeydown="if(event.key==='Enter')searchMeteo()"/>
+    <button onclick="searchMeteo()">🔍</button>
+  </div>
+  <p class="spots-title">Mes spots</p>
+  <div class="spots-grid">
+    <button class="spot-btn" onclick="spotM(0)"><span class="si">🌤️</span>Pointe du Roselier</button>
+    <button class="spot-btn" onclick="spotM(1)"><span class="si">🌤️</span>Lac de Guérlédan</button>
+    <button class="spot-btn" onclick="spotM(2)"><span class="si">🌤️</span>Château Hunaudaye</button>
+    <button class="spot-btn" onclick="spotM(3)"><span class="si">🌤️</span>Sillon de Talbert</button>
+    <button class="spot-btn" onclick="spotM(4)"><span class="si">🌤️</span>Cap Fréhel</button>
+    <button class="spot-btn" onclick="spotM(5)"><span class="si">🌤️</span>Fort La Latte</button>
+    <button class="spot-btn" onclick="spotM(6)"><span class="si">🌤️</span>Plougrescant</button>
+    <button class="spot-btn" onclick="spotM(7)"><span class="si">🌤️</span>Ploumanac'h</button>
+    <button class="spot-btn" onclick="spotM(8)"><span class="si">🌤️</span>Île de Bréhat</button>
+    <button class="spot-btn" onclick="spotM(9)"><span class="si">🌤️</span>Cap d'Erquy</button>
+  </div>
+  <div id="meteo-result"><div class="empty"><span class="empty-icon">🌤️</span><p>Indique ta position pour voir les conditions météo pour ton Air 3S.</p></div></div>
+</div>
+
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',(i===0&&t==='zones')||(i===1&&t==='meteo')));
+  document.getElementById('tab-zones').classList.toggle('active',t==='zones');
+  document.getElementById('tab-meteo').classList.toggle('active',t==='meteo');
+}
+
+const ZONES=[
+  {name:"Aéroport de Saint-Brieuc (LFRT)",lat:48.5375,lon:-2.8566,radius:5,status:"orange",emoji:"✈️",altitude:null,title:"Vérification requise — zone aéroport",explain:"Saint-Brieuc (LFRT) n'a <strong>pas de tour de contrôle permanente</strong> (juste un service d'information AFIS), donc pas de vraie CTR. Mais une <strong>géozone de restriction drone</strong> existe autour — vol interdit sans autorisation préalable via AlphaTango. Le rayon exact est à confirmer sur cartes.gouv.fr.",rules:["Vol interdit sans autorisation préalable via AlphaTango","Pour voler ici, contacte l'aéroport : operations@aeroport-saint-brieuc.fr","Radio AFIS sur 118.455 MHz si tu es équipé","Vérifie le rayon exact de la géozone sur cartes.gouv.fr"]},
+  {name:"Aéroport de Lannion (LFRO)",lat:48.7544,lon:-3.4720,radius:5.56,status:"red",emoji:"✈️",altitude:null,title:"Vol interdit — CTR aéroport",explain:"Tu es dans la <strong>CTR de Lannion</strong> — un cercle de 5,56 km de rayon autour de l'aéroport, du sol jusqu'à environ 762 m. Les drones y sont <strong>strictement interdits</strong> sans autorisation, zone active 24h/24.",rules:["Interdiction de voler sans autorisation (CTR 5,56 km)","Demande via alphatango.aviation-civile.gouv.fr","Zone active H24","Au-delà de la CTR, la TMA peut aussi s'appliquer selon l'altitude"]},
+  {name:"Aéroport de Rennes (LFRN)",lat:48.0697,lon:-1.7279,radius:12.04,status:"red",emoji:"✈️",altitude:null,title:"Vol interdit — CTR aéroport",explain:"Tu es dans la <strong>CTR de Rennes-Saint-Jacques</strong> — 12 km de rayon, classe D, active 24h/24, du sol jusqu'à environ 457 m. Les drones y sont interdits sans autorisation. Si tu prévois de voler ici, compte <strong>5 jours minimum</strong> pour la demande d'autorisation.",rules:["Interdiction de voler sans autorisation (CTR 12 km)","Demande à déposer 5 jours minimum à l'avance (alphatango ou clearance.aero)","Zone de classe D, active H24","S'étend du sol à ~457 m"]},
+  {name:"Aéroport de Brest (LFRB)",lat:48.4350,lon:-4.4338,radius:17,status:"red",emoji:"✈️",altitude:null,title:"Vol interdit — CTR Bretagne",explain:"Tu es dans (ou proche de) la <strong>CTR Bretagne</strong> de l'aéroport de Brest — une zone assez grande (environ 33 × 17 km), pas un simple cercle, du sol jusqu'à ~457 m. Les drones y sont interdits sans autorisation. Elle est voisine des CTR militaires de Landivisiau et Lanvéoc.",rules:["Interdiction de voler sans autorisation dans la CTR Bretagne","Zone de classe D, active H24","Demande via alphatango.aviation-civile.gouv.fr","Zone réelle = polygone irrégulier, ce rayon est une approximation"]},
+  {name:"Zone offshore R17 C « CORSEN »",lat:48.6,lon:-4.8,radius:35,status:"orange",emoji:"⚓",altitude:120,title:"Info — couloir côtier libre + zone interdite au large",explain:"<strong>Changement important :</strong> le SUP AIP 076/25 a été remplacé par le <strong>165/25</strong> (valable jusqu'au 30 avril 2027). Depuis la <strong>côte continentale</strong>, tu peux voler <strong>librement jusqu'à 1850 m en mer</strong> (max 120 m d'altitude), sans autorisation. Au-delà de 1850 m au large (zone R17 C), le vol est <strong>interdit 24h/24</strong>. Attention : les <strong>îles</strong> (Ouessant...) ne bénéficient pas de ce couloir — la zone interdite touche directement leur littoral.",rules:["Depuis la côte continentale : vol libre jusqu'à 1850 m en mer, max 120 m","Au-delà de 1850 m au large : interdit H24 (zone R17 C)","Pas de décollage depuis un bateau","Drones > 900 g : notification AlphaTango obligatoire avant le vol","Les îles ne bénéficient PAS de ce couloir — vérifie au cas par cas"]},
+  {name:"Île de Bréhat",lat:48.846,lon:-2.999,radius:3,status:"orange",emoji:"🏝️",altitude:120,title:"Vérification requise — île classée",explain:"Bréhat est une <strong>île</strong> — elle ne bénéficie <strong>pas</strong> du couloir libre de 1850 m réservé aux côtes continentales. En mer autour de l'île (zone R17 A « AVEL »), le vol est interdit à partir d'1 mille nautique du littoral. Sur l'île elle-même, le vol est possible en catégorie ouverte <strong>sauf arrêté municipal contraire</strong> — renseigne-toi en mairie avant d'y aller.",rules:["Île : pas de couloir libre en mer (contrairement à la côte continentale)","Mer autour de l'île : interdit au-delà d'1 NM (zone R17 A)","Sur l'île : vérifier en mairie qu'aucun arrêté municipal ne limite les drones","Site naturel protégé — respecte la faune (nidification mars–juillet)"]},
+  {name:"Cap Fréhel",lat:48.683,lon:-2.317,radius:2,status:"orange",emoji:"🦅",altitude:30,title:"Prudence — réserve ornithologique",explain:"Le Cap Fréhel abrite une <strong>réserve ornithologique majeure</strong> — plus de 1000 oiseaux marins nichent sur les falaises de février à mi-juillet. Des <strong>arrêtés municipaux de Plévenon</strong> peuvent réglementer ou interdire les vols de drone. La hauteur max sur la géozone peut descendre à <strong>30 m</strong> selon le secteur — bien moins que les 120 m habituels.",rules:["Renseigne-toi en mairie de Plévenon avant tout vol — arrêté municipal possible","Période critique de nidification : février à mi-juillet, évite les falaises","Hauteur max sur la géozone : 30 à 50 m selon le secteur (pas 120 m !)","Grand Site de France — les survols bas perturbent fortement la faune"]},
+  {name:"Côte de Granit Rose — Ploumanac'h",lat:48.833,lon:-3.480,radius:4,status:"orange",emoji:"🪨",altitude:50,title:"Vérification requise — arrêtés municipaux",explain:"La Côte de Granit Rose est couverte par des <strong>arrêtés municipaux</strong> (Perros-Guirec, Trégastel, Ploumanac'h) qui limitent les vols selon les secteurs. La hauteur max varie de <strong>30 à 100 m</strong> selon la géozone. Attention : les <strong>Sept-Îles</strong> (réserve naturelle au large) sont en <strong>interdiction stricte</strong> de survol, sans bénéficier du couloir côtier.",rules:["Arrêtés municipaux à vérifier avant chaque vol (Perros-Guirec et communes voisines)","Hauteur max variable : 30 à 100 m selon le secteur (cartes.gouv.fr)","Zones de biotope protégé — certaines falaises interdites de survol","Sept-Îles : interdiction stricte de survol, pas de couloir côtier applicable"]},
+  {name:"Cap d'Erquy",lat:48.6453,lon:-2.4891,radius:2,status:"orange",emoji:"🌿",altitude:120,title:"Prudence — Grand Site de France",explain:"Le Cap d'Erquy fait partie du <strong>Grand Site de France « Cap d'Erquy – Cap Fréhel »</strong> — landes, falaises et fonds marins classés. Aucun arrêté préfectoral spécifique aux drones n'a été trouvé pour Erquy, mais des restrictions municipales peuvent exister. Vérifie la géozone précise sur cartes.gouv.fr avant de voler.",rules:["Vérifie la géozone précise sur cartes.gouv.fr avant le vol","Renseigne-toi en mairie d'Erquy pour d'éventuels arrêtés locaux","Évite le survol des falaises en période de nidification (mars–juillet)","Hauteur max probable : 120 m en l'absence de restriction identifiée"]},
+  {name:"Parc naturel régional d'Armorique",lat:48.35,lon:-3.85,radius:18,status:"orange",emoji:"🌳",altitude:120,title:"Vérification requise — parc naturel régional",explain:"Le PNR d'Armorique n'interdit pas lui-même les drones, mais inclut des <strong>réserves naturelles régionales</strong> (ex. Landes et Tourbières du Cragou-Vergam) où toute perturbation de la faune est interdite. La partie ouest du parc chevauche aussi la <strong>CTR Bretagne</strong> (Brest). Pour les zones sensibles, contacte le parc : 02 98 81 90 08.",rules:["Le PNR n'a pas de règle aéronautique propre, mais ses réserves naturelles si","Évite le survol bas des réserves incluses (faune protégée)","Partie ouest dans la CTR Bretagne — autorisation nécessaire","Contact PNRA pour zones sensibles : 02 98 81 90 08"]},
+  {name:"Camp militaire de Coëtquidan (R506A)",lat:47.9534,lon:-2.2089,radius:8,status:"red",emoji:"🪖",altitude:null,title:"Vol interdit pendant activité — zone militaire",explain:"Le camp de Coëtquidan est couvert par la zone réglementée <strong>R506A</strong>, du sol jusqu'à environ 3500 m. Le contournement est <strong>obligatoire pendant l'activité</strong> — en pratique interdit pour les drones civils. Bonne nouvelle : la zone est <strong>inactive le dimanche et les jours fériés</strong>. Pour voler en semaine, contacte le camp.",rules:["Zone réglementée R506A — contournement obligatoire pendant l'activité","Inactive le dimanche et les jours fériés","Pour voler en période d'inactivité : contacter le camp au 02 97 70 77 67","Activités : tirs sol/sol et parachutage — danger réel si activité en cours"]},
+];
+
+// NOTAMs et restrictions temporaires actives
+const NOTAMS=[
+  {ref:"SUP AIP 099/26",desc:"Exercice militaire « Personal Recovery 2026 » — 19 zones temporaires activées en Bretagne le 16, 17 et 18 juin 2026, de 12h00 à 16h30. Évite de voler en Bretagne sur ces créneaux.",from:"2026-06-16",until:"2026-06-18",urgent:true},
+  {ref:"SUP AIP 165/25",desc:"Remplace le SUP AIP 076/25. Couloir libre de 1850 m en mer depuis la côte continentale (max 120 m), zones R17 créées au large. Valable jusqu'au 30 avril 2027.",from:"2025-09-29",until:"2027-04-30",urgent:false},
+];
+
+function checkNotams(){
+  const today=new Date(); today.setHours(0,0,0,0);
+  let html='';
+  for(const n of NOTAMS){
+    const from=new Date(n.from), until=new Date(n.until);
+    const isActive = today>=from && today<=until;
+    const daysToStart = Math.ceil((from-today)/86400000);
+    if(isActive || (n.urgent && daysToStart>=0 && daysToStart<=3)){
+      const when = isActive ? `🔴 Actif maintenant (jusqu'au ${until.toLocaleDateString('fr-FR')})` : `⏳ Démarre dans ${daysToStart} jour(s) (${from.toLocaleDateString('fr-FR')} au ${until.toLocaleDateString('fr-FR')})`;
+      html+=`<div class="note-card ${n.urgent?'red':'orange'}"><div class="note-header ${n.urgent?'red':'orange'}">🚨 ${n.ref} — ${when}</div>${n.desc}</div>`;
+    }
+  }
+  document.getElementById('notam-banner').innerHTML=html;
+}
+checkNotams();
+
+const SEASONAL={
+  "cap fréhel":{months:[3,4,5,6,7],bad:"🦅 <strong>Période de nidification active</strong> — Les oiseaux nichent dans les falaises en ce moment. Vol déconseillé et potentiellement interdit par arrêté.",ok:"Les oiseaux ont quitté les falaises pour cet hiver. Vol possible — vérifie quand même Géoportail pour toute restriction temporaire."},
+  "île de bréhat":{months:[3,4,5,6,7],bad:"🐦 <strong>Période de reproduction (mars–juillet)</strong> — Faune protégée particulièrement sensible. L'autorisation préfectorale est encore plus importante en ce moment.",ok:"Hors période de reproduction. L'autorisation préfectorale reste recommandée avant tout vol."},
+  "ploumanac":{months:[3,4,5,6,7],bad:"🪨 <strong>Période de nidification (mars–juillet)</strong> — Faune locale protégée. Arrêté préfectoral possible en zone Natura 2000.",ok:"Hors saison sensible. Vérifie quand même les arrêtés préfectoraux en vigueur."},
+  "erquy":{months:[3,4,5,6,7],bad:"🌿 <strong>Période sensible (mars–juillet)</strong> — Landes et falaises en zone protégée. Vol déconseillé pendant la nidification.",ok:"Hors saison sensible. Zone ouverte — vol possible avec ta certification AlphaTango."},
+};
+
+function dist(la1,lo1,la2,lo2){const R=6371,dL=(la2-la1)*Math.PI/180,dO=(lo2-lo1)*Math.PI/180,a=Math.sin(dL/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dO/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))}
+
+function seasonNote(locName){
+  const m=new Date().getMonth()+1,n=locName.toLowerCase();
+  for(const[k,d]of Object.entries(SEASONAL)){
+    if(n.includes(k)){
+      const bad=d.months.includes(m);
+      return`<div class="note-card ${bad?'orange':'green'}"><div class="note-header ${bad?'orange':'green'}">${bad?'⚠️ Restriction saisonnière — ':'✅ Hors saison — '}${new Date().toLocaleDateString('fr-FR',{month:'long'})}</div>${bad?d.bad:d.ok}</div>`;
+    }
+  }
+  return'';
+}
+
+function altBadge(alt){
+  if(alt===null||alt===undefined)return'';
+  if(alt<120)return`<div class="note-card orange"><div class="note-header orange">📏 Hauteur max ici : ${alt} m</div>Inférieure à la limite standard de 120 m — ne la dépasse pas, même si ton drone peut monter plus haut.</div>`;
+  return'';
+}
+
+// Types Nominatim correspondant à une zone habitée
+const AGGLO_TYPES={city:"une ville",town:"une ville",village:"un village",hamlet:"un hameau",municipality:"une commune",administrative:"une commune",suburb:"un quartier habité",neighbourhood:"un quartier habité",isolated_dwelling:"une habitation isolée",farm:"une exploitation habitée"};
+let currentAggloShape=null; // {type:'geojson'|'bbox', data:...}
+
+function aggloInfo(placeInfo){
+  currentAggloShape=null;
+  if(!placeInfo||!placeInfo.type||!AGGLO_TYPES[placeInfo.type])return{isAgglo:false};
+  if(placeInfo.geojson&&placeInfo.geojson.type!=='Point'){
+    currentAggloShape={type:'geojson',data:placeInfo.geojson};
+  }else if(placeInfo.bbox){
+    const[s,n,w,e]=placeInfo.bbox;
+    currentAggloShape={type:'bbox',data:[[s,w],[n,e]]};
+  }
+  return{isAgglo:true,label:AGGLO_TYPES[placeInfo.type]};
+}
+
+function aggloExtraNote(label,locName){
+  return`<div class="note-card red"><div class="note-header red">🏘️ "${locName}" est ${label}</div>Indépendamment de la zone ci-dessus, le survol de <strong>personnes, routes, véhicules et propriétés privées</strong> est réglementé partout en France. Reste à distance des habitations et rassemblements. La forme rouge sur la carte indique le contour approximatif de cette zone habitée.</div>`;
+}
+
+function renderZone(lat,lon,locName,placeInfo=null){
+  let inside=[],nearest=null,minD=Infinity;
+  for(const z of ZONES){const d=dist(lat,lon,z.lat,z.lon);if(d<z.radius)inside.push({...z});if(d<minD){minD=d;nearest=z}}
+  minD=Math.round(minD*10)/10;
+  // Les 11 zones surveillées sont concentrées en Bretagne — au-delà de 80 km, "la plus proche" n'a pas de sens
+  const nearestTxt = minD<=80 ? ` Zone restrictive listée la plus proche : <strong>${nearest.name}</strong> à <strong>${minD} km</strong>.` : ` Les zones surveillées par cette appli sont concentrées en Bretagne (Côtes-d'Armor et alentours) — aucune n'est pertinente ici, vérifie cartes.gouv.fr pour ta région.`;
+  const geo=`https://cartes.gouv.fr/explorer-les-cartes?c=${lon},${lat}&z=14&l=GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN25TOUR$GEOPORTAIL:OGC:WMTS(1;1;1;0),TRANSPORTS.DRONES.RESTRICTIONS$GEOPORTAIL:OGC:WMTS(2;0.55;1;0)&permalink=yes`;
+  const ai=aggloInfo(placeInfo);
+  let html='';
+  if(inside.some(z=>z.status==="red")){
+    const z=inside.find(z=>z.status==="red");
+    html+=`<div class="result-card"><div class="status-banner red"><div class="s-emoji">${z.emoji}</div><div><div class="s-title red">${z.title}</div><div class="s-loc">${locName}</div></div></div><div class="explain-box">${z.explain}</div><div class="rules-list">${z.rules.map(r=>`<div class="rule-item"><div class="rule-dot red"></div>${r}</div>`).join('')}</div></div>`;
+    html+=altBadge(z.altitude);
+    if(ai.isAgglo)html+=aggloExtraNote(ai.label,locName);
+  }else if(inside.some(z=>z.status==="orange")){
+    const z=inside.find(z=>z.status==="orange");
+    html+=`<div class="result-card"><div class="status-banner orange"><div class="s-emoji">${z.emoji}</div><div><div class="s-title orange">${z.title}</div><div class="s-loc">${locName}</div></div></div><div class="explain-box">${z.explain}</div><div class="rules-list">${z.rules.map(r=>`<div class="rule-item"><div class="rule-dot orange"></div>${r}</div>`).join('')}</div></div>`;
+    html+=altBadge(z.altitude);
+    if(ai.isAgglo)html+=aggloExtraNote(ai.label,locName);
+    html+=seasonNote(locName);
+  }else if(ai.isAgglo){
+    html+=`<div class="result-card"><div class="status-banner orange"><div class="s-emoji">🏘️</div><div><div class="s-title orange">Vérification requise — zone habitée</div><div class="s-loc">${locName}</div></div></div><div class="explain-box">"${locName}" est ${ai.label}. Aucune zone aéroport/militaire/protégée ne couvre cet endroit, mais le survol de <strong>personnes, routes, véhicules et propriétés privées</strong> est réglementé partout en France — pas seulement ici. La forme rouge sur la carte indique le contour approximatif de la zone habitée.${nearestTxt}</div><div class="rules-list"><div class="rule-item"><div class="rule-dot orange"></div>Altitude max 120 m au-dessus du sol</div><div class="rule-item"><div class="rule-dot orange"></div>Ne survole pas de personnes, véhicules ou habitations sans leur accord</div><div class="rule-item"><div class="rule-dot orange"></div>En sous-catégorie A3 : reste à 150 m des zones résidentielles/commerciales</div><div class="rule-item"><div class="rule-dot orange"></div>Vérifie cartes.gouv.fr pour une éventuelle géozone spécifique au centre-ville</div></div></div>`;
+    html+=seasonNote(locName);
+  }else{
+    const info=SPOT_INFO[locName];
+    const alt=info?info.alt:120;
+    const note=info?info.note:`Pas d'aéroport, de zone militaire ou de site protégé bloquant à proximité.${nearestTxt}`;
+    html+=`<div class="result-card"><div class="status-banner green"><div class="s-emoji">✅</div><div><div class="s-title green">Tu peux voler ici !</div><div class="s-loc">${locName}</div></div></div><div class="explain-box">${note}</div><div class="rules-list"><div class="rule-item"><div class="rule-dot green"></div>Altitude max ${alt} m au-dessus du sol</div><div class="rule-item"><div class="rule-dot green"></div>Vol en visibilité directe obligatoire à tout moment</div><div class="rule-item"><div class="rule-dot green"></div>Ne survole pas les personnes, routes ou bâtiments habités</div><div class="rule-item"><div class="rule-dot green"></div>Certification AlphaTango A1/A3 — tu l'as, c'est bon</div></div></div>`;
+    html+=seasonNote(locName);
+  }
+  html+=`<div id="wfs-live"></div>`;
+  html+=`<button class="map-btn" onclick="toggleMap(${lat},${lon},'${locName.replace(/'/g,"\\'")}')">🗺️ Voir la carte autour de moi</button>
+  <div class="map-container" id="map-container"><div id="map-inner" class="map-inner"></div><div class="map-legend"><span><span class="map-dot you"></span>Toi</span><span><span class="map-dot red"></span>Zone habitée</span></div></div>`;
+  html+=`<button class="map-btn" onclick="toggleOfficialMap(${lat},${lon})">🛰️ Voir la carte officielle DGAC (cartes.gouv.fr)</button>
+  <div class="iframe-container" id="iframe-container"><iframe id="official-iframe" src="" sandbox="allow-forms allow-scripts allow-same-origin" allowfullscreen loading="lazy"></iframe><div class="iframe-caption">Restrictions UAS — DGAC / cartes.gouv.fr · <a href="${geo}" target="_blank" style="color:var(--sky)">Plein écran ↗</a></div></div>`;
+  html+=`<button class="signal-btn" onclick="signalIssue('${locName.replace(/'/g,"\\'")}')">🚩 Signaler une info obsolète sur ce lieu</button>
+  <div class="footer">Données indicatives · DGAC · AlphaTango · SUP AIP 165/25 · Maj ${new Date().toLocaleDateString('fr-FR')}</div>`;
+  document.getElementById('zone-result').innerHTML=html;
+  queryDGACWFS(lat,lon);
+}
+
+function toggleOfficialMap(lat,lon){
+  const c=document.getElementById('iframe-container');
+  const iframe=document.getElementById('official-iframe');
+  if(c.classList.contains('active')){c.classList.remove('active');iframe.src='';return}
+  c.classList.add('active');
+  iframe.src=`https://cartes.gouv.fr/explorer-les-cartes/embed?c=${lon},${lat}&z=14&l=GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN25TOUR$GEOPORTAIL:OGC:WMTS(1;1;1;0),TRANSPORTS.DRONES.RESTRICTIONS$GEOPORTAIL:OGC:WMTS(2;0.55;1;0)&permalinkShare=yes`;
+}
+
+// EXPÉRIMENTAL : tente d'interroger la couche officielle DGAC en direct (WFS data.geopf.fr).
+// Si ça échoue (CORS, format...), ne fait rien — aucun impact sur le reste de l'appli.
+async function queryDGACWFS(lat,lon){
+  const d=0.01; // petite bbox autour du point
+  const bbox=`${lon-d},${lat-d},${lon+d},${lat+d},EPSG:4326`;
+  const url=`https://data.geopf.fr/wfs/ows?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=TRANSPORTS.DRONES.RESTRICTIONS:carte_restriction_drones_lf&OUTPUTFORMAT=application/json&SRSNAME=EPSG:4326&BBOX=${bbox}&COUNT=5`;
+  try{
+    const r=await fetch(url);
+    if(!r.ok)return;
+    const data=await r.json();
+    if(!data.features||!data.features.length)return;
+    // Récupère toutes les valeurs "limite" uniques, nettoyées
+    const limites=new Set();
+    data.features.forEach(f=>{
+      const v=f.properties&&f.properties.limite;
+      if(v)limites.add(v.toString().replace(/\*/g,'').trim());
+    });
+    if(!limites.size)return;
+    const items=[...limites].map(l=>{
+      const isInterdit=l.toLowerCase().includes('interdit');
+      return`<div class="rule-item"><div class="rule-dot ${isInterdit?'red':'orange'}"></div>${l}</div>`;
+    }).join('');
+    const html=`<div class="result-card" style="margin-top:.75rem"><div class="status-banner orange" style="padding:1rem 1.25rem 0.5rem"><div class="s-emoji">🔬</div><div><div class="s-title orange" style="font-size:15px">Donnée officielle DGAC en direct</div><div class="s-loc">Couche cartes.gouv.fr — TRANSPORTS.DRONES.RESTRICTIONS</div></div></div><div class="rules-list">${items}</div></div>`;
+    const el=document.getElementById('wfs-live');
+    if(el)el.innerHTML=html;
+  }catch(e){
+    // Silencieux : CORS, réseau ou format inattendu — l'appli continue normalement
+  }
+}
+
+let leafletMap=null;
+function toggleMap(lat,lon,locName){
+  const c=document.getElementById('map-container');
+  const isActive=c.classList.contains('active');
+  if(isActive){c.classList.remove('active');return}
+  c.classList.add('active');
+  setTimeout(()=>{
+    if(leafletMap){leafletMap.remove();leafletMap=null}
+    leafletMap=L.map('map-inner').setView([lat,lon],13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:18}).addTo(leafletMap);
+    L.circleMarker([lat,lon],{radius:8,color:'#0ea5e9',fillColor:'#0ea5e9',fillOpacity:0.9,weight:2}).addTo(leafletMap).bindPopup(locName);
+    if(currentAggloShape){
+      const style={color:'#dc2626',weight:2,fillColor:'#dc2626',fillOpacity:0.25};
+      const popup='🏘️ Zone habitée — survol de personnes/biens réglementé';
+      if(currentAggloShape.type==='geojson'){
+        L.geoJSON(currentAggloShape.data,{style}).addTo(leafletMap).bindPopup(popup);
+        leafletMap.fitBounds(L.geoJSON(currentAggloShape.data).getBounds(),{padding:[20,20]});
+      }else{
+        L.rectangle(currentAggloShape.data,style).addTo(leafletMap).bindPopup(popup);
+        leafletMap.fitBounds(currentAggloShape.data,{padding:[20,20]});
+      }
+    }
+  },100);
+}
+
+function signalIssue(locName){
+  const subject=encodeURIComponent(`Signalement Drone Checker — ${locName}`);
+  const body=encodeURIComponent(`Lieu : ${locName}\n\nDécris ici l'information qui semble obsolète ou incorrecte :\n`);
+  window.location.href=`mailto:?subject=${subject}&body=${body}`;
+}
+
+// Seuils DJI Air 3S : résistance niveau 6 = 12 m/s = 43 km/h
+function cWind(v){return v<25?'green':v<40?'orange':'red'}
+function cGust(v){return v<35?'green':v<50?'orange':'red'}
+function cVis(v){return v>=5000?'green':v>=2000?'orange':'red'}
+function cRain(v){return v===0?'green':v<0.5?'orange':'red'}
+function cKp(v){return v<3?'green':v<5?'orange':'red'}
+function cTemp(v){return v>=-10&&v<=40?'green':'red'}
+function cHum(v){return v<80?'green':v<90?'orange':'red'}
+function bar(v,max){return Math.min(100,Math.round(v/max*100))}
+
+function degToCompass(deg){
+  const dirs=['N','NE','E','SE','S','SO','O','NO'];
+  return dirs[Math.round(deg/45)%8];
+}
+
+async function fetchKp(){
+  try{const r=await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json');const d=await r.json();return parseFloat(d[d.length-1][1])||0}catch{return null}
+}
+
+async function loadMeteo(lat,lon,locName){
+  document.getElementById('meteo-result').innerHTML='<div class="loading"><div class="spinner"></div>Chargement météo en cours...</div>';
+  try{
+    const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m,precipitation,visibility,cloud_cover,relative_humidity_2m,weather_code&hourly=wind_speed_10m,wind_gusts_10m,precipitation_probability,cloud_cover,temperature_2m&daily=sunrise,sunset&wind_speed_unit=kmh&timezone=Europe/Paris&forecast_days=1`;
+    const[mr,kp]=await Promise.all([fetch(url).then(r=>r.json()),fetchKp()]);
+    const c=mr.current;
+    const wind=Math.round(c.wind_speed_10m),gust=Math.round(c.wind_gusts_10m),vis=Math.round(c.visibility),rain=Math.round(c.precipitation*10)/10,temp=Math.round(c.temperature_2m);
+    const windDir=Math.round(c.wind_direction_10m), cloud=Math.round(c.cloud_cover), hum=Math.round(c.relative_humidity_2m);
+    const kpV=kp!==null?Math.round(kp*10)/10:null;
+
+    // Lever / coucher du soleil
+    const sunrise=new Date(mr.daily.sunrise[0]);
+    const sunset=new Date(mr.daily.sunset[0]);
+    const now=new Date();
+    const isNight=now<sunrise||now>sunset;
+    const fmtTime=d=>d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    const minsToSunset=Math.round((sunset-now)/60000);
+
+    // Prévision 3-6h
+    const hourly=mr.hourly;
+    const nowH=new Date().getHours();
+    let fcCards='';
+    [1,3,6].forEach(off=>{
+      const idx=nowH+off;
+      if(idx<24){
+        const t=new Date(hourly.time[idx]);
+        const w=Math.round(hourly.wind_speed_10m[idx]);
+        const g=Math.round(hourly.wind_gusts_10m[idx]);
+        const p=Math.round(hourly.precipitation_probability[idx]);
+        const cl=Math.round(hourly.cloud_cover[idx]);
+        const icon=p>=50?'🌧️':cl>=70?'☁️':cl>=30?'⛅':'☀️';
+        fcCards+=`<div class="forecast-card"><div class="fc-time">${fmtTime(t)}</div><div class="fc-icon">${icon}</div><div class="fc-wind ${cWind(w)}">${w} km/h</div><div class="fc-rain">💧${p}% · ${cl}% nuages</div></div>`;
+      }
+    });
+
+    const scores=[cWind(wind),cGust(gust),cVis(vis),cRain(rain),cHum(hum)];
+    if(kpV!==null)scores.push(cKp(kpV));
+    const gc=scores.includes('red')?'red':scores.includes('orange')?'orange':'green';
+    const ge=gc==='green'?'✅':gc==='orange'?'⚠️':'🔴';
+    const gl=gc==='green'?'Conditions idéales — Vol recommandé':gc==='orange'?'Conditions acceptables — Vole avec prudence':'Conditions défavorables — Ne pas voler';
+
+    let windNote='';
+    if(wind>=43)windNote=`<div class="note-card red"><div class="note-header red">🚫 Vent dépasse la limite de l'Air 3S</div>La <strong>limite officielle est 43 km/h</strong>. À ${wind} km/h tu risques de perdre le contrôle ou de ne plus pouvoir rentrer.</div>`;
+    else if(wind>=30)windNote=`<div class="note-card orange"><div class="note-header orange">⚠️ Vent soutenu — surveille les rafales</div>Ton Air 3S tient jusqu'à <strong>43 km/h</strong>. À ${wind} km/h tu es dans la marge — mais les rafales à ${gust} km/h et la batterie qui se vide plus vite sont à surveiller. Vent venant du <strong>${degToCompass(windDir)}</strong> — positionne-toi en conséquence pour décoller face au vent.</div>`;
+    else windNote=`<div class="note-card green"><div class="note-header green">✅ Vent largement dans les limites</div>À ${wind} km/h tu es bien en dessous de la <strong>limite de 43 km/h</strong>. La nacelle 3 axes s'occupe du reste. Vent venant du <strong>${degToCompass(windDir)}</strong>.</div>`;
+
+    let nightNote='';
+    if(isNight)nightNote=`<div class="note-card red"><div class="note-header red">🌙 Vol de nuit interdit sans autorisation</div>Le soleil est couché (lever ${fmtTime(sunrise)}, coucher ${fmtTime(sunset)}). Le vol de nuit est <strong>interdit sans autorisation spécifique et sans feux de signalisation homologués</strong>.</div>`;
+    else if(minsToSunset<60&&minsToSunset>0)nightNote=`<div class="note-card orange"><div class="note-header orange">🌇 Coucher de soleil dans ${minsToSunset} min</div>Le soleil se couche à <strong>${fmtTime(sunset)}</strong>. Prévois de finir ton vol avant — le vol de nuit est interdit sans autorisation.</div>`;
+
+    let humNote='';
+    if(hum>=90)humNote=`<div class="note-card red"><div class="note-header red">💧 Humidité très élevée</div>À ${hum}% d'humidité, risque de condensation sur les lentilles et l'électronique. Ton Air 3S <strong>n'est pas waterproof</strong> — évite de voler par brouillard ou bruine.</div>`;
+    else if(hum>=80)humNote=`<div class="note-card orange"><div class="note-header orange">💧 Humidité élevée</div>À ${hum}% d'humidité, surveille la formation de buée sur la caméra. Pas de risque immédiat mais reste attentif.</div>`;
+
+    const kpHtml=kpV!==null?`<div class="meteo-card"><div class="mc-label">🌌 Indice Kp (GPS)</div><div class="mc-value ${cKp(kpV)}">${kpV}</div><div class="mc-unit">${kpV<3?'Signal GPS stable':kpV<5?'Légères perturbations':'⚠️ GPS perturbé'}</div><div class="mc-bar"><div class="mc-bar-fill ${cKp(kpV)}" style="width:${bar(kpV,9)}%"></div></div></div>`:'';
+
+    document.getElementById('meteo-result').innerHTML=`
+      <div class="meteo-score ${gc}"><div class="score-icon">${ge}</div><div><div class="score-label ${gc}">${gl}</div><div class="score-sub">${locName}</div></div></div>
+      <div class="sun-card">
+        <div class="sun-item"><span class="si-emoji">🌅</span><div class="si-time">${fmtTime(sunrise)}</div><div class="si-label">Lever du soleil</div></div>
+        <div class="sun-item"><span class="si-emoji">🌇</span><div class="si-time">${fmtTime(sunset)}</div><div class="si-label">Coucher du soleil</div></div>
+      </div>
+      <div class="meteo-grid">
+        <div class="meteo-card"><div class="mc-label">💨 Vent moyen</div><div class="mc-value ${cWind(wind)}">${wind}</div><div class="mc-unit">km/h · limite Air 3S : 43</div><div class="mc-bar"><div class="mc-bar-fill ${cWind(wind)}" style="width:${bar(wind,60)}%"></div></div></div>
+        <div class="meteo-card"><div class="mc-label">🌬️ Rafales</div><div class="mc-value ${cGust(gust)}">${gust}</div><div class="mc-unit">km/h · seuil prudence : 50</div><div class="mc-bar"><div class="mc-bar-fill ${cGust(gust)}" style="width:${bar(gust,70)}%"></div></div></div>
+        <div class="meteo-card"><div class="mc-label">🧭 Direction du vent</div><div class="mc-value green"><span class="compass" style="display:inline-block;transform:rotate(${windDir}deg)">⬇️</span> ${degToCompass(windDir)}</div><div class="mc-unit">${windDir}° · vient du ${degToCompass(windDir)}</div></div>
+        <div class="meteo-card"><div class="mc-label">👁️ Visibilité</div><div class="mc-value ${cVis(vis)}">${vis>=1000?Math.round(vis/100)/10+' km':vis+' m'}</div><div class="mc-unit">${vis>=5000?'Excellente':vis>=2000?'Correcte':'Réduite'}</div><div class="mc-bar"><div class="mc-bar-fill ${cVis(vis)}" style="width:${bar(vis,10000)}%"></div></div></div>
+        <div class="meteo-card"><div class="mc-label">🌧️ Précipitations</div><div class="mc-value ${cRain(rain)}">${rain}</div><div class="mc-unit">mm/h · ${rain===0?'Aucune':rain<0.5?'Traces':'Pluie active'}</div><div class="mc-bar"><div class="mc-bar-fill ${cRain(rain)}" style="width:${bar(rain,5)}%"></div></div></div>
+        <div class="meteo-card"><div class="mc-label">☁️ Nébulosité</div><div class="mc-value green">${cloud}%</div><div class="mc-unit">${cloud<30?'Ciel dégagé — top photo':cloud<70?'Ciel voilé':'Ciel couvert'}</div><div class="mc-bar"><div class="mc-bar-fill green" style="width:${cloud}%"></div></div></div>
+        <div class="meteo-card"><div class="mc-label">💧 Humidité</div><div class="mc-value ${cHum(hum)}">${hum}%</div><div class="mc-unit">${hum<80?'OK':hum<90?'Surveiller buée':'⚠️ Risque condensation'}</div><div class="mc-bar"><div class="mc-bar-fill ${cHum(hum)}" style="width:${hum}%"></div></div></div>
+        ${kpHtml}
+        <div class="meteo-card"><div class="mc-label">🌡️ Température</div><div class="mc-value ${cTemp(temp)}">${temp}°C</div><div class="mc-unit">${cTemp(temp)==='green'?'OK pour l\'Air 3S':'Hors plage Air 3S'} (-10° à 40°)</div></div>
+      </div>
+      <p class="links-title">Prévision pour ta sortie</p>
+      <div class="forecast-row">${fcCards}</div>
+      ${windNote}
+      ${nightNote}
+      ${humNote}
+      <button class="signal-btn" onclick="signalIssue('${locName.replace(/'/g,"\\'")} (météo)')">🚩 Signaler une info incorrecte</button>
+      <div class="footer">Météo : Open-Meteo · Kp : NOAA Space Weather<br>Seuils calibrés DJI Air 3S — résistance niveau 6 (43 km/h)</div>`;
+  }catch(e){
+    document.getElementById('meteo-result').innerHTML='<div class="empty"><span class="empty-icon">📡</span><p>Erreur de connexion internet.</p></div>';
+  }
+}
+
+function loading(id,msg){document.getElementById(id).innerHTML=`<div class="loading"><div class="spinner"></div>${msg}</div>`}
+function useGPS(mode){
+  if(!navigator.geolocation){alert('GPS non disponible.');return}
+  const rid=mode==='zones'?'zone-result':'meteo-result';
+  loading(rid,'Localisation...');
+  navigator.geolocation.getCurrentPosition(
+    async p=>{
+      const la=p.coords.latitude,lo=p.coords.longitude,n=`Ma position (${la.toFixed(4)}, ${lo.toFixed(4)})`;
+      if(mode==='zones'){const rg=await reverseGeo(la,lo);renderZone(la,lo,n,rg)}
+      else loadMeteo(la,lo,n);
+    },
+    ()=>{document.getElementById(mode==='zones'?'zone-result':'meteo-result').innerHTML='<div class="empty"><span class="empty-icon">🚫</span><p>GPS refusé. Autorise la localisation ou recherche un lieu.</p></div>'},
+    {enableHighAccuracy:true,timeout:10000}
+  );
+}
+async function geo(q){
+  const r=await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q+' France')}&format=json&limit=1&accept-language=fr&polygon_geojson=1`);
+  const d=await r.json();
+  if(!d.length)return null;
+  return{lat:parseFloat(d[0].lat),lon:parseFloat(d[0].lon),name:d[0].display_name.split(',').slice(0,2).join(','),type:d[0].type,bbox:d[0].boundingbox?d[0].boundingbox.map(parseFloat):null,geojson:d[0].geojson||null};
+}
+async function reverseGeo(lat,lon){
+  // zoom 10 = ville/commune (meilleur contour pour petites communes), 14 = quartier, 18 = bâtiment
+  for(const zoom of [10,14,18]){
+    try{
+      const r=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=fr&zoom=${zoom}&polygon_geojson=1`);
+      const d=await r.json();
+      if(d&&d.type&&AGGLO_TYPES[d.type]&&(d.geojson||d.boundingbox)){
+        return{type:d.type,bbox:d.boundingbox?d.boundingbox.map(parseFloat):null,geojson:d.geojson||null};
+      }
+    }catch{}
+  }
+  return null;
+}
+async function searchZone(){const q=document.getElementById('zoneInput').value.trim();if(!q)return;loading('zone-result','Recherche...');const l=await geo(q);l?renderZone(l.lat,l.lon,l.name,l):document.getElementById('zone-result').innerHTML='<div class="empty"><span class="empty-icon">🔍</span><p>Lieu introuvable.</p></div>'}
+async function searchMeteo(){const q=document.getElementById('meteoInput').value.trim();if(!q)return;loading('meteo-result','Recherche...');const l=await geo(q);l?loadMeteo(l.lat,l.lon,l.name):document.getElementById('meteo-result').innerHTML='<div class="empty"><span class="empty-icon">🔍</span><p>Lieu introuvable.</p></div>'}
+// Notes personnalisées par spot (issues de l'analyse Cowork)
+const SPOT_INFO={
+  "Pointe du Roselier":{alt:120,note:"À environ 8 km de l'aéroport de Saint-Brieuc (LFRT) — vérifie la géozone sur cartes.gouv.fr, tu peux être en bordure. Ce spot côtier bénéficie du couloir libre de 1850 m en mer depuis la côte continentale."},
+  "Lac de Guérlédan":{alt:120,note:"Aucune zone aéronautique majeure identifiée à proximité — zone rurale du centre-Bretagne, loin des aérodromes et zones militaires. Vérifie tout de même cartes.gouv.fr (zone de parachutage ou ULM local possible)."},
+  "Château de la Hunaudaye":{alt:120,note:"Aucune zone aéronautique majeure identifiée. Site médiéval en zone rurale, à environ 20 km au sud-est du Cap Fréhel."},
+  "Sillon de Talbert":{alt:120,note:"Presqu'île continentale — bénéficie du couloir libre de 1850 m en mer (zones D18/R17). Attention : les îlots et rochers au large sont en zone interdite — ne survole pas leurs abords au-delà de 1850 m."},
+  "Fort La Latte":{alt:120,note:"Situé entre Cap Fréhel et Erquy. Monument historique classé — vérifie si un arrêté de la commune de Fréhel limite les prises de vue aériennes (arrêté du 10/06/2021 sur certains monuments). Bénéficie du couloir côtier en mer."},
+  "Gouffre de Plougrescant":{alt:120,note:"Aucune restriction aéronautique spécifique identifiée pour ce spot. Bénéficie du couloir libre de 1850 m en mer. Vérifie cartes.gouv.fr et les éventuels arrêtés municipaux de Plougrescant."},
+};
+
+// Coordonnées GPS exactes des 10 spots — chargement instantané, zéro geocoding
+const SPOTS=[
+  {name:"Pointe du Roselier",    lat:48.5541, lon:-2.7148},
+  {name:"Lac de Guérlédan",      lat:48.2042, lon:-3.0500},
+  {name:"Château de la Hunaudaye",lat:48.4728, lon:-2.3390},
+  {name:"Sillon de Talbert",     lat:48.8669, lon:-3.1019},
+  {name:"Cap Fréhel",            lat:48.6835, lon:-2.3180},
+  {name:"Fort La Latte",         lat:48.6753, lon:-2.3008},
+  {name:"Gouffre de Plougrescant",lat:48.8668, lon:-3.2377},
+  {name:"Ploumanac'h",           lat:48.8330, lon:-3.4808},
+  {name:"Île de Bréhat",         lat:48.8461, lon:-2.9999},
+  {name:"Cap d'Erquy",           lat:48.6453, lon:-2.4891},
+];
+function spotZ(i){const s=SPOTS[i];document.getElementById('zoneInput').value=s.name;loading('zone-result','Analyse...');renderZone(s.lat,s.lon,s.name)}
+function spotM(i){const s=SPOTS[i];document.getElementById('meteoInput').value=s.name;loading('meteo-result','Météo...');loadMeteo(s.lat,s.lon,s.name)}
+async function sZ(n){document.getElementById('zoneInput').value=n;loading('zone-result','Analyse...');const l=await geo(n);l&&renderZone(l.lat,l.lon,l.name,l)}
+async function sM(n){document.getElementById('meteoInput').value=n;loading('meteo-result','Météo...');const l=await geo(n);l&&loadMeteo(l.lat,l.lon,l.name)}
+</script>
+</body>
+</html>
