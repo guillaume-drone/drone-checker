@@ -498,7 +498,10 @@ function useGPS(mode){
       if(mode==='zones'){const rg=await reverseGeo(la,lo);renderZone(la,lo,n,rg)}
       else loadMeteo(la,lo,n);
     },
-    ()=>{document.getElementById(mode==='zones'?'zone-result':'meteo-result').innerHTML='<div class="empty"><span class="empty-icon">🚫</span><p>GPS refusé. Autorise la localisation ou recherche un lieu.</p></div>'},
+    e=>{
+      const msg={1:'Permission refusée — va dans Paramètres > Applis > Chrome > Autorisations > Localisation',2:'Position indisponible — active le GPS dans les paramètres du téléphone',3:'Délai dépassé — réessaie en extérieur ou avec le WiFi activé'}[e.code]||'Erreur GPS inconnue (code '+e.code+')';
+      document.getElementById(mode==='zones'?'zone-result':'meteo-result').innerHTML=`<div class="empty"><span class="empty-icon">🚫</span><p>${msg}</p></div>`;
+    },
     {enableHighAccuracy:true,timeout:10000}
   );
 }
