@@ -95,10 +95,6 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
 .map-container{display:none;border-radius:var(--rs);overflow:hidden;margin-bottom:1rem;border:1px solid rgba(255,255,255,0.08)}
 .map-container.active{display:block}
 .map-container .map-inner{width:100%;height:280px}
-.iframe-container{display:none;border-radius:var(--rs);overflow:hidden;margin-bottom:1rem;border:1px solid rgba(255,255,255,0.08)}
-.iframe-container.active{display:block}
-.iframe-container iframe{width:100%;height:320px;display:block;border:none}
-.iframe-caption{padding:8px 12px;background:rgba(0,0,0,0.3);font-size:11px;color:rgba(255,255,255,0.6)}
 .map-legend{display:flex;gap:12px;padding:8px 12px;background:rgba(0,0,0,0.3);font-size:11px;color:rgba(255,255,255,0.7);flex-wrap:wrap}
 .map-legend span{display:flex;align-items:center;gap:5px}
 .map-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
@@ -306,20 +302,11 @@ function renderZone(lat,lon,locName,placeInfo=null){
   html+=`<div id="wfs-live"></div>`;
   html+=`<button class="map-btn" onclick="toggleMap(${lat},${lon},'${locName.replace(/'/g,"\\'")}')">🗺️ Voir la carte autour de moi</button>
   <div class="map-container" id="map-container"><div id="map-inner" class="map-inner"></div><div class="map-legend"><span><span class="map-dot you"></span>Toi</span><span><span class="map-dot red"></span>Zone habitée</span></div></div>`;
-  html+=`<button class="map-btn" onclick="toggleOfficialMap(${lat},${lon})">🛰️ Voir la carte officielle DGAC (cartes.gouv.fr)</button>
-  <div class="iframe-container" id="iframe-container"><iframe id="official-iframe" src="" sandbox="allow-forms allow-scripts allow-same-origin" allowfullscreen loading="lazy"></iframe><div class="iframe-caption">Restrictions UAS — DGAC / cartes.gouv.fr · <a href="${geo}" target="_blank" style="color:var(--sky)">Plein écran ↗</a></div></div>`;
+  html+=`<a class="link-btn" href="${geo}" target="_blank">🛰️ Carte officielle DGAC — Restrictions UAS <span>↗</span></a>`;
   html+=`<button class="signal-btn" onclick="signalIssue('${locName.replace(/'/g,"\\'")}')">🚩 Signaler une info obsolète sur ce lieu</button>
   <div class="footer">Données indicatives · DGAC · AlphaTango · SUP AIP 165/25 · Maj ${new Date().toLocaleDateString('fr-FR')}</div>`;
   document.getElementById('zone-result').innerHTML=html;
   queryDGACWFS(lat,lon);
-}
-
-function toggleOfficialMap(lat,lon){
-  const c=document.getElementById('iframe-container');
-  const iframe=document.getElementById('official-iframe');
-  if(c.classList.contains('active')){c.classList.remove('active');iframe.src='';return}
-  c.classList.add('active');
-  iframe.src=`https://cartes.gouv.fr/explorer-les-cartes/embed?c=${lon},${lat}&z=14&l=GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN25TOUR$GEOPORTAIL:OGC:WMTS(1;1;1;0),TRANSPORTS.DRONES.RESTRICTIONS$GEOPORTAIL:OGC:WMTS(2;0.55;1;0)&permalinkShare=yes`;
 }
 
 // EXPÉRIMENTAL : tente d'interroger la couche officielle DGAC en direct (WFS data.geopf.fr).
