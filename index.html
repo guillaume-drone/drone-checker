@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Drone 22">
@@ -95,6 +98,10 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
 .map-container{display:none;border-radius:var(--rs);overflow:hidden;margin-bottom:1rem;border:1px solid rgba(255,255,255,0.08)}
 .map-container.active{display:block}
 .map-container .map-inner{width:100%;height:280px}
+.iframe-container{display:none;border-radius:var(--rs);overflow:hidden;margin-bottom:1rem;border:1px solid rgba(255,255,255,0.08)}
+.iframe-container.active{display:block}
+.iframe-container iframe{width:100%;height:320px;display:block;border:none}
+.iframe-caption{padding:8px 12px;background:rgba(0,0,0,0.3);font-size:11px;color:rgba(255,255,255,0.6)}
 .map-legend{display:flex;gap:12px;padding:8px 12px;background:rgba(0,0,0,0.3);font-size:11px;color:rgba(255,255,255,0.7);flex-wrap:wrap}
 .map-legend span{display:flex;align-items:center;gap:5px}
 .map-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
@@ -302,7 +309,11 @@ function renderZone(lat,lon,locName,placeInfo=null){
   html+=`<div id="wfs-live"></div>`;
   html+=`<button class="map-btn" onclick="toggleMap(${lat},${lon},'${locName.replace(/'/g,"\\'")}')">🗺️ Voir la carte autour de moi</button>
   <div class="map-container" id="map-container"><div id="map-inner" class="map-inner"></div><div class="map-legend"><span><span class="map-dot you"></span>Toi</span><span><span class="map-dot red"></span>Zone habitée</span></div></div>`;
-  html+=`<a class="link-btn" href="${geo}" target="_blank">🛰️ Carte officielle DGAC — Restrictions UAS <span>↗</span></a>`;
+  html+=`<button class="map-btn" onclick="toggleOfficialMap(${lat},${lon})">🛰️ Carte officielle DGAC (restrictions)</button>
+  <div class="iframe-container" id="iframe-container">
+    <iframe id="official-iframe" src="" sandbox="allow-forms allow-scripts allow-same-origin" allowfullscreen loading="lazy"></iframe>
+    <div class="iframe-caption">Restrictions UAS — DGAC / cartes.gouv.fr · <a href="${geo}" target="_blank" style="color:var(--sky)">Plein écran ↗</a> · <a href="javascript:void(0)" onclick="reloadOfficialMap()" style="color:var(--sky)">Réessayer 🔄</a></div>
+  </div>`;
   html+=`<button class="signal-btn" onclick="signalIssue('${locName.replace(/'/g,"\\'")}')">🚩 Signaler une info obsolète sur ce lieu</button>
   <div class="footer">Données indicatives · DGAC · AlphaTango · SUP AIP 165/25 · Maj ${new Date().toLocaleDateString('fr-FR')}</div>`;
   document.getElementById('zone-result').innerHTML=html;
@@ -310,6 +321,20 @@ function renderZone(lat,lon,locName,placeInfo=null){
 }
 
 // EXPÉRIMENTAL : tente d'interroger la couche officielle DGAC en direct (WFS data.geopf.fr).
+let currentOfficialMapUrl='';
+function toggleOfficialMap(lat,lon){
+  const c=document.getElementById('iframe-container');
+  const iframe=document.getElementById('official-iframe');
+  if(c.classList.contains('active')){c.classList.remove('active');iframe.src='';currentOfficialMapUrl='';return}
+  c.classList.add('active');
+  const url=`https://cartes.gouv.fr/explorer-les-cartes/embed?c=${lon},${lat}&z=14&l=GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN25TOUR$GEOPORTAIL:OGC:WMTS(1;1;1;0),TRANSPORTS.DRONES.RESTRICTIONS$GEOPORTAIL:OGC:WMTS(2;0.55;1;0)&permalinkShare=yes`;
+  currentOfficialMapUrl=url;
+  iframe.src=url;
+}
+function reloadOfficialMap(){
+  const iframe=document.getElementById('official-iframe');
+  if(currentOfficialMapUrl)iframe.src=currentOfficialMapUrl+'&t='+Date.now();
+}
 // Si ça échoue (CORS, format...), ne fait rien — aucun impact sur le reste de l'appli.
 async function queryDGACWFS(lat,lon){
   const d=0.01; // petite bbox autour du point
