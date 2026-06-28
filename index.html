@@ -161,21 +161,22 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
     <button class="spot-btn" onclick="spotZ(9)"><span class="si">🟡</span>Cap d'Erquy</button>
 
     <div class="spots-section-label">🗺️ Vacances Été 2026 — Semaine 1 (Roscoff)</div>
-    <button class="spot-btn" onclick="spotZ(10)"><span class="si">🟡</span>Île Callot · Carantec</button>
-    <button class="spot-btn" onclick="spotZ(11)"><span class="si">🟡</span>Plage de Tahiti</button>
-    <button class="spot-btn" onclick="spotZ(12)"><span class="si">🟡</span>Tréguastel</button>
+    <button class="spot-btn" onclick="spotZ(10)"><span class="si">🔴</span>Île Callot · Carantec</button>
+    <button class="spot-btn" onclick="spotZ(11)"><span class="si">🔴</span>Plage de Tahiti</button>
+    <button class="spot-btn" onclick="spotZ(12)"><span class="si">🟡</span>Tréguastel (mer)</button>
 
     <div class="spots-section-label">🗺️ Vacances Été 2026 — Semaine 2 (Kerlouan)</div>
-    <button class="spot-btn" onclick="spotZ(13)"><span class="si">🟡</span>Brignogan-Plage</button>
-    <button class="spot-btn" onclick="spotZ(14)"><span class="si">🟡</span>Phare de Pontusval</button>
+    <button class="spot-btn" onclick="spotZ(13)"><span class="si">🔴</span>Brignogan-Plage</button>
+    <button class="spot-btn" onclick="spotZ(14)"><span class="si">🔴</span>Phare de Pontusval</button>
+    <button class="spot-btn" onclick="spotZ(19)"><span class="si">🟢</span>Grève de Goulven</button>
 
     <div class="spots-section-label">🗺️ Vacances Été 2026 — Le Conquet & Ouessant</div>
     <button class="spot-btn" onclick="spotZ(15)"><span class="si">🔴</span>Le Conquet</button>
     <button class="spot-btn" onclick="spotZ(16)"><span class="si">🔴</span>Île d'Ouessant ⚠️</button>
 
     <div class="spots-section-label">🗺️ Vacances Été 2026 — Île d'Oléron</div>
-    <button class="spot-btn" onclick="spotZ(17)"><span class="si">🔴</span>Fort Boyard ⚠️</button>
-    <button class="spot-btn" onclick="spotZ(18)"><span class="si">🟡</span>Île d'Oléron</button>
+    <button class="spot-btn" onclick="spotZ(17)"><span class="si">🔴</span>Fort Boyard ❌</button>
+    <button class="spot-btn" onclick="spotZ(18)"><span class="si">🟢</span>Île d'Oléron</button>
   </div>
   <div id="zone-result"><div class="empty"><span class="empty-icon">🗺️</span><p>Indique ta position ou choisis un spot pour voir les restrictions.</p></div></div>
 </div>
@@ -207,11 +208,12 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
     <div class="spots-section-label">🗺️ Vacances Été 2026 — Semaine 1 (Roscoff)</div>
     <button class="spot-btn" onclick="spotM(10)"><span class="si">🌤️</span>Île Callot · Carantec</button>
     <button class="spot-btn" onclick="spotM(11)"><span class="si">🌤️</span>Plage de Tahiti</button>
-    <button class="spot-btn" onclick="spotM(12)"><span class="si">🌤️</span>Tréguastel</button>
+    <button class="spot-btn" onclick="spotM(12)"><span class="si">🌤️</span>Tréguastel (mer)</button>
 
     <div class="spots-section-label">🗺️ Vacances Été 2026 — Semaine 2 (Kerlouan)</div>
     <button class="spot-btn" onclick="spotM(13)"><span class="si">🌤️</span>Brignogan-Plage</button>
     <button class="spot-btn" onclick="spotM(14)"><span class="si">🌤️</span>Phare de Pontusval</button>
+    <button class="spot-btn" onclick="spotM(19)"><span class="si">🌤️</span>Grève de Goulven</button>
 
     <div class="spots-section-label">🗺️ Vacances Été 2026 — Le Conquet & Ouessant</div>
     <button class="spot-btn" onclick="spotM(15)"><span class="si">🌤️</span>Le Conquet</button>
@@ -253,8 +255,8 @@ const ZONES=[
 
 // NOTAMs et restrictions temporaires actives
 const NOTAMS=[
-  {ref:"SUP AIP 099/26", desc:"Exercice militaire Personal Recovery 2026 – zones temporaires en Bretagne (expiré)", from:"2026-06-16", until:"2026-06-18", urgent:false},
-  {ref:"SUP AIP 077/26", desc:"Zones R17 offshore Bretagne (remplace SUP AIP 165/25) — depuis la côte : drone autorisé jusqu'à 1000 m et 120 m de hauteur, sans protocole ARMOR, mais notification AlphaTango obligatoire si >900g", from:"2026-05-01", until:"2027-04-30", urgent:false},
+  {ref:"SUP AIP 099/26",desc:"Exercice militaire « Personal Recovery 2026 » — 19 zones temporaires activées en Bretagne le 16, 17 et 18 juin 2026, de 12h00 à 16h30. Évite de voler en Bretagne sur ces créneaux.",from:"2026-06-16",until:"2026-06-18",urgent:false},
+  {ref:"SUP AIP 077/26",desc:"Remplace le SUP AIP 165/25. Couloir libre de 1850 m en mer depuis la côte continentale (max 120 m), 7 ZRT au large (zones LF-R17) actives H24 pour la Marine. Valable jusqu'au 30 avril 2027.",from:"2026-05-01",until:"2027-04-30",urgent:false},
 ];
 
 function checkNotams(){
@@ -358,7 +360,11 @@ function renderZone(lat,lon,locName,placeInfo=null){
     <div class="iframe-caption">Restrictions UAS — DGAC / cartes.gouv.fr · <a href="${geo}" target="_blank" style="color:var(--sky)">Plein écran ↗</a> · <a href="javascript:void(0)" onclick="reloadOfficialMap()" style="color:var(--sky)">Réessayer 🔄</a></div>
   </div>`;
   html+=`<button class="signal-btn" onclick="signalIssue('${locName.replace(/'/g,"\\'")}')">🚩 Signaler une info obsolète sur ce lieu</button>
-  <div class="footer">Données indicatives · DGAC · AlphaTango · SUP AIP 165/25 · Maj ${new Date().toLocaleDateString('fr-FR')}</div>`;
+  <div style="display:flex;gap:8px;margin-top:8px">
+    <a href="https://dronespot.io/#${lat},${lon},14" target="_blank" class="map-btn" style="flex:1;text-decoration:none;font-size:13px">🚁 DroneSpot</a>
+    <a href="https://www.geodrones.fr/carte?lat=${lat}&lng=${lon}&zoom=14" target="_blank" class="map-btn" style="flex:1;text-decoration:none;font-size:13px">📍 GeoDrones</a>
+  </div>
+  <div class="footer">Données indicatives · DGAC · AlphaTango · SUP AIP 077/26 · Maj ${new Date().toLocaleDateString('fr-FR')}</div>`;
   document.getElementById('zone-result').innerHTML=html;
   queryDGACWFS(lat,lon);
 }
@@ -568,12 +574,13 @@ const SPOT_INFO={
   "Sillon de Talbert":{alt:120,note:"Presqu'île continentale — bénéficie du couloir libre de 1850 m en mer (zones D18/R17). Attention : les îlots et rochers au large sont en zone interdite — ne survole pas leurs abords au-delà de 1850 m."},
   "Fort La Latte":{alt:120,note:"Situé entre Cap Fréhel et Erquy. Monument historique classé — vérifie si un arrêté de la commune de Fréhel limite les prises de vue aériennes (arrêté du 10/06/2021 sur certains monuments). Bénéficie du couloir côtier en mer."},
   "Gouffre de Plougrescant":{alt:120,note:"Aucune restriction aéronautique spécifique identifiée pour ce spot. Bénéficie du couloir libre de 1850 m en mer. Vérifie cartes.gouv.fr et les éventuels arrêtés municipaux de Plougrescant."},
-  "Île Callot · Carantec":{alt:120,note:"Île accessible à marée basse depuis Carantec. <strong>Attention :</strong> île = pas de couloir côtier libre en mer. Vérifier les restrictions sur cartes.gouv.fr avant le vol. Penser à vérifier les horaires des marées pour le retour."},
-  "Plage de Tahiti":{alt:120,note:"Vue sur l'Île Louet et le Château du Taureau. Côte continentale — bénéficie du couloir libre de 1850 m en mer. Pas de zone aéronautique majeure identifiée à proximité immédiate. Vérifie cartes.gouv.fr."},
-  "Tréguastel":{alt:50,note:"Côte de Granit Rose — arrêtés municipaux possibles, hauteur max variable (30 à 100 m selon secteur). Voisin de Ploumanac'h qui est plus restrictif. Vérifie les arrêtés de Trégastel et cartes.gouv.fr."},
-  "Brignogan-Plage":{alt:120,note:"Station balnéaire du Finistère Nord. Pas de zone aéronautique majeure identifiée. Vérifie cartes.gouv.fr — zone radar militaire possible dans ce secteur du Finistère. Couloir côtier libre jusqu'à 1850 m en mer."},
-  "Phare de Pontusval":{alt:120,note:"Phare de 1869, énormes blocs de granit. Pas de zone aéronautique majeure identifiée. Vérifie cartes.gouv.fr avant le vol. Le menhir christianisé de +8 m offre un beau sujet photo."},
-  "Île d'Oléron":{alt:120,note:"Île d'Oléron — hors Bretagne (Charente-Maritime). Les zones codées dans cette app sont pour la Bretagne. <strong>Vérifie impérativement cartes.gouv.fr</strong> pour les restrictions spécifiques à l'île d'Oléron. Île = pas de couloir côtier libre."},
+  "Île Callot · Carantec":{alt:0,note:"⛔ <strong>Vol interdit — CTR Bretagne (Brest)</strong>. Toute la zone autour de Carantec est dans la CTR Brest. Autorisation préalable obligatoire via AlphaTango (délai minimum 5 jours)."},
+  "Plage de Tahiti":{alt:0,note:"⛔ <strong>Vol interdit — CTR Bretagne (Brest)</strong>. La Rade de Morlaix et ses abords sont dans la CTR Brest. Château du Taureau également interdit. Autorisation préalable obligatoire via AlphaTango."},
+  "Tréguastel":{alt:120,note:"🌊 <strong>Vol possible uniquement depuis les rochers côtiers vers la mer</strong> — pas depuis l'agglomération (vol interdit). Les îlots (Île Renote, Île de Costaèrès) sont accessibles. Décollage depuis le GR34 sur les rochers, hors zone habitée. Évite le sable !"},
+  "Brignogan-Plage":{alt:0,note:"⛔ <strong>Vol interdit — CTR Bretagne (Brest)</strong>. Toute la zone de Brignogan est dans la CTR Brest. Autorisation préalable obligatoire via AlphaTango (délai minimum 5 jours)."},
+  "Phare de Pontusval":{alt:0,note:"⛔ <strong>Vol interdit — CTR Bretagne (Brest)</strong>. Le phare et ses abords (terre ET mer) sont dans la CTR Brest. Autorisation préalable obligatoire via AlphaTango."},
+  "Grève de Goulven":{alt:120,note:"✅ <strong>Zone libre identifiée !</strong> La Grève de Goulven et les Dunes de Keremma sont hors CTR Brest. Pas de données de restriction sur cartes.gouv.fr. À ~20 min de Kerlouan. Évite le sable des dunes pour le décollage — utilise un parking ou chemin rocailleux."},
+  "Île d'Oléron":{alt:100,note:"✅ <strong>Bonnes zones volables</strong> sur l'île d'Oléron. Zones vertes (libre 120 m) et jaune clair (100 m max) disponibles loin des agglomérations. Évite les villages (rouge = interdit). Forêt domaniale et côtes accessibles."},
 };
 
 const SPOTS=[
@@ -600,6 +607,8 @@ const SPOTS=[
   // Île d'Oléron
   {name:"Fort Boyard",           lat:45.9908, lon:-1.2136},
   {name:"Île d'Oléron",          lat:45.9000, lon:-1.3000},
+  // Spot libre semaine 2
+  {name:"Grève de Goulven",      lat:48.6350, lon:-4.2800},
 ];
 
 function spotZ(i){const s=SPOTS[i];document.getElementById('zoneInput').value=s.name;loading('zone-result','Analyse...');renderZone(s.lat,s.lon,s.name)}
