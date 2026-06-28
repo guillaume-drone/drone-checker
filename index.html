@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -41,6 +42,7 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
 .spot-btn{padding:10px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:var(--rs);color:rgba(255,255,255,0.8);font-family:'Inter',sans-serif;font-size:12px;cursor:pointer;text-align:left;line-height:1.4}
 .spot-btn:hover{background:rgba(14,165,233,0.1);border-color:rgba(14,165,233,0.2)}
 .spot-btn .si{display:block;font-size:15px;margin-bottom:3px}
+.spots-section-label{font-size:10px;font-weight:600;color:var(--sky);text-transform:uppercase;letter-spacing:.08em;margin:10px 0 6px;grid-column:1/-1;padding:4px 8px;background:rgba(14,165,233,0.08);border-radius:4px}
 .result-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:var(--r);overflow:hidden;margin-bottom:1rem}
 .status-banner{padding:1.25rem;display:flex;align-items:flex-start;gap:14px}
 .status-banner.green{background:rgba(22,163,74,0.15);border-bottom:1px solid rgba(22,163,74,0.2)}
@@ -125,7 +127,7 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
 <body>
 <div class="header">
   <div class="header-icon">🚁</div>
-  <div><h1>Drone Checker</h1><p>DJI Air 3S — Côtes-d'Armor</p></div>
+  <div><h1>Drone Checker</h1><p>DJI Air 3S — Bretagne Été 2026</p></div>
 </div>
 <div class="tabs">
   <button class="tab active" onclick="switchTab('zones')">🗺️ Zones</button>
@@ -143,8 +145,10 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
     <input type="text" id="zoneInput" placeholder="Cap Fréhel, Lannion, Ploumanac'h..." onkeydown="if(event.key==='Enter')searchZone()"/>
     <button onclick="searchZone()">🔍</button>
   </div>
+
   <p class="spots-title">Mes spots</p>
   <div class="spots-grid">
+    <div class="spots-section-label">📍 Spots Côtes-d'Armor</div>
     <button class="spot-btn" onclick="spotZ(0)"><span class="si">🟢</span>Pointe du Roselier</button>
     <button class="spot-btn" onclick="spotZ(1)"><span class="si">🟢</span>Lac de Guérlédan</button>
     <button class="spot-btn" onclick="spotZ(2)"><span class="si">🟢</span>Château Hunaudaye</button>
@@ -155,6 +159,23 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
     <button class="spot-btn" onclick="spotZ(7)"><span class="si">🟡</span>Ploumanac'h</button>
     <button class="spot-btn" onclick="spotZ(8)"><span class="si">🟡</span>Île de Bréhat</button>
     <button class="spot-btn" onclick="spotZ(9)"><span class="si">🟡</span>Cap d'Erquy</button>
+
+    <div class="spots-section-label">🗺️ Vacances Été 2026 — Semaine 1 (Roscoff)</div>
+    <button class="spot-btn" onclick="spotZ(10)"><span class="si">🟡</span>Île Callot · Carantec</button>
+    <button class="spot-btn" onclick="spotZ(11)"><span class="si">🟡</span>Plage de Tahiti</button>
+    <button class="spot-btn" onclick="spotZ(12)"><span class="si">🟡</span>Tréguastel</button>
+
+    <div class="spots-section-label">🗺️ Vacances Été 2026 — Semaine 2 (Kerlouan)</div>
+    <button class="spot-btn" onclick="spotZ(13)"><span class="si">🟡</span>Brignogan-Plage</button>
+    <button class="spot-btn" onclick="spotZ(14)"><span class="si">🟡</span>Phare de Pontusval</button>
+
+    <div class="spots-section-label">🗺️ Vacances Été 2026 — Le Conquet & Ouessant</div>
+    <button class="spot-btn" onclick="spotZ(15)"><span class="si">🔴</span>Le Conquet</button>
+    <button class="spot-btn" onclick="spotZ(16)"><span class="si">🔴</span>Île d'Ouessant ⚠️</button>
+
+    <div class="spots-section-label">🗺️ Vacances Été 2026 — Île d'Oléron</div>
+    <button class="spot-btn" onclick="spotZ(17)"><span class="si">🔴</span>Fort Boyard ⚠️</button>
+    <button class="spot-btn" onclick="spotZ(18)"><span class="si">🟡</span>Île d'Oléron</button>
   </div>
   <div id="zone-result"><div class="empty"><span class="empty-icon">🗺️</span><p>Indique ta position ou choisis un spot pour voir les restrictions.</p></div></div>
 </div>
@@ -171,6 +192,7 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
   </div>
   <p class="spots-title">Mes spots</p>
   <div class="spots-grid">
+    <div class="spots-section-label">📍 Spots Côtes-d'Armor</div>
     <button class="spot-btn" onclick="spotM(0)"><span class="si">🌤️</span>Pointe du Roselier</button>
     <button class="spot-btn" onclick="spotM(1)"><span class="si">🌤️</span>Lac de Guérlédan</button>
     <button class="spot-btn" onclick="spotM(2)"><span class="si">🌤️</span>Château Hunaudaye</button>
@@ -181,6 +203,23 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
     <button class="spot-btn" onclick="spotM(7)"><span class="si">🌤️</span>Ploumanac'h</button>
     <button class="spot-btn" onclick="spotM(8)"><span class="si">🌤️</span>Île de Bréhat</button>
     <button class="spot-btn" onclick="spotM(9)"><span class="si">🌤️</span>Cap d'Erquy</button>
+
+    <div class="spots-section-label">🗺️ Vacances Été 2026 — Semaine 1 (Roscoff)</div>
+    <button class="spot-btn" onclick="spotM(10)"><span class="si">🌤️</span>Île Callot · Carantec</button>
+    <button class="spot-btn" onclick="spotM(11)"><span class="si">🌤️</span>Plage de Tahiti</button>
+    <button class="spot-btn" onclick="spotM(12)"><span class="si">🌤️</span>Tréguastel</button>
+
+    <div class="spots-section-label">🗺️ Vacances Été 2026 — Semaine 2 (Kerlouan)</div>
+    <button class="spot-btn" onclick="spotM(13)"><span class="si">🌤️</span>Brignogan-Plage</button>
+    <button class="spot-btn" onclick="spotM(14)"><span class="si">🌤️</span>Phare de Pontusval</button>
+
+    <div class="spots-section-label">🗺️ Vacances Été 2026 — Le Conquet & Ouessant</div>
+    <button class="spot-btn" onclick="spotM(15)"><span class="si">🌤️</span>Le Conquet</button>
+    <button class="spot-btn" onclick="spotM(16)"><span class="si">🌤️</span>Île d'Ouessant</button>
+
+    <div class="spots-section-label">🗺️ Vacances Été 2026 — Île d'Oléron</div>
+    <button class="spot-btn" onclick="spotM(17)"><span class="si">🌤️</span>Fort Boyard</button>
+    <button class="spot-btn" onclick="spotM(18)"><span class="si">🌤️</span>Île d'Oléron</button>
   </div>
   <div id="meteo-result"><div class="empty"><span class="empty-icon">🌤️</span><p>Indique ta position pour voir les conditions météo pour ton Air 3S.</p></div></div>
 </div>
@@ -206,12 +245,16 @@ const ZONES=[
   {name:"Cap d'Erquy",lat:48.6453,lon:-2.4891,radius:2,status:"orange",emoji:"🌿",altitude:120,title:"Prudence — Grand Site de France",explain:"Le Cap d'Erquy fait partie du <strong>Grand Site de France « Cap d'Erquy – Cap Fréhel »</strong> — landes, falaises et fonds marins classés. Aucun arrêté préfectoral spécifique aux drones n'a été trouvé pour Erquy, mais des restrictions municipales peuvent exister. Vérifie la géozone précise sur cartes.gouv.fr avant de voler.",rules:["Vérifie la géozone précise sur cartes.gouv.fr avant le vol","Renseigne-toi en mairie d'Erquy pour d'éventuels arrêtés locaux","Évite le survol des falaises en période de nidification (mars–juillet)","Hauteur max probable : 120 m en l'absence de restriction identifiée"]},
   {name:"Parc naturel régional d'Armorique",lat:48.35,lon:-3.85,radius:18,status:"orange",emoji:"🌳",altitude:120,title:"Vérification requise — parc naturel régional",explain:"Le PNR d'Armorique n'interdit pas lui-même les drones, mais inclut des <strong>réserves naturelles régionales</strong> (ex. Landes et Tourbières du Cragou-Vergam) où toute perturbation de la faune est interdite. La partie ouest du parc chevauche aussi la <strong>CTR Bretagne</strong> (Brest). Pour les zones sensibles, contacte le parc : 02 98 81 90 08.",rules:["Le PNR n'a pas de règle aéronautique propre, mais ses réserves naturelles si","Évite le survol bas des réserves incluses (faune protégée)","Partie ouest dans la CTR Bretagne — autorisation nécessaire","Contact PNRA pour zones sensibles : 02 98 81 90 08"]},
   {name:"Camp militaire de Coëtquidan (R506A)",lat:47.9534,lon:-2.2089,radius:8,status:"red",emoji:"🪖",altitude:null,title:"Vol interdit pendant activité — zone militaire",explain:"Le camp de Coëtquidan est couvert par la zone réglementée <strong>R506A</strong>, du sol jusqu'à environ 3500 m. Le contournement est <strong>obligatoire pendant l'activité</strong> — en pratique interdit pour les drones civils. Bonne nouvelle : la zone est <strong>inactive le dimanche et les jours fériés</strong>. Pour voler en semaine, contacte le camp.",rules:["Zone réglementée R506A — contournement obligatoire pendant l'activité","Inactive le dimanche et les jours fériés","Pour voler en période d'inactivité : contacter le camp au 02 97 70 77 67","Activités : tirs sol/sol et parachutage — danger réel si activité en cours"]},
+  // --- ZONES VACANCES ÉTÉ 2026 ---
+  {name:"Base aéronavale de Lanvéoc (P112)",lat:48.2972,lon:-4.4503,radius:5,status:"red",emoji:"🪖",altitude:null,title:"Vol INTERDIT — zone P militaire",explain:"Tu es dans (ou proche de) la <strong>zone P112 — Base aéronavale de Lanvéoc-Poulmic</strong>, zone interdite permanente. C'est exactement la zone où un pilote a été convoqué au tribunal en mai 2026 pour survol par négligence. Aucune dérogation possible pour les civils.",rules:["Zone P/ZIT permanente — interdiction absolue H24","Pas de demande d'autorisation possible — zone fermée aux civils","Risque : jusqu'à 6 mois de prison + 15 000 € d'amende","Évite tout survol même à distance — la zone est plus grande qu'elle n'y paraît"]},
+  {name:"Le Conquet — CTR Brest",lat:48.3614,lon:-4.7783,radius:10,status:"red",emoji:"✈️",altitude:null,title:"Vol interdit — CTR Brest à proximité",explain:"Le Conquet est situé à environ 20 km à l'ouest de Brest, dans ou très proche de la <strong>CTR Bretagne</strong> (aéroport de Brest LFRB). Cette zone couvre un large périmètre et les drones y sont interdits sans autorisation. La présence de la base navale de Brest renforce les restrictions.",rules:["CTR Bretagne (Brest LFRB) — interdiction sans autorisation","Présence de la base navale de Brest à proximité","Demande via alphatango.aviation-civile.gouv.fr (délai minimum 5 jours)","Vérifie la carte officielle cartes.gouv.fr avant tout vol ici"]},
+  {name:"Île d'Ouessant — Zone interdite",lat:48.4608,lon:-5.0997,radius:8,status:"red",emoji:"🚫",altitude:null,title:"Vol interdit — île + réserve + zone militaire",explain:"Ouessant cumule <strong>trois restrictions majeures</strong> : (1) c'est une île, donc pas de couloir côtier libre en mer, (2) elle est entourée de zones militaires R17 qui touchent directement son littoral, (3) elle est classée <strong>Réserve de biosphère UNESCO</strong> avec des zones naturelles protégées. Le vol de drone y est <strong>extrêmement réglementé</strong> voire interdit dans la plupart des secteurs.",rules:["Île : pas de couloir libre de 1850 m (réservé à la côte continentale)","Zones militaires R17 touchent directement le littoral de l'île","Réserve de biosphère UNESCO — faune strictement protégée","Avant tout vol : contacter la mairie d'Ouessant ET vérifier AlphaTango"]},
 ];
 
 // NOTAMs et restrictions temporaires actives
 const NOTAMS=[
-  {ref:"SUP AIP 099/26",desc:"Exercice militaire « Personal Recovery 2026 » — 19 zones temporaires activées en Bretagne le 16, 17 et 18 juin 2026, de 12h00 à 16h30. Évite de voler en Bretagne sur ces créneaux.",from:"2026-06-16",until:"2026-06-18",urgent:false},
-  {ref:"SUP AIP 077/26",desc:"Remplace le SUP AIP 165/25. Couloir libre de 1850 m en mer depuis la côte continentale (max 120 m), 7 ZRT au large (zones LF-R17) actives H24 pour la Marine. Valable jusqu’au 30 avril 2027.",from:"2026-05-01",until:"2027-04-30",urgent:false},
+  {ref:"SUP AIP 099/26",desc:"Exercice militaire « Personal Recovery 2026 » — 19 zones temporaires activées en Bretagne le 16, 17 et 18 juin 2026, de 12h00 à 16h30. Évite de voler en Bretagne sur ces créneaux.",from:"2026-06-16",until:"2026-06-18",urgent:false},
+  {ref:"SUP AIP 077/26",desc:"Remplace le SUP AIP 165/25. Couloir libre de 1850 m en mer depuis la côte continentale (max 120 m), 7 ZRT au large (zones LF-R17) actives H24 pour la Marine. Valable jusqu'au 30 avril 2027.",from:"2026-05-01",until:"2027-04-30",urgent:false},
 ];
 
 function checkNotams(){
@@ -235,6 +278,8 @@ const SEASONAL={
   "île de bréhat":{months:[3,4,5,6,7],bad:"🐦 <strong>Période de reproduction (mars–juillet)</strong> — Faune protégée particulièrement sensible. L'autorisation préfectorale est encore plus importante en ce moment.",ok:"Hors période de reproduction. L'autorisation préfectorale reste recommandée avant tout vol."},
   "ploumanac":{months:[3,4,5,6,7],bad:"🪨 <strong>Période de nidification (mars–juillet)</strong> — Faune locale protégée. Arrêté préfectoral possible en zone Natura 2000.",ok:"Hors saison sensible. Vérifie quand même les arrêtés préfectoraux en vigueur."},
   "erquy":{months:[3,4,5,6,7],bad:"🌿 <strong>Période sensible (mars–juillet)</strong> — Landes et falaises en zone protégée. Vol déconseillé pendant la nidification.",ok:"Hors saison sensible. Zone ouverte — vol possible avec ta certification AlphaTango."},
+  "tréguastel":{months:[3,4,5,6,7],bad:"🪨 <strong>Période de nidification (mars–juillet)</strong> — Côte de Granit Rose, faune protégée. Vérifie les arrêtés municipaux.",ok:"Hors saison sensible. Vérifie les arrêtés municipaux de Trégastel avant de voler."},
+  "ouessant":{months:[1,2,3,4,5,6,7,8,9,10,11,12],bad:"🚫 <strong>Zone très réglementée toute l'année</strong> — Île + réserve UNESCO + zones militaires. Contacte la mairie avant tout vol.",ok:"🚫 <strong>Zone très réglementée toute l'année</strong> — Île + réserve UNESCO + zones militaires. Contacte la mairie avant tout vol."},
 };
 
 function dist(la1,lo1,la2,lo2){const R=6371,dL=(la2-la1)*Math.PI/180,dO=(lo2-lo1)*Math.PI/180,a=Math.sin(dL/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dO/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))}
@@ -256,9 +301,8 @@ function altBadge(alt){
   return'';
 }
 
-// Types Nominatim correspondant à une zone habitée
 const AGGLO_TYPES={city:"une ville",town:"une ville",village:"un village",hamlet:"un hameau",municipality:"une commune",administrative:"une commune",suburb:"un quartier habité",neighbourhood:"un quartier habité",isolated_dwelling:"une habitation isolée",farm:"une exploitation habitée"};
-let currentAggloShape=null; // {type:'geojson'|'bbox', data:...}
+let currentAggloShape=null;
 
 function aggloInfo(placeInfo){
   currentAggloShape=null;
@@ -280,8 +324,7 @@ function renderZone(lat,lon,locName,placeInfo=null){
   let inside=[],nearest=null,minD=Infinity;
   for(const z of ZONES){const d=dist(lat,lon,z.lat,z.lon);if(d<z.radius)inside.push({...z});if(d<minD){minD=d;nearest=z}}
   minD=Math.round(minD*10)/10;
-  // Les 11 zones surveillées sont concentrées en Bretagne — au-delà de 80 km, "la plus proche" n'a pas de sens
-  const nearestTxt = minD<=80 ? ` Zone restrictive listée la plus proche : <strong>${nearest.name}</strong> à <strong>${minD} km</strong>.` : ` Les zones surveillées par cette appli sont concentrées en Bretagne (Côtes-d'Armor et alentours) — aucune n'est pertinente ici, vérifie cartes.gouv.fr pour ta région.`;
+  const nearestTxt = minD<=80 ? ` Zone restrictive listée la plus proche : <strong>${nearest.name}</strong> à <strong>${minD} km</strong>.` : ` Les zones surveillées par cette appli sont concentrées en Bretagne — aucune n'est pertinente ici, vérifie cartes.gouv.fr pour ta région.`;
   const geo=`https://cartes.gouv.fr/explorer-les-cartes?c=${lon},${lat}&z=14&l=GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN25TOUR$GEOPORTAIL:OGC:WMTS(1;1;1;0),TRANSPORTS.DRONES.RESTRICTIONS$GEOPORTAIL:OGC:WMTS(2;0.55;1;0)&permalink=yes`;
   const ai=aggloInfo(placeInfo);
   let html='';
@@ -320,7 +363,6 @@ function renderZone(lat,lon,locName,placeInfo=null){
   queryDGACWFS(lat,lon);
 }
 
-// EXPÉRIMENTAL : tente d'interroger la couche officielle DGAC en direct (WFS data.geopf.fr).
 let currentOfficialMapUrl='';
 function toggleOfficialMap(lat,lon){
   const c=document.getElementById('iframe-container');
@@ -335,9 +377,8 @@ function reloadOfficialMap(){
   const iframe=document.getElementById('official-iframe');
   if(currentOfficialMapUrl)iframe.src=currentOfficialMapUrl+'&t='+Date.now();
 }
-// Si ça échoue (CORS, format...), ne fait rien — aucun impact sur le reste de l'appli.
 async function queryDGACWFS(lat,lon){
-  const d=0.01; // petite bbox autour du point
+  const d=0.01;
   const bbox=`${lon-d},${lat-d},${lon+d},${lat+d},EPSG:4326`;
   const url=`https://data.geopf.fr/wfs/ows?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=TRANSPORTS.DRONES.RESTRICTIONS:carte_restriction_drones_lf&OUTPUTFORMAT=application/json&SRSNAME=EPSG:4326&BBOX=${bbox}&COUNT=5`;
   try{
@@ -345,7 +386,6 @@ async function queryDGACWFS(lat,lon){
     if(!r.ok)return;
     const data=await r.json();
     if(!data.features||!data.features.length)return;
-    // Récupère toutes les valeurs "limite" uniques, nettoyées
     const limites=new Set();
     data.features.forEach(f=>{
       const v=f.properties&&f.properties.limite;
@@ -359,9 +399,7 @@ async function queryDGACWFS(lat,lon){
     const html=`<div class="result-card" style="margin-top:.75rem"><div class="status-banner orange" style="padding:1rem 1.25rem 0.5rem"><div class="s-emoji">🔬</div><div><div class="s-title orange" style="font-size:15px">Donnée officielle DGAC en direct</div><div class="s-loc">Couche cartes.gouv.fr — TRANSPORTS.DRONES.RESTRICTIONS</div></div></div><div class="rules-list">${items}</div></div>`;
     const el=document.getElementById('wfs-live');
     if(el)el.innerHTML=html;
-  }catch(e){
-    // Silencieux : CORS, réseau ou format inattendu — l'appli continue normalement
-  }
+  }catch(e){}
 }
 
 let leafletMap=null;
@@ -395,7 +433,6 @@ function signalIssue(locName){
   window.location.href=`mailto:?subject=${subject}&body=${body}`;
 }
 
-// Seuils DJI Air 3S : résistance niveau 6 = 12 m/s = 43 km/h
 function cWind(v){return v<25?'green':v<40?'orange':'red'}
 function cGust(v){return v<35?'green':v<50?'orange':'red'}
 function cVis(v){return v>=5000?'green':v>=2000?'orange':'red'}
@@ -404,11 +441,7 @@ function cKp(v){return v<3?'green':v<5?'orange':'red'}
 function cTemp(v){return v>=-10&&v<=40?'green':'red'}
 function cHum(v){return v<80?'green':v<90?'orange':'red'}
 function bar(v,max){return Math.min(100,Math.round(v/max*100))}
-
-function degToCompass(deg){
-  const dirs=['N','NE','E','SE','S','SO','O','NO'];
-  return dirs[Math.round(deg/45)%8];
-}
+function degToCompass(deg){const dirs=['N','NE','E','SE','S','SO','O','NO'];return dirs[Math.round(deg/45)%8]}
 
 async function fetchKp(){
   try{const r=await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json');const d=await r.json();return parseFloat(d[d.length-1][1])||0}catch{return null}
@@ -423,16 +456,12 @@ async function loadMeteo(lat,lon,locName){
     const wind=Math.round(c.wind_speed_10m),gust=Math.round(c.wind_gusts_10m),vis=Math.round(c.visibility),rain=Math.round(c.precipitation*10)/10,temp=Math.round(c.temperature_2m);
     const windDir=Math.round(c.wind_direction_10m), cloud=Math.round(c.cloud_cover), hum=Math.round(c.relative_humidity_2m);
     const kpV=kp!==null?Math.round(kp*10)/10:null;
-
-    // Lever / coucher du soleil
     const sunrise=new Date(mr.daily.sunrise[0]);
     const sunset=new Date(mr.daily.sunset[0]);
     const now=new Date();
     const isNight=now<sunrise||now>sunset;
     const fmtTime=d=>d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
     const minsToSunset=Math.round((sunset-now)/60000);
-
-    // Prévision 3-6h
     const hourly=mr.hourly;
     const nowH=new Date().getHours();
     let fcCards='';
@@ -448,28 +477,22 @@ async function loadMeteo(lat,lon,locName){
         fcCards+=`<div class="forecast-card"><div class="fc-time">${fmtTime(t)}</div><div class="fc-icon">${icon}</div><div class="fc-wind ${cWind(w)}">${w} km/h</div><div class="fc-rain">💧${p}% · ${cl}% nuages</div></div>`;
       }
     });
-
     const scores=[cWind(wind),cGust(gust),cVis(vis),cRain(rain),cHum(hum)];
     if(kpV!==null)scores.push(cKp(kpV));
     const gc=scores.includes('red')?'red':scores.includes('orange')?'orange':'green';
     const ge=gc==='green'?'✅':gc==='orange'?'⚠️':'🔴';
     const gl=gc==='green'?'Conditions idéales — Vol recommandé':gc==='orange'?'Conditions acceptables — Vole avec prudence':'Conditions défavorables — Ne pas voler';
-
     let windNote='';
     if(wind>=43)windNote=`<div class="note-card red"><div class="note-header red">🚫 Vent dépasse la limite de l'Air 3S</div>La <strong>limite officielle est 43 km/h</strong>. À ${wind} km/h tu risques de perdre le contrôle ou de ne plus pouvoir rentrer.</div>`;
     else if(wind>=30)windNote=`<div class="note-card orange"><div class="note-header orange">⚠️ Vent soutenu — surveille les rafales</div>Ton Air 3S tient jusqu'à <strong>43 km/h</strong>. À ${wind} km/h tu es dans la marge — mais les rafales à ${gust} km/h et la batterie qui se vide plus vite sont à surveiller. Vent venant du <strong>${degToCompass(windDir)}</strong> — positionne-toi en conséquence pour décoller face au vent.</div>`;
     else windNote=`<div class="note-card green"><div class="note-header green">✅ Vent largement dans les limites</div>À ${wind} km/h tu es bien en dessous de la <strong>limite de 43 km/h</strong>. La nacelle 3 axes s'occupe du reste. Vent venant du <strong>${degToCompass(windDir)}</strong>.</div>`;
-
     let nightNote='';
     if(isNight)nightNote=`<div class="note-card red"><div class="note-header red">🌙 Vol de nuit interdit sans autorisation</div>Le soleil est couché (lever ${fmtTime(sunrise)}, coucher ${fmtTime(sunset)}). Le vol de nuit est <strong>interdit sans autorisation spécifique et sans feux de signalisation homologués</strong>.</div>`;
     else if(minsToSunset<60&&minsToSunset>0)nightNote=`<div class="note-card orange"><div class="note-header orange">🌇 Coucher de soleil dans ${minsToSunset} min</div>Le soleil se couche à <strong>${fmtTime(sunset)}</strong>. Prévois de finir ton vol avant — le vol de nuit est interdit sans autorisation.</div>`;
-
     let humNote='';
     if(hum>=90)humNote=`<div class="note-card red"><div class="note-header red">💧 Humidité très élevée</div>À ${hum}% d'humidité, risque de condensation sur les lentilles et l'électronique. Ton Air 3S <strong>n'est pas waterproof</strong> — évite de voler par brouillard ou bruine.</div>`;
     else if(hum>=80)humNote=`<div class="note-card orange"><div class="note-header orange">💧 Humidité élevée</div>À ${hum}% d'humidité, surveille la formation de buée sur la caméra. Pas de risque immédiat mais reste attentif.</div>`;
-
     const kpHtml=kpV!==null?`<div class="meteo-card"><div class="mc-label">🌌 Indice Kp (GPS)</div><div class="mc-value ${cKp(kpV)}">${kpV}</div><div class="mc-unit">${kpV<3?'Signal GPS stable':kpV<5?'Légères perturbations':'⚠️ GPS perturbé'}</div><div class="mc-bar"><div class="mc-bar-fill ${cKp(kpV)}" style="width:${bar(kpV,9)}%"></div></div></div>`:'';
-
     document.getElementById('meteo-result').innerHTML=`
       <div class="meteo-score ${gc}"><div class="score-icon">${ge}</div><div><div class="score-label ${gc}">${gl}</div><div class="score-sub">${locName}</div></div></div>
       <div class="sun-card">
@@ -524,7 +547,6 @@ async function geo(q){
   return{lat:parseFloat(d[0].lat),lon:parseFloat(d[0].lon),name:d[0].display_name.split(',').slice(0,2).join(','),type:d[0].type,bbox:d[0].boundingbox?d[0].boundingbox.map(parseFloat):null,geojson:d[0].geojson||null};
 }
 async function reverseGeo(lat,lon){
-  // zoom 10 = ville/commune (meilleur contour pour petites communes), 14 = quartier, 18 = bâtiment
   for(const zoom of [10,14,18]){
     try{
       const r=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=fr&zoom=${zoom}&polygon_geojson=1`);
@@ -538,7 +560,7 @@ async function reverseGeo(lat,lon){
 }
 async function searchZone(){const q=document.getElementById('zoneInput').value.trim();if(!q)return;loading('zone-result','Recherche...');const l=await geo(q);l?renderZone(l.lat,l.lon,l.name,l):document.getElementById('zone-result').innerHTML='<div class="empty"><span class="empty-icon">🔍</span><p>Lieu introuvable.</p></div>'}
 async function searchMeteo(){const q=document.getElementById('meteoInput').value.trim();if(!q)return;loading('meteo-result','Recherche...');const l=await geo(q);l?loadMeteo(l.lat,l.lon,l.name):document.getElementById('meteo-result').innerHTML='<div class="empty"><span class="empty-icon">🔍</span><p>Lieu introuvable.</p></div>'}
-// Notes personnalisées par spot (issues de l'analyse Cowork)
+
 const SPOT_INFO={
   "Pointe du Roselier":{alt:120,note:"À environ 8 km de l'aéroport de Saint-Brieuc (LFRT) — vérifie la géozone sur cartes.gouv.fr, tu peux être en bordure. Ce spot côtier bénéficie du couloir libre de 1850 m en mer depuis la côte continentale."},
   "Lac de Guérlédan":{alt:120,note:"Aucune zone aéronautique majeure identifiée à proximité — zone rurale du centre-Bretagne, loin des aérodromes et zones militaires. Vérifie tout de même cartes.gouv.fr (zone de parachutage ou ULM local possible)."},
@@ -546,9 +568,14 @@ const SPOT_INFO={
   "Sillon de Talbert":{alt:120,note:"Presqu'île continentale — bénéficie du couloir libre de 1850 m en mer (zones D18/R17). Attention : les îlots et rochers au large sont en zone interdite — ne survole pas leurs abords au-delà de 1850 m."},
   "Fort La Latte":{alt:120,note:"Situé entre Cap Fréhel et Erquy. Monument historique classé — vérifie si un arrêté de la commune de Fréhel limite les prises de vue aériennes (arrêté du 10/06/2021 sur certains monuments). Bénéficie du couloir côtier en mer."},
   "Gouffre de Plougrescant":{alt:120,note:"Aucune restriction aéronautique spécifique identifiée pour ce spot. Bénéficie du couloir libre de 1850 m en mer. Vérifie cartes.gouv.fr et les éventuels arrêtés municipaux de Plougrescant."},
+  "Île Callot · Carantec":{alt:120,note:"Île accessible à marée basse depuis Carantec. <strong>Attention :</strong> île = pas de couloir côtier libre en mer. Vérifier les restrictions sur cartes.gouv.fr avant le vol. Penser à vérifier les horaires des marées pour le retour."},
+  "Plage de Tahiti":{alt:120,note:"Vue sur l'Île Louet et le Château du Taureau. Côte continentale — bénéficie du couloir libre de 1850 m en mer. Pas de zone aéronautique majeure identifiée à proximité immédiate. Vérifie cartes.gouv.fr."},
+  "Tréguastel":{alt:50,note:"Côte de Granit Rose — arrêtés municipaux possibles, hauteur max variable (30 à 100 m selon secteur). Voisin de Ploumanac'h qui est plus restrictif. Vérifie les arrêtés de Trégastel et cartes.gouv.fr."},
+  "Brignogan-Plage":{alt:120,note:"Station balnéaire du Finistère Nord. Pas de zone aéronautique majeure identifiée. Vérifie cartes.gouv.fr — zone radar militaire possible dans ce secteur du Finistère. Couloir côtier libre jusqu'à 1850 m en mer."},
+  "Phare de Pontusval":{alt:120,note:"Phare de 1869, énormes blocs de granit. Pas de zone aéronautique majeure identifiée. Vérifie cartes.gouv.fr avant le vol. Le menhir christianisé de +8 m offre un beau sujet photo."},
+  "Île d'Oléron":{alt:120,note:"Île d'Oléron — hors Bretagne (Charente-Maritime). Les zones codées dans cette app sont pour la Bretagne. <strong>Vérifie impérativement cartes.gouv.fr</strong> pour les restrictions spécifiques à l'île d'Oléron. Île = pas de couloir côtier libre."},
 };
 
-// Coordonnées GPS exactes des 10 spots — chargement instantané, zéro geocoding
 const SPOTS=[
   {name:"Pointe du Roselier",    lat:48.5541, lon:-2.7148},
   {name:"Lac de Guérlédan",      lat:48.2042, lon:-3.0500},
@@ -560,11 +587,23 @@ const SPOTS=[
   {name:"Ploumanac'h",           lat:48.8330, lon:-3.4808},
   {name:"Île de Bréhat",         lat:48.8461, lon:-2.9999},
   {name:"Cap d'Erquy",           lat:48.6453, lon:-2.4891},
+  // Vacances Été 2026 — Semaine 1 Roscoff
+  {name:"Île Callot · Carantec", lat:48.6833, lon:-3.9167},
+  {name:"Plage de Tahiti",        lat:48.6481, lon:-3.8833},
+  {name:"Tréguastel",            lat:48.8200, lon:-3.5100},
+  // Vacances Été 2026 — Semaine 2 Kerlouan
+  {name:"Brignogan-Plage",       lat:48.6739, lon:-4.3264},
+  {name:"Phare de Pontusval",    lat:48.6936, lon:-4.3311},
+  // Le Conquet & Ouessant
+  {name:"Le Conquet",            lat:48.3614, lon:-4.7783},
+  {name:"Île d'Ouessant",        lat:48.4608, lon:-5.0997},
+  // Île d'Oléron
+  {name:"Fort Boyard",           lat:45.9908, lon:-1.2136},
+  {name:"Île d'Oléron",          lat:45.9000, lon:-1.3000},
 ];
+
 function spotZ(i){const s=SPOTS[i];document.getElementById('zoneInput').value=s.name;loading('zone-result','Analyse...');renderZone(s.lat,s.lon,s.name)}
 function spotM(i){const s=SPOTS[i];document.getElementById('meteoInput').value=s.name;loading('meteo-result','Météo...');loadMeteo(s.lat,s.lon,s.name)}
-async function sZ(n){document.getElementById('zoneInput').value=n;loading('zone-result','Analyse...');const l=await geo(n);l&&renderZone(l.lat,l.lon,l.name,l)}
-async function sM(n){document.getElementById('meteoInput').value=n;loading('meteo-result','Météo...');const l=await geo(n);l&&loadMeteo(l.lat,l.lon,l.name)}
 </script>
 </body>
 </html>
