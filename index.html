@@ -360,10 +360,7 @@ function renderZone(lat,lon,locName,placeInfo=null){
     <div class="iframe-caption">Restrictions UAS — DGAC / cartes.gouv.fr · <a href="${geo}" target="_blank" style="color:var(--sky)">Plein écran ↗</a> · <a href="javascript:void(0)" onclick="reloadOfficialMap()" style="color:var(--sky)">Réessayer 🔄</a></div>
   </div>`;
   html+=`<button class="signal-btn" onclick="signalIssue('${locName.replace(/'/g,"\\'")}')">🚩 Signaler une info obsolète sur ce lieu</button>
-  <div style="display:flex;gap:8px;margin-top:8px">
-    <a href="https://dronespot.fr/fr/map#${lat},${lon},14" target="_blank" class="map-btn" style="flex:1;text-decoration:none;font-size:13px">🚁 DroneSpot</a>
-    <a href="https://www.geodrones.fr/" target="_blank" class="map-btn" style="flex:1;text-decoration:none;font-size:13px">📍 GeoDrones</a>
-  </div>
+  <a href="https://dronespot.fr/fr/map#${lat},${lon},13" target="_blank" class="map-btn" style="text-decoration:none;font-size:13px">🚁 Spots pilotes nearby — DroneSpot</a>
   <div class="footer">Données indicatives · DGAC · AlphaTango · SUP AIP 077/26 · Maj ${new Date().toLocaleDateString('fr-FR')}</div>`;
   document.getElementById('zone-result').innerHTML=html;
   queryDGACWFS(lat,lon);
