@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -134,7 +133,6 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
   <button class="tab" onclick="switchTab('meteo')">🌤️ Météo drone</button>
 </div>
 <div class="content">
-
 <!-- ZONES -->
 <div id="tab-zones" class="section active">
   <br>
@@ -145,7 +143,6 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
     <input type="text" id="zoneInput" placeholder="Cap Fréhel, Lannion, Ploumanac'h..." onkeydown="if(event.key==='Enter')searchZone()"/>
     <button onclick="searchZone()">🔍</button>
   </div>
-
   <p class="spots-title">Mes spots</p>
   <div class="spots-grid">
     <div class="spots-section-label">📍 Spots Côtes-d'Armor</div>
@@ -159,28 +156,24 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
     <button class="spot-btn" onclick="spotZ(7)"><span class="si">🟡</span>Ploumanac'h</button>
     <button class="spot-btn" onclick="spotZ(8)"><span class="si">🟡</span>Île de Bréhat</button>
     <button class="spot-btn" onclick="spotZ(9)"><span class="si">🟡</span>Cap d'Erquy</button>
-
     <div class="spots-section-label">🗺️ Vacances Été 2026 — Semaine 1 (Roscoff)</div>
     <button class="spot-btn" onclick="spotZ(10)"><span class="si">🔴</span>Île Callot · Carantec</button>
     <button class="spot-btn" onclick="spotZ(11)"><span class="si">🔴</span>Plage de Tahiti</button>
     <button class="spot-btn" onclick="spotZ(12)"><span class="si">🟡</span>Tréguastel (mer)</button>
-
     <div class="spots-section-label">🗺️ Vacances Été 2026 — Semaine 2 (Kerlouan)</div>
     <button class="spot-btn" onclick="spotZ(13)"><span class="si">🔴</span>Brignogan-Plage</button>
     <button class="spot-btn" onclick="spotZ(14)"><span class="si">🔴</span>Phare de Pontusval</button>
-    <button class="spot-btn" onclick="spotZ(19)"><span class="si">🟢</span>Grève de Goulven</button>
-
+    <button class="spot-btn" onclick="spotZ(19)"><span class="si">🟡</span>Grève de Goulven</button>
+    <button class="spot-btn" onclick="spotZ(20)"><span class="si">🔴</span>Meneham (hameau)</button>
     <div class="spots-section-label">🗺️ Vacances Été 2026 — Le Conquet & Ouessant</div>
     <button class="spot-btn" onclick="spotZ(15)"><span class="si">🔴</span>Le Conquet</button>
     <button class="spot-btn" onclick="spotZ(16)"><span class="si">🔴</span>Île d'Ouessant ⚠️</button>
-
     <div class="spots-section-label">🗺️ Vacances Été 2026 — Île d'Oléron</div>
     <button class="spot-btn" onclick="spotZ(17)"><span class="si">🔴</span>Fort Boyard ❌</button>
     <button class="spot-btn" onclick="spotZ(18)"><span class="si">🟢</span>Île d'Oléron</button>
   </div>
   <div id="zone-result"><div class="empty"><span class="empty-icon">🗺️</span><p>Indique ta position ou choisis un spot pour voir les restrictions.</p></div></div>
 </div>
-
 <!-- MÉTÉO -->
 <div id="tab-meteo" class="section">
   <br>
@@ -204,28 +197,24 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
     <button class="spot-btn" onclick="spotM(7)"><span class="si">🌤️</span>Ploumanac'h</button>
     <button class="spot-btn" onclick="spotM(8)"><span class="si">🌤️</span>Île de Bréhat</button>
     <button class="spot-btn" onclick="spotM(9)"><span class="si">🌤️</span>Cap d'Erquy</button>
-
     <div class="spots-section-label">🗺️ Vacances Été 2026 — Semaine 1 (Roscoff)</div>
     <button class="spot-btn" onclick="spotM(10)"><span class="si">🌤️</span>Île Callot · Carantec</button>
     <button class="spot-btn" onclick="spotM(11)"><span class="si">🌤️</span>Plage de Tahiti</button>
     <button class="spot-btn" onclick="spotM(12)"><span class="si">🌤️</span>Tréguastel (mer)</button>
-
     <div class="spots-section-label">🗺️ Vacances Été 2026 — Semaine 2 (Kerlouan)</div>
     <button class="spot-btn" onclick="spotM(13)"><span class="si">🌤️</span>Brignogan-Plage</button>
     <button class="spot-btn" onclick="spotM(14)"><span class="si">🌤️</span>Phare de Pontusval</button>
     <button class="spot-btn" onclick="spotM(19)"><span class="si">🌤️</span>Grève de Goulven</button>
-
+    <button class="spot-btn" onclick="spotM(20)"><span class="si">🌤️</span>Meneham (hameau)</button>
     <div class="spots-section-label">🗺️ Vacances Été 2026 — Le Conquet & Ouessant</div>
     <button class="spot-btn" onclick="spotM(15)"><span class="si">🌤️</span>Le Conquet</button>
     <button class="spot-btn" onclick="spotM(16)"><span class="si">🌤️</span>Île d'Ouessant</button>
-
     <div class="spots-section-label">🗺️ Vacances Été 2026 — Île d'Oléron</div>
     <button class="spot-btn" onclick="spotM(17)"><span class="si">🌤️</span>Fort Boyard</button>
     <button class="spot-btn" onclick="spotM(18)"><span class="si">🌤️</span>Île d'Oléron</button>
   </div>
   <div id="meteo-result"><div class="empty"><span class="empty-icon">🌤️</span><p>Indique ta position pour voir les conditions météo pour ton Air 3S.</p></div></div>
 </div>
-
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
@@ -234,7 +223,6 @@ function switchTab(t){
   document.getElementById('tab-zones').classList.toggle('active',t==='zones');
   document.getElementById('tab-meteo').classList.toggle('active',t==='meteo');
 }
-
 const ZONES=[
   {name:"Aéroport de Saint-Brieuc (LFRT)",lat:48.5375,lon:-2.8566,radius:5,status:"orange",emoji:"✈️",altitude:null,title:"Vérification requise — zone aéroport",explain:"Saint-Brieuc (LFRT) n'a <strong>pas de tour de contrôle permanente</strong> (juste un service d'information AFIS), donc pas de vraie CTR. Mais une <strong>géozone de restriction drone</strong> existe autour — vol interdit sans autorisation préalable via AlphaTango. Le rayon exact est à confirmer sur cartes.gouv.fr.",rules:["Vol interdit sans autorisation préalable via AlphaTango","Pour voler ici, contacte l'aéroport : operations@aeroport-saint-brieuc.fr","Radio AFIS sur 118.455 MHz si tu es équipé","Vérifie le rayon exact de la géozone sur cartes.gouv.fr"]},
   {name:"Aéroport de Lannion (LFRO)",lat:48.7544,lon:-3.4720,radius:5.56,status:"red",emoji:"✈️",altitude:null,title:"Vol interdit — CTR aéroport",explain:"Tu es dans la <strong>CTR de Lannion</strong> — un cercle de 5,56 km de rayon autour de l'aéroport, du sol jusqu'à environ 762 m. Les drones y sont <strong>strictement interdits</strong> sans autorisation, zone active 24h/24.",rules:["Interdiction de voler sans autorisation (CTR 5,56 km)","Demande via alphatango.aviation-civile.gouv.fr","Zone active H24","Au-delà de la CTR, la TMA peut aussi s'appliquer selon l'altitude"]},
@@ -251,15 +239,13 @@ const ZONES=[
   {name:"Base aéronavale de Lanvéoc (P112)",lat:48.2972,lon:-4.4503,radius:5,status:"red",emoji:"🪖",altitude:null,title:"Vol INTERDIT — zone P militaire",explain:"Tu es dans (ou proche de) la <strong>zone P112 — Base aéronavale de Lanvéoc-Poulmic</strong>, zone interdite permanente. C'est exactement la zone où un pilote a été convoqué au tribunal en mai 2026 pour survol par négligence. Aucune dérogation possible pour les civils.",rules:["Zone P/ZIT permanente — interdiction absolue H24","Pas de demande d'autorisation possible — zone fermée aux civils","Risque : jusqu'à 6 mois de prison + 15 000 € d'amende","Évite tout survol même à distance — la zone est plus grande qu'elle n'y paraît"]},
   {name:"Le Conquet — CTR Brest",lat:48.3614,lon:-4.7783,radius:10,status:"red",emoji:"✈️",altitude:null,title:"Vol interdit — CTR Brest à proximité",explain:"Le Conquet est situé à environ 20 km à l'ouest de Brest, dans ou très proche de la <strong>CTR Bretagne</strong> (aéroport de Brest LFRB). Cette zone couvre un large périmètre et les drones y sont interdits sans autorisation. La présence de la base navale de Brest renforce les restrictions.",rules:["CTR Bretagne (Brest LFRB) — interdiction sans autorisation","Présence de la base navale de Brest à proximité","Demande via alphatango.aviation-civile.gouv.fr (délai minimum 5 jours)","Vérifie la carte officielle cartes.gouv.fr avant tout vol ici"]},
   {name:"Île d'Ouessant — Zone interdite",lat:48.4608,lon:-5.0997,radius:8,status:"red",emoji:"🚫",altitude:null,title:"Vol interdit — île + réserve + zone militaire",explain:"Ouessant cumule <strong>trois restrictions majeures</strong> : (1) c'est une île, donc pas de couloir côtier libre en mer, (2) elle est entourée de zones militaires R17 qui touchent directement son littoral, (3) elle est classée <strong>Réserve de biosphère UNESCO</strong> avec des zones naturelles protégées. Le vol de drone y est <strong>extrêmement réglementé</strong> voire interdit dans la plupart des secteurs.",rules:["Île : pas de couloir libre de 1000 m (réservé à la côte continentale)","Zones militaires R17 touchent directement le littoral de l'île","Réserve de biosphère UNESCO — faune strictement protégée","Avant tout vol : contacter la mairie d'Ouessant ET vérifier AlphaTango"]},
-  {name:"P42 Kerlouan — Zone interdite militaire",lat:48.63818,lon:-4.35083,radius:7,status:"red",emoji:"🪖",altitude:null,title:"Vol INTERDIT — zone P permanente (Brignogan / Pontusval)",explain:"Tu es dans (ou proche de) la <strong>zone P42 Kerlouan</strong>, zone interdite permanente au profit d'un site militaire (sol → 610 m / 2000 ft, active H24). Elle couvre notamment Brignogan-Plage et le Phare de Pontusval. Contrairement à une CTR classique, il n'y a <strong>pas d'autorisation AlphaTango possible</strong> ici : la seule voie est une Lettre d'Accord + dérogation (ADV) auprès du bureau Survols du CECLANT — une démarche réservée aux exploitants professionnels (assurance, brevet DGAC, drone à ID électronique), délai minimum 20 jours ouvrés, et depuis 09/2023 plus aucune dérogation accordée pour un usage privé/promotionnel. En pratique : zone fermée pour un pilote loisir.",rules:["Zone P permanente — interdiction absolue H24 (sol à 610 m)","Pas d'autorisation AlphaTango possible dans cette zone","Dérogation réservée aux pros (LOA + ADV) — CECLANT bureau Survols : ceclant-survols.resp.fct@intradef.gouv.fr","Depuis sept. 2023 : plus de dérogation pour usage privé/promotionnel — fermé en pratique au loisir","Couvre Brignogan-Plage et le Phare de Pontusval — vérifie bien avant de voler","Mairie de Kerlouan (infos générales) : 02 98 83 93 13"]},
+  {name:"P42 Kerlouan — Zone interdite militaire",lat:48.63818,lon:-4.35083,radius:7,status:"red",emoji:"🪖",altitude:null,title:"Vol INTERDIT — zone P permanente (Brignogan / Pontusval)",explain:"Tu es dans (ou proche de) la <strong>zone P42 Kerlouan</strong>, zone interdite permanente au profit d'un site militaire (sol → 610 m / 2000 ft, active H24). Elle couvre notamment Brignogan-Plage, le Phare de Pontusval et le hameau de Meneham. Contrairement à une CTR classique, il n'y a <strong>pas d'autorisation AlphaTango possible</strong> ici : la seule voie est une Lettre d'Accord + dérogation (ADV) auprès du bureau Survols du CECLANT — une démarche réservée aux exploitants professionnels (assurance, brevet DGAC, drone à ID électronique), délai minimum 20 jours ouvrés, et depuis 09/2023 plus aucune dérogation accordée pour un usage privé/promotionnel. En pratique : zone fermée pour un pilote loisir. <strong>Note :</strong> ce rayon de 7 km est une approximation cercle — le contour réel (polygone) doit être vérifié sur cartes.gouv.fr, en particulier pour les points en bordure comme Grève de Goulven (~5,2 km du centre) qui pourraient être en réalité hors zone.",rules:["Zone P permanente — interdiction absolue H24 (sol à 610 m)","Pas d'autorisation AlphaTango possible dans cette zone","Dérogation réservée aux pros (LOA + ADV) — CECLANT bureau Survols : ceclant-survols.resp.fct@intradef.gouv.fr","Depuis sept. 2023 : plus de dérogation pour usage privé/promotionnel — fermé en pratique au loisir","Couvre Brignogan-Plage, le Phare de Pontusval et Meneham — vérifie bien avant de voler","Rayon 7 km = approximation cercle, pas le vrai contour polygonal — clique le contour magenta sur cartes.gouv.fr pour les points en bordure","Mairie de Kerlouan (infos générales) : 02 98 83 93 13"]},
 ];
-
 // NOTAMs et restrictions temporaires actives
 const NOTAMS=[
   {ref:"SUP AIP 099/26",desc:"Exercice militaire « Personal Recovery 2026 » — 19 zones temporaires activées en Bretagne le 16, 17 et 18 juin 2026, de 12h00 à 16h30. Évite de voler en Bretagne sur ces créneaux.",from:"2026-06-16",until:"2026-06-18",urgent:false},
   {ref:"SUP AIP 077/26",desc:"Remplace le SUP AIP 165/25. Depuis le littoral continental, vol drone en vue autorisé jusqu'à 1000 m de la côte (au lieu de 1850 m) et 120 m de hauteur max, sans protocole avec ARMOR — mais notification obligatoire via AlphaTango pour les drones de plus de 900 g. 7 ZRT au large (LF-R17 : AVEL, BATZ, CORSEN, DOLMEN, ECKMUHL, FOUESNANT, GUERANDE) activables H24 par la Marine ; zones LF-D18 A1/A2 mises en sommeil. Valable jusqu'au 30 avril 2027.",from:"2026-05-01",until:"2027-04-30",urgent:false},
 ];
-
 function checkNotams(){
   const today=new Date(); today.setHours(0,0,0,0);
   let html='';
@@ -275,7 +261,6 @@ function checkNotams(){
   document.getElementById('notam-banner').innerHTML=html;
 }
 checkNotams();
-
 const SEASONAL={
   "cap fréhel":{months:[3,4,5,6,7],bad:"🦅 <strong>Période de nidification active</strong> — Les oiseaux nichent dans les falaises en ce moment. Vol déconseillé et potentiellement interdit par arrêté.",ok:"Les oiseaux ont quitté les falaises pour cet hiver. Vol possible — vérifie quand même Géoportail pour toute restriction temporaire."},
   "île de bréhat":{months:[3,4,5,6,7],bad:"🐦 <strong>Période de reproduction (mars–juillet)</strong> — Faune protégée particulièrement sensible. L'autorisation préfectorale est encore plus importante en ce moment.",ok:"Hors période de reproduction. L'autorisation préfectorale reste recommandée avant tout vol."},
@@ -283,10 +268,10 @@ const SEASONAL={
   "erquy":{months:[3,4,5,6,7],bad:"🌿 <strong>Période sensible (mars–juillet)</strong> — Landes et falaises en zone protégée. Vol déconseillé pendant la nidification.",ok:"Hors saison sensible. Zone ouverte — vol possible avec ta certification AlphaTango."},
   "tréguastel":{months:[3,4,5,6,7],bad:"🪨 <strong>Période de nidification (mars–juillet)</strong> — Côte de Granit Rose, faune protégée. Vérifie les arrêtés municipaux.",ok:"Hors saison sensible. Vérifie les arrêtés municipaux de Trégastel avant de voler."},
   "ouessant":{months:[1,2,3,4,5,6,7,8,9,10,11,12],bad:"🚫 <strong>Zone très réglementée toute l'année</strong> — Île + réserve UNESCO + zones militaires. Contacte la mairie avant tout vol.",ok:"🚫 <strong>Zone très réglementée toute l'année</strong> — Île + réserve UNESCO + zones militaires. Contacte la mairie avant tout vol."},
+  "goulven":{months:[3,4,5,6,7],bad:"🐦 <strong>Baie de Goulven / Dunes de Keremma — Natura 2000</strong> (mars–juillet) — site d'oiseaux nicheurs et migrateurs. Reste sur les chemins/parkings, évite les zones de nidification des dunes.",ok:"Hors principale période de nidification. Site Natura 2000 (Baie de Goulven-Dunes de Keremma) — reste prudent près des dunes et des oiseaux."},
+  "meneham":{months:[3,4,5,6,7],bad:"🏘️ Hameau habité + falaises côtières — période de nidification (mars–juillet) sur le secteur, en plus de la restriction militaire ci-dessus.",ok:"Hors principale période de nidification, mais la restriction militaire P42 s'applique toute l'année, indépendamment de la saison."},
 };
-
 function dist(la1,lo1,la2,lo2){const R=6371,dL=(la2-la1)*Math.PI/180,dO=(lo2-lo1)*Math.PI/180,a=Math.sin(dL/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dO/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))}
-
 function seasonNote(locName){
   const m=new Date().getMonth()+1,n=locName.toLowerCase();
   for(const[k,d]of Object.entries(SEASONAL)){
@@ -297,16 +282,13 @@ function seasonNote(locName){
   }
   return'';
 }
-
 function altBadge(alt){
   if(alt===null||alt===undefined)return'';
   if(alt<120)return`<div class="note-card orange"><div class="note-header orange">📏 Hauteur max ici : ${alt} m</div>Inférieure à la limite standard de 120 m — ne la dépasse pas, même si ton drone peut monter plus haut.</div>`;
   return'';
 }
-
 const AGGLO_TYPES={city:"une ville",town:"une ville",village:"un village",hamlet:"un hameau",municipality:"une commune",administrative:"une commune",suburb:"un quartier habité",neighbourhood:"un quartier habité",isolated_dwelling:"une habitation isolée",farm:"une exploitation habitée"};
 let currentAggloShape=null;
-
 function aggloInfo(placeInfo){
   currentAggloShape=null;
   if(!placeInfo||!placeInfo.type||!AGGLO_TYPES[placeInfo.type])return{isAgglo:false};
@@ -318,11 +300,9 @@ function aggloInfo(placeInfo){
   }
   return{isAgglo:true,label:AGGLO_TYPES[placeInfo.type]};
 }
-
 function aggloExtraNote(label,locName){
   return`<div class="note-card red"><div class="note-header red">🏘️ "${locName}" est ${label}</div>Indépendamment de la zone ci-dessus, le survol de <strong>personnes, routes, véhicules et propriétés privées</strong> est réglementé partout en France. Reste à distance des habitations et rassemblements. La forme rouge sur la carte indique le contour approximatif de cette zone habitée.</div>`;
 }
-
 function renderZone(lat,lon,locName,placeInfo=null){
   let inside=[],nearest=null,minD=Infinity;
   for(const z of ZONES){const d=dist(lat,lon,z.lat,z.lon);if(d<z.radius)inside.push({...z});if(d<minD){minD=d;nearest=z}}
@@ -361,12 +341,10 @@ function renderZone(lat,lon,locName,placeInfo=null){
     <div class="iframe-caption">Restrictions UAS — DGAC / cartes.gouv.fr · <a href="${geo}" target="_blank" style="color:var(--sky)">Plein écran ↗</a> · <a href="javascript:void(0)" onclick="reloadOfficialMap()" style="color:var(--sky)">Réessayer 🔄</a></div>
   </div>`;
   html+=`<button class="signal-btn" onclick="signalIssue('${locName.replace(/'/g,"\\'")}')">🚩 Signaler une info obsolète sur ce lieu</button>
-
   <div class="footer">Données indicatives · DGAC · AlphaTango · SUP AIP 077/26 · Maj ${new Date().toLocaleDateString('fr-FR')}</div>`;
   document.getElementById('zone-result').innerHTML=html;
   queryDGACWFS(lat,lon);
 }
-
 let currentOfficialMapUrl='';
 function toggleOfficialMap(lat,lon){
   const c=document.getElementById('iframe-container');
@@ -405,7 +383,6 @@ async function queryDGACWFS(lat,lon){
     if(el)el.innerHTML=html;
   }catch(e){}
 }
-
 let leafletMap=null;
 function toggleMap(lat,lon,locName){
   const c=document.getElementById('map-container');
@@ -430,13 +407,11 @@ function toggleMap(lat,lon,locName){
     }
   },100);
 }
-
 function signalIssue(locName){
   const subject=encodeURIComponent(`Signalement Drone Checker — ${locName}`);
   const body=encodeURIComponent(`Lieu : ${locName}\n\nDécris ici l'information qui semble obsolète ou incorrecte :\n`);
   window.location.href=`mailto:?subject=${subject}&body=${body}`;
 }
-
 function cWind(v){return v<25?'green':v<40?'orange':'red'}
 function cGust(v){return v<35?'green':v<50?'orange':'red'}
 function cVis(v){return v>=5000?'green':v>=2000?'orange':'red'}
@@ -446,11 +421,9 @@ function cTemp(v){return v>=-10&&v<=40?'green':'red'}
 function cHum(v){return v<80?'green':v<90?'orange':'red'}
 function bar(v,max){return Math.min(100,Math.round(v/max*100))}
 function degToCompass(deg){const dirs=['N','NE','E','SE','S','SO','O','NO'];return dirs[Math.round(deg/45)%8]}
-
 async function fetchKp(){
   try{const r=await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json');const d=await r.json();return parseFloat(d[d.length-1][1])||0}catch{return null}
 }
-
 async function loadMeteo(lat,lon,locName){
   document.getElementById('meteo-result').innerHTML='<div class="loading"><div class="spinner"></div>Chargement météo en cours...</div>';
   try{
@@ -525,7 +498,6 @@ async function loadMeteo(lat,lon,locName){
     document.getElementById('meteo-result').innerHTML='<div class="empty"><span class="empty-icon">📡</span><p>Erreur de connexion internet.</p></div>';
   }
 }
-
 function loading(id,msg){document.getElementById(id).innerHTML=`<div class="loading"><div class="spinner"></div>${msg}</div>`}
 function useGPS(mode){
   if(!navigator.geolocation){alert('GPS non disponible.');return}
@@ -564,7 +536,6 @@ async function reverseGeo(lat,lon){
 }
 async function searchZone(){const q=document.getElementById('zoneInput').value.trim();if(!q)return;loading('zone-result','Recherche...');const l=await geo(q);l?renderZone(l.lat,l.lon,l.name,l):document.getElementById('zone-result').innerHTML='<div class="empty"><span class="empty-icon">🔍</span><p>Lieu introuvable.</p></div>'}
 async function searchMeteo(){const q=document.getElementById('meteoInput').value.trim();if(!q)return;loading('meteo-result','Recherche...');const l=await geo(q);l?loadMeteo(l.lat,l.lon,l.name):document.getElementById('meteo-result').innerHTML='<div class="empty"><span class="empty-icon">🔍</span><p>Lieu introuvable.</p></div>'}
-
 const SPOT_INFO={
   "Pointe du Roselier":{alt:120,note:"À environ 8 km de l'aéroport de Saint-Brieuc (LFRT) — vérifie la géozone sur cartes.gouv.fr, tu peux être en bordure. Ce spot côtier bénéficie du couloir libre de 1000 m en mer depuis la côte continentale."},
   "Lac de Guérlédan":{alt:120,note:"Aucune zone aéronautique majeure identifiée à proximité — zone rurale du centre-Bretagne, loin des aérodromes et zones militaires. Vérifie tout de même cartes.gouv.fr (zone de parachutage ou ULM local possible)."},
@@ -577,10 +548,10 @@ const SPOT_INFO={
   "Tréguastel":{alt:120,note:"🌊 <strong>Vol possible uniquement depuis les rochers côtiers vers la mer</strong> — pas depuis l'agglomération (vol interdit). Les îlots (Île Renote, Île de Costaèrès) sont accessibles. Décollage depuis le GR34 sur les rochers, hors zone habitée. Évite le sable ! En cas de doute, Mairie de Trégastel : 02 96 15 38 00."},
   "Brignogan-Plage":{alt:0,note:"⛔ <strong>Vol interdit — zone militaire P42 Kerlouan</strong>. Brignogan est à proximité immédiate de la zone interdite permanente P42 (sol → 610 m, H24) — pas simplement la CTR Bretagne, bien plus loin (~27 km). Aucune autorisation AlphaTango possible ici : la dérogation (CECLANT, ceclant-survols.resp.fct@intradef.gouv.fr) est réservée aux exploitants professionnels, pas au loisir. Mairie de Kerlouan : 02 98 83 93 13."},
   "Phare de Pontusval":{alt:0,note:"⛔ <strong>Vol interdit — zone militaire P42 Kerlouan</strong>. Le phare et ses abords (terre ET mer) sont dans la zone interdite permanente P42 (sol → 610 m, H24) — pas la CTR Bretagne, bien plus loin (~27 km). Aucune autorisation AlphaTango possible ici : la dérogation (CECLANT, ceclant-survols.resp.fct@intradef.gouv.fr) est réservée aux exploitants professionnels, pas au loisir. Mairie de Kerlouan : 02 98 83 93 13."},
-  "Grève de Goulven":{alt:120,note:"✅ <strong>Zone libre identifiée !</strong> La Grève de Goulven et les Dunes de Keremma sont hors CTR Brest. Pas de données de restriction sur cartes.gouv.fr. À ~20 min de Kerlouan. Évite le sable des dunes pour le décollage — utilise un parking ou chemin rocailleux."},
+  "Meneham":{alt:0,note:"⛔ <strong>Vol interdit — zone militaire P42 Kerlouan</strong>. Le hameau se situe à environ 1,5 km du centre de la zone interdite permanente P42 (sol → 610 m, H24), largement à l'intérieur du rayon de 7 km retenu par cette appli. Aucune autorisation AlphaTango possible ici. Avant de renoncer complètement, vérifie le contour exact (polygone) sur cartes.gouv.fr — un rayon de 7 km est une approximation et le vrai contour du P42 n'a pas pu être confirmé précisément. Mairie de Kerlouan : 02 98 83 93 13."},
+  "Grève de Goulven":{alt:120,note:"⚠️ <strong>Zone à vérifier — en bordure de l'approximation P42</strong>. La Grève de Goulven / Dunes de Keremma est à environ 5,2 km du centre de la zone militaire P42 Kerlouan, donc à l'intérieur du rayon-cercle de 7 km utilisé par cette appli (qui se déclenchera en rouge), mais le vrai contour du P42 est un polygone, probablement plus resserré vers la côte — ce point est peut-être en réalité hors zone. Site Natura 2000 (Baie de Goulven-Dunes de Keremma) par ailleurs — reste sur les chemins/parkings, évite le survol bas des dunes en période de nidification (mars-juillet). <strong>Vérifie impérativement le contour magenta réel sur cartes.gouv.fr avant d'y voler.</strong>"},
   "Île d'Oléron":{alt:100,note:"✅ <strong>Bonnes zones volables</strong> sur l'île d'Oléron. Zones vertes (libre 120 m) et jaune clair (100 m max) disponibles loin des agglomérations. Évite les villages (rouge = interdit). Forêt domaniale et côtes accessibles."},
 };
-
 const SPOTS=[
   {name:"Pointe du Roselier",    lat:48.5541, lon:-2.7148},
   {name:"Lac de Guérlédan",      lat:48.2042, lon:-3.0500},
@@ -607,8 +578,9 @@ const SPOTS=[
   {name:"Île d'Oléron",          lat:45.9000, lon:-1.3000},
   // Spot libre semaine 2
   {name:"Grève de Goulven",      lat:48.6350, lon:-4.2800},
+  // Ajout 11/07/2026 — Kerlouan
+  {name:"Meneham",               lat:48.6519, lon:-4.3462},
 ];
-
 function spotZ(i){const s=SPOTS[i];document.getElementById('zoneInput').value=s.name;loading('zone-result','Analyse...');renderZone(s.lat,s.lon,s.name)}
 function spotM(i){const s=SPOTS[i];document.getElementById('meteoInput').value=s.name;loading('meteo-result','Météo...');loadMeteo(s.lat,s.lon,s.name)}
 </script>
