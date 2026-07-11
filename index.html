@@ -289,14 +289,29 @@ function altBadge(alt){
 }
 const AGGLO_TYPES={city:"une ville",town:"une ville",village:"un village",hamlet:"un hameau",municipality:"une commune",administrative:"une commune",suburb:"un quartier habité",neighbourhood:"un quartier habité",isolated_dwelling:"une habitation isolée",farm:"une exploitation habitée"};
 let currentAggloShape=null;
+function geojsonBounds(gj){
+  let minLat=Infinity,maxLat=-Infinity,minLon=Infinity,maxLon=-Infinity;
+  const walk=c=>{ if(typeof c[0]==='number'){const[lon,lat]=c; if(lat<minLat)minLat=lat; if(lat>maxLat)maxLat=lat; if(lon<minLon)minLon=lon; if(lon>maxLon)maxLon=lon;} else c.forEach(walk); };
+  try{ if(gj.type==='GeometryCollection') gj.geometries.forEach(g=>walk(g.coordinates)); else walk(gj.coordinates); }catch(e){}
+  return[minLat,maxLat,minLon,maxLon];
+}
+function spanTooLarge(minLat,maxLat,minLon,maxLon){
+  if(!isFinite(minLat))return true;
+  return (maxLat-minLat)>0.5 || (maxLon-minLon)>0.5; // >~55km : probablement un mauvais résultat Nominatim (région/pays au lieu du lieu recherché)
+}
 function aggloInfo(placeInfo){
   currentAggloShape=null;
   if(!placeInfo||!placeInfo.type||!AGGLO_TYPES[placeInfo.type])return{isAgglo:false};
   if(placeInfo.geojson&&placeInfo.geojson.type!=='Point'){
-    currentAggloShape={type:'geojson',data:placeInfo.geojson};
+    const[minLat,maxLat,minLon,maxLon]=geojsonBounds(placeInfo.geojson);
+    if(!spanTooLarge(minLat,maxLat,minLon,maxLon)){
+      currentAggloShape={type:'geojson',data:placeInfo.geojson};
+    }
   }else if(placeInfo.bbox){
     const[s,n,w,e]=placeInfo.bbox;
-    currentAggloShape={type:'bbox',data:[[s,w],[n,e]]};
+    if(!spanTooLarge(s,n,w,e)){
+      currentAggloShape={type:'bbox',data:[[s,w],[n,e]]};
+    }
   }
   return{isAgglo:true,label:AGGLO_TYPES[placeInfo.type]};
 }
@@ -399,11 +414,12 @@ function toggleMap(lat,lon,locName){
       const popup='🏘️ Zone habitée — survol de personnes/biens réglementé';
       if(currentAggloShape.type==='geojson'){
         L.geoJSON(currentAggloShape.data,{style}).addTo(leafletMap).bindPopup(popup);
-        leafletMap.fitBounds(L.geoJSON(currentAggloShape.data).getBounds(),{padding:[20,20]});
+        leafletMap.fitBounds(L.geoJSON(currentAggloShape.data).getBounds(),{padding:[20,20],maxZoom:16});
       }else{
         L.rectangle(currentAggloShape.data,style).addTo(leafletMap).bindPopup(popup);
-        leafletMap.fitBounds(currentAggloShape.data,{padding:[20,20]});
+        leafletMap.fitBounds(currentAggloShape.data,{padding:[20,20],maxZoom:16});
       }
+      if(leafletMap.getZoom()<11)leafletMap.setView([lat,lon],13);
     }
   },100);
 }
