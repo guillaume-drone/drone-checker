@@ -140,9 +140,9 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
 <div class="tabs">
   <button class="tab active" onclick="switchTab('zones')">🗺️ Zones</button>
   <button class="tab" onclick="switchTab('meteo')">🌤️ Météo drone</button>
-  <button class="tab" onclick="switchTab('loisir')">🏞️ Loisir</button>
+  <button class="tab" onclick="switchTab('loisir')">🏞️ Loisir</button><button class="tab" onclick="switchTab('supplements')">📎 Suppléments</button>
 </div>
-<div class="content">
+<div class="content"><div id="tab-supplements" class="section"><br><div class="drone-badge">📎 Suppléments</div><div class="loisir-card"><div class="loisir-top"><div class="loisir-title">Chapelle Saint-Honoré</div><div class="loisir-dist">Plogastel-Saint-Germain</div></div><div class="loisir-desc">Ruines de chapelle (17e siècle), en zone CTR Quimper (LFRQ) - plafond drone 30 m à cet endroit (catégorie Ouverte, cartes.gouv.fr).</div><a class="link-btn" href="#" onclick="openItineraire('47.944363,-4.233224');return false;">🧭 Itinéraire <span>→</span></a></div></div>
 <!-- ZONES -->
 <div id="tab-zones" class="section active">
   <br>
@@ -212,10 +212,10 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 function switchTab(t){
-  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',(i===0&&t==='zones')||(i===1&&t==='meteo')||(i===2&&t==='loisir')));
+  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',(i===0&&t==='zones')||(i===1&&t==='meteo')||(i===2&&t==='loisir')||(i===3&&t==='supplements')));
   document.getElementById('tab-zones').classList.toggle('active',t==='zones');
   document.getElementById('tab-meteo').classList.toggle('active',t==='meteo');
-  document.getElementById('tab-loisir').classList.toggle('active',t==='loisir');
+  document.getElementById('tab-loisir').classList.toggle('active',t==='loisir');document.getElementById('tab-supplements').classList.toggle('active',t==='supplements');
 }
 const ZONES=[
   {name:"Aéroport de Saint-Brieuc (LFRT)",lat:48.5375,lon:-2.8566,radius:5,status:"orange",emoji:"✈️",altitude:null,title:"Vérification requise — zone aéroport",explain:"Saint-Brieuc (LFRT) n'a <strong>pas de tour de contrôle permanente</strong> (juste un service d'information AFIS), donc pas de vraie CTR. Mais une <strong>géozone de restriction drone</strong> existe autour — vol interdit sans autorisation préalable via AlphaTango. Le rayon exact est à confirmer sur cartes.gouv.fr.",rules:["Vol interdit sans autorisation préalable via AlphaTango","Pour voler ici, contacte l'aéroport : operations@aeroport-saint-brieuc.fr","Radio AFIS sur 118.455 MHz si tu es équipé","Vérifie le rayon exact de la géozone sur cartes.gouv.fr"]},
@@ -279,12 +279,12 @@ function renderLoisir(){
       <div class="loisir-desc">${l.desc}</div>
       <span class="loisir-pill ${l.status}">${b.icon} ${b.label}</span>
       <div class="loisir-desc" style="margin-top:8px">${l.note}</div>
-      <div class="loisir-dist">Source : ${l.src}</div>
+      <div class="loisir-dist">Source : ${l.src}</div><a class="link-btn" href="#" onclick="openItineraire('${l.name.replace(/'/g," ")}');return false;">🧭 Itinéraire <span>→</span></a>
     </div>`;
   }
   document.getElementById('loisir-list').innerHTML=html;
 }
-renderLoisir();
+renderLoisir();function openItineraire(dest){const isCoord=/^-?\d+(\.\d+)?,-?\d+(\.\d+)?$/.test(dest);const q=encodeURIComponent(isCoord?dest:(dest+', France'));const waze=isCoord?('https://waze.com/ul?ll='+dest+'&navigate=yes'):('https://waze.com/ul?q='+q+'&navigate=yes');const gmaps='https://www.google.com/maps/dir/?api=1&destination='+q;const fb=setTimeout(function(){window.location.href=gmaps;},1500);window.addEventListener('blur',function(){clearTimeout(fb);},{once:true});window.location.href=waze;}
 const SEASONAL={
   "cap fréhel":{months:[3,4,5,6,7],bad:"🦅 <strong>Période de nidification active</strong> — Les oiseaux nichent dans les falaises en ce moment. Vol déconseillé et potentiellement interdit par arrêté.",ok:"Les oiseaux ont quitté les falaises pour cet hiver. Vol possible — vérifie quand même Géoportail pour toute restriction temporaire."},
   "île de bréhat":{months:[3,4,5,6,7],bad:"🐦 <strong>Période de reproduction (mars–juillet)</strong> — Faune protégée particulièrement sensible. L'autorisation préfectorale est encore plus importante en ce moment.",ok:"Hors période de reproduction. L'autorisation préfectorale reste recommandée avant tout vol."},
