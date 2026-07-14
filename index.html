@@ -130,6 +130,21 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
 .forecast-card .fc-wind{font-size:13px;font-weight:600;font-family:'Space Grotesk',sans-serif}
 .forecast-card .fc-rain{font-size:10px;color:var(--g400);margin-top:2px}
 .compass{display:inline-block;transition:transform 0.3s}
+.carte-toolbar{display:flex;gap:8px;margin-bottom:1rem}
+.layer-toggle-btn{padding:14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:var(--r);color:#fff;font-family:'Inter',sans-serif;font-size:14px;cursor:pointer;white-space:nowrap}
+.layer-toggle-btn:hover{background:rgba(255,255,255,0.1)}
+.carte-wrap{position:relative;border-radius:var(--rs);overflow:hidden;margin-bottom:.75rem;border:1px solid rgba(255,255,255,0.08)}
+.carte-inner{width:100%;height:420px;background:#0c1a2e}
+.carte-layer-panel{position:absolute;top:0;left:0;bottom:0;width:210px;background:rgba(10,15,25,0.96);backdrop-filter:blur(4px);z-index:1000;padding:14px;transform:translateX(-100%);transition:transform .2s ease;overflow-y:auto}
+.carte-layer-panel.open{transform:translateX(0)}
+.clp-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--g400);margin-bottom:10px}
+.clp-item{display:flex;align-items:center;gap:8px;font-size:13px;padding:9px 4px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.06);color:rgba(255,255,255,0.85)}
+.clp-item input{accent-color:var(--sky);width:15px;height:15px;flex-shrink:0}
+.clp-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.clp-note{font-size:11px;color:var(--g400);line-height:1.5;margin-top:10px}
+.clp-close{display:flex;justify-content:flex-end;margin-bottom:4px}
+.clp-close button{background:none;border:none;color:var(--g400);font-size:16px;cursor:pointer}
+.carte-zoom-hint{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(10,15,25,0.9);color:rgba(255,255,255,0.8);font-size:11px;padding:6px 12px;border-radius:20px;z-index:900;pointer-events:none;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -140,7 +155,7 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
 <div class="tabs">
   <button class="tab active" onclick="switchTab('zones')">🗺️ Zones</button>
   <button class="tab" onclick="switchTab('meteo')">🌤️ Météo drone</button>
-  <button class="tab" onclick="switchTab('loisir')">🏞️ Loisir</button><button class="tab" onclick="switchTab('supplements')">📎 Suppléments</button>
+  <button class="tab" onclick="switchTab('loisir')">🏞️ Loisir</button><button class="tab" onclick="switchTab('supplements')">📎 Suppléments</button><button class="tab" onclick="switchTab('carte')">🧭 Carte</button>
 </div>
 <div class="content"><div id="tab-supplements" class="section"><br><div class="drone-badge">📎 Suppléments</div><div class="loisir-card"><div class="loisir-top"><div class="loisir-title">Chapelle Saint-Honoré</div><div class="loisir-dist">Plogastel-Saint-Germain</div></div><div class="loisir-desc">Ruines de chapelle (17e siècle), en zone CTR Quimper (LFRQ) - plafond drone 30 m à cet endroit (catégorie Ouverte, cartes.gouv.fr).</div><a class="link-btn" href="#" onclick="openItineraire('47.944363,-4.233224');return false;">🧭 Itinéraire <span>→</span></a></div></div>
 <!-- ZONES -->
@@ -152,23 +167,6 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
   <div class="search-row">
     <input type="text" id="zoneInput" placeholder="Cap Fréhel, Lannion, Ploumanac'h..." onkeydown="if(event.key==='Enter')searchZone()"/>
     <button onclick="searchZone()">🔍</button>
-  </div>
-  <p class="spots-title">Mes spots (rayon 80 km autour de Kerlouan)</p>
-  <div class="spots-grid">
-    <div class="spots-section-label">📍 Autour de Kerlouan</div>
-    <button class="spot-btn" onclick="spotZ(0)"><span class="si">🟡</span>Ploumanac'h (~70km)</button>
-    <div class="spots-section-label">🗺️ Roscoff / Carantec</div>
-    <button class="spot-btn" onclick="spotZ(1)"><span class="si">🔴</span>Île Callot · Carantec</button>
-    <button class="spot-btn" onclick="spotZ(2)"><span class="si">🔴</span>Plage de Tahiti</button>
-    <button class="spot-btn" onclick="spotZ(3)"><span class="si">🟡</span>Tréguastel (mer)</button>
-    <div class="spots-section-label">🗺️ Kerlouan / Brignogan</div>
-    <button class="spot-btn" onclick="spotZ(4)"><span class="si">🔴</span>Brignogan-Plage</button>
-    <button class="spot-btn" onclick="spotZ(5)"><span class="si">🔴</span>Phare de Pontusval</button>
-    <button class="spot-btn" onclick="spotZ(8)"><span class="si">🟡</span>Grève de Goulven</button>
-    <button class="spot-btn" onclick="spotZ(9)"><span class="si">🔴</span>Meneham (hameau)</button>
-    <div class="spots-section-label">🗺️ Le Conquet & Ouessant</div>
-    <button class="spot-btn" onclick="spotZ(6)"><span class="si">🔴</span>Le Conquet</button>
-    <button class="spot-btn" onclick="spotZ(7)"><span class="si">🔴</span>Île d'Ouessant ⚠️</button>
   </div>
   <div id="zone-result"><div class="empty"><span class="empty-icon">🗺️</span><p>Indique ta position ou choisis un spot pour voir les restrictions.</p></div></div>
 </div>
@@ -182,23 +180,6 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
     <input type="text" id="meteoInput" placeholder="Cap Fréhel, Lannion, Ploumanac'h..." onkeydown="if(event.key==='Enter')searchMeteo()"/>
     <button onclick="searchMeteo()">🔍</button>
   </div>
-  <p class="spots-title">Mes spots (rayon 80 km autour de Kerlouan)</p>
-  <div class="spots-grid">
-    <div class="spots-section-label">📍 Autour de Kerlouan</div>
-    <button class="spot-btn" onclick="spotM(0)"><span class="si">🌤️</span>Ploumanac'h (~70km)</button>
-    <div class="spots-section-label">🗺️ Roscoff / Carantec</div>
-    <button class="spot-btn" onclick="spotM(1)"><span class="si">🌤️</span>Île Callot · Carantec</button>
-    <button class="spot-btn" onclick="spotM(2)"><span class="si">🌤️</span>Plage de Tahiti</button>
-    <button class="spot-btn" onclick="spotM(3)"><span class="si">🌤️</span>Tréguastel (mer)</button>
-    <div class="spots-section-label">🗺️ Kerlouan / Brignogan</div>
-    <button class="spot-btn" onclick="spotM(4)"><span class="si">🌤️</span>Brignogan-Plage</button>
-    <button class="spot-btn" onclick="spotM(5)"><span class="si">🌤️</span>Phare de Pontusval</button>
-    <button class="spot-btn" onclick="spotM(8)"><span class="si">🌤️</span>Grève de Goulven</button>
-    <button class="spot-btn" onclick="spotM(9)"><span class="si">🌤️</span>Meneham (hameau)</button>
-    <div class="spots-section-label">🗺️ Le Conquet & Ouessant</div>
-    <button class="spot-btn" onclick="spotM(6)"><span class="si">🌤️</span>Le Conquet</button>
-    <button class="spot-btn" onclick="spotM(7)"><span class="si">🌤️</span>Île d'Ouessant</button>
-  </div>
   <div id="meteo-result"><div class="empty"><span class="empty-icon">🌤️</span><p>Indique ta position pour voir les conditions météo pour ton Air 3S.</p></div></div>
 </div>
 <!-- LOISIR -->
@@ -208,14 +189,51 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
   <div id="loisir-list"></div>
   <div class="footer">Sources : offices de tourisme du Pays des Abers, du Pays de Landerneau-Daoulas, du Pays d'Iroise, de Roscoff et de Perros-Guirec, et sites des mairies concernées. Statuts drone à titre indicatif — vérifie toujours cartes.gouv.fr avant de voler.</div>
 </div>
+
+<!-- CARTE -->
+<div id="tab-carte" class="section">
+  <br>
+  <div id="notam-banner-carte"></div>
+  <div class="carte-toolbar">
+    <button class="btn-gps" style="margin-bottom:0;flex:1" onclick="carteGPS()">📍 Ma position</button>
+    <button class="layer-toggle-btn" onclick="toggleLayerPanel()">☰ Couches</button>
+  </div>
+  <div class="search-row">
+    <input type="text" id="carteInput" placeholder="N'importe où en France..." onkeydown="if(event.key==='Enter')searchCarte()"/>
+    <button onclick="searchCarte()">🔍</button>
+  </div>
+  <div class="carte-wrap">
+    <div id="carte-layer-panel" class="carte-layer-panel">
+      <div class="clp-close"><button onclick="toggleLayerPanel()">✕</button></div>
+      <div class="clp-title">Couches</div>
+      <label class="clp-item"><input type="checkbox" id="lyr-dgac" checked onchange="toggleLayer('dgac')"><span class="clp-dot" style="background:#0ea5e9"></span>Restrictions DGAC (France)</label>
+      <label class="clp-item"><input type="checkbox" id="lyr-zones" checked onchange="toggleLayer('zones')"><span class="clp-dot" style="background:#ea580c"></span>Zones connues Bretagne</label>
+      <div class="clp-note">La couche DGAC se charge automatiquement sur la zone affichée (France entière) — zoome pour la faire apparaître.</div>
+    </div>
+    <div id="carte-inner" class="carte-inner"></div>
+    <div id="carte-zoom-hint" class="carte-zoom-hint" style="display:none">Zoome pour charger les restrictions DGAC ici</div>
+  </div>
+  <div class="map-legend">
+    <span><span class="map-dot you"></span>Toi</span>
+    <span><span class="map-dot red"></span>Interdit / actif</span>
+    <span><span class="map-dot orange"></span>Prudence / vérif. requise</span>
+  </div>
+  <div class="footer">Carte interactive · Restrictions DGAC en direct (data.geopf.fr) · OpenStreetMap · Zones Bretagne codées en dur</div>
+</div>
+
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 function switchTab(t){
-  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',(i===0&&t==='zones')||(i===1&&t==='meteo')||(i===2&&t==='loisir')||(i===3&&t==='supplements')));
+  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',(i===0&&t==='zones')||(i===1&&t==='meteo')||(i===2&&t==='loisir')||(i===3&&t==='supplements')||(i===4&&t==='carte')));
   document.getElementById('tab-zones').classList.toggle('active',t==='zones');
   document.getElementById('tab-meteo').classList.toggle('active',t==='meteo');
   document.getElementById('tab-loisir').classList.toggle('active',t==='loisir');document.getElementById('tab-supplements').classList.toggle('active',t==='supplements');
+  document.getElementById('tab-carte').classList.toggle('active',t==='carte');
+  if(t==='carte'){
+    initCarte();
+    setTimeout(()=>{if(carteMap)carteMap.invalidateSize()},150);
+  }
 }
 const ZONES=[
   {name:"Aéroport de Saint-Brieuc (LFRT)",lat:48.5375,lon:-2.8566,radius:5,status:"orange",emoji:"✈️",altitude:null,title:"Vérification requise — zone aéroport",explain:"Saint-Brieuc (LFRT) n'a <strong>pas de tour de contrôle permanente</strong> (juste un service d'information AFIS), donc pas de vraie CTR. Mais une <strong>géozone de restriction drone</strong> existe autour — vol interdit sans autorisation préalable via AlphaTango. Le rayon exact est à confirmer sur cartes.gouv.fr.",rules:["Vol interdit sans autorisation préalable via AlphaTango","Pour voler ici, contacte l'aéroport : operations@aeroport-saint-brieuc.fr","Radio AFIS sur 118.455 MHz si tu es équipé","Vérifie le rayon exact de la géozone sur cartes.gouv.fr"]},
@@ -253,6 +271,8 @@ function checkNotams(){
     }
   }
   document.getElementById('notam-banner').innerHTML=html;
+  const c2=document.getElementById('notam-banner-carte');
+  if(c2)c2.innerHTML=html;
 }
 checkNotams();
 // Onglet Loisir — sites remarquables (rayon ~80 km autour de Kerlouan), sources : offices de tourisme locaux + mairies
@@ -447,6 +467,106 @@ function toggleMap(lat,lon,locName){
     }
   },100);
 }
+// ===== Onglet Carte — vue France entière façon AirOps =====
+let carteMap=null, carteMarker=null, dgacDebounce=null;
+const carteLayers={dgac:null, zones:null};
+
+function toggleLayerPanel(){
+  document.getElementById('carte-layer-panel').classList.toggle('open');
+}
+
+function initCarte(){
+  if(carteMap)return;
+  carteMap=L.map('carte-inner').setView([46.6,2.4],6);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:18}).addTo(carteMap);
+  carteLayers.zones=L.layerGroup().addTo(carteMap);
+  ZONES.forEach(z=>{
+    const color=z.status==='red'?'#dc2626':'#ea580c';
+    L.circle([z.lat,z.lon],{radius:z.radius*1000,color,fillColor:color,fillOpacity:0.12,weight:2}).addTo(carteLayers.zones).bindPopup(`<strong>${z.emoji} ${z.name}</strong><br>${z.title}`);
+  });
+  carteLayers.dgac=L.layerGroup().addTo(carteMap);
+  carteMap.on('moveend',()=>{
+    clearTimeout(dgacDebounce);
+    dgacDebounce=setTimeout(loadDGACForView,400);
+  });
+  loadDGACForView();
+}
+
+// Charge la couche officielle DGAC (data.geopf.fr) sur la zone actuellement affichée.
+// Volontairement limitée à partir d'un certain niveau de zoom pour ne pas surcharger le WFS sur la France entière.
+async function loadDGACForView(){
+  if(!carteMap)return;
+  const hint=document.getElementById('carte-zoom-hint');
+  const zoom=carteMap.getZoom();
+  if(zoom<10){
+    if(hint)hint.style.display='block';
+    carteLayers.dgac.clearLayers();
+    return;
+  }
+  if(hint)hint.style.display='none';
+  const cb=document.getElementById('lyr-dgac');
+  if(!cb||!cb.checked)return;
+  const b=carteMap.getBounds();
+  const bbox=`${b.getWest()},${b.getSouth()},${b.getEast()},${b.getNorth()},EPSG:4326`;
+  const url=`https://data.geopf.fr/wfs/ows?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=TRANSPORTS.DRONES.RESTRICTIONS:carte_restriction_drones_lf&OUTPUTFORMAT=application/json&SRSNAME=EPSG:4326&BBOX=${bbox}&COUNT=300`;
+  try{
+    const r=await fetch(url);
+    if(!r.ok)return;
+    const data=await r.json();
+    carteLayers.dgac.clearLayers();
+    if(!data.features)return;
+    data.features.forEach(f=>{
+      const limite=(f.properties&&f.properties.limite)?f.properties.limite.toString().replace(/\*/g,'').trim():'';
+      const isInterdit=limite.toLowerCase().includes('interdit');
+      const style={color:isInterdit?'#dc2626':'#0ea5e9',weight:1.5,fillOpacity:0.15};
+      try{
+        L.geoJSON(f.geometry,{style}).bindPopup(limite||'Restriction UAS — DGAC').addTo(carteLayers.dgac);
+      }catch(e){}
+    });
+  }catch(e){
+    // Silencieux : CORS, réseau ou format inattendu — la carte continue de fonctionner
+  }
+}
+
+function toggleLayer(name){
+  if(!carteMap)return;
+  const cb=document.getElementById('lyr-'+name);
+  if(cb.checked){
+    carteMap.addLayer(carteLayers[name]);
+    if(name==='dgac')loadDGACForView();
+  }else{
+    carteMap.removeLayer(carteLayers[name]);
+  }
+}
+
+function carteGPS(){
+  if(!navigator.geolocation){alert('GPS non disponible.');return}
+  navigator.geolocation.getCurrentPosition(
+    p=>{
+      const la=p.coords.latitude,lo=p.coords.longitude;
+      if(!carteMap)return;
+      if(carteMarker)carteMap.removeLayer(carteMarker);
+      carteMarker=L.circleMarker([la,lo],{radius:8,color:'#0ea5e9',fillColor:'#0ea5e9',fillOpacity:0.9,weight:2}).addTo(carteMap).bindPopup('📍 Ta position').openPopup();
+      carteMap.setView([la,lo],13);
+    },
+    e=>{
+      const msg={1:'Permission refusée — autorise la localisation dans les paramètres',2:'Position indisponible — active le GPS',3:'Délai dépassé — réessaie'}[e.code]||'Erreur GPS';
+      alert(msg);
+    },
+    {enableHighAccuracy:false,timeout:20000,maximumAge:60000}
+  );
+}
+
+async function searchCarte(){
+  const q=document.getElementById('carteInput').value.trim();
+  if(!q)return;
+  const l=await geo(q);
+  if(!l||!carteMap){alert('Lieu introuvable.');return}
+  if(carteMarker)carteMap.removeLayer(carteMarker);
+  carteMarker=L.marker([l.lat,l.lon]).addTo(carteMap).bindPopup(`📍 ${l.name}`).openPopup();
+  carteMap.setView([l.lat,l.lon],13);
+}
+
 function signalIssue(locName){
   const subject=encodeURIComponent(`Signalement Drone Checker — ${locName}`);
   const body=encodeURIComponent(`Lieu : ${locName}\n\nDécris ici l'information qui semble obsolète ou incorrecte :\n`);
@@ -585,21 +705,6 @@ const SPOT_INFO={
   "Meneham":{alt:0,note:"⛔ <strong>Vol interdit — zone militaire P42 Kerlouan</strong>. Le hameau se situe à environ 1,5 km du centre de la zone interdite permanente P42 (sol → 610 m, H24), largement à l'intérieur du rayon de 7 km retenu par cette appli. Aucune autorisation AlphaTango possible ici. Avant de renoncer complètement, vérifie le contour exact (polygone) sur cartes.gouv.fr — un rayon de 7 km est une approximation et le vrai contour du P42 n'a pas pu être confirmé précisément. Mairie de Kerlouan : 02 98 83 93 13."},
   "Grève de Goulven":{alt:120,note:"⚠️ <strong>Zone à vérifier — en bordure de l'approximation P42</strong>. La Grève de Goulven / Dunes de Keremma est à environ 5,2 km du centre de la zone militaire P42 Kerlouan, donc à l'intérieur du rayon-cercle de 7 km utilisé par cette appli (qui se déclenchera en rouge), mais le vrai contour du P42 est un polygone, probablement plus resserré vers la côte — ce point est peut-être en réalité hors zone. Site Natura 2000 (Baie de Goulven-Dunes de Keremma) par ailleurs — reste sur les chemins/parkings, évite le survol bas des dunes en période de nidification (mars-juillet). <strong>Vérifie impérativement le contour magenta réel sur cartes.gouv.fr avant d'y voler.</strong>"},
 };
-const SPOTS=[
-  // Autour de Kerlouan (rayon 80 km) — liste allégée le 11/07/2026
-  {name:"Ploumanac'h",           lat:48.8330, lon:-3.4808},
-  {name:"Île Callot · Carantec", lat:48.6833, lon:-3.9167},
-  {name:"Plage de Tahiti",        lat:48.6481, lon:-3.8833},
-  {name:"Tréguastel",            lat:48.8200, lon:-3.5100},
-  {name:"Brignogan-Plage",       lat:48.6739, lon:-4.3264},
-  {name:"Phare de Pontusval",    lat:48.6936, lon:-4.3311},
-  {name:"Le Conquet",            lat:48.3614, lon:-4.7783},
-  {name:"Île d'Ouessant",        lat:48.4608, lon:-5.0997},
-  {name:"Grève de Goulven",      lat:48.6350, lon:-4.2800},
-  {name:"Meneham",               lat:48.6519, lon:-4.3462},
-];
-function spotZ(i){const s=SPOTS[i];document.getElementById('zoneInput').value=s.name;loading('zone-result','Analyse...');renderZone(s.lat,s.lon,s.name)}
-function spotM(i){const s=SPOTS[i];document.getElementById('meteoInput').value=s.name;loading('meteo-result','Météo...');loadMeteo(s.lat,s.lon,s.name)}
 </script>
 </body>
 </html>
