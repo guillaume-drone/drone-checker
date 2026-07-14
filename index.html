@@ -145,9 +145,24 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
 .clp-close{display:flex;justify-content:flex-end;margin-bottom:4px}
 .clp-close button{background:none;border:none;color:var(--g400);font-size:16px;cursor:pointer}
 .carte-zoom-hint{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(10,15,25,0.9);color:rgba(255,255,255,0.8);font-size:11px;padding:6px 12px;border-radius:20px;z-index:900;pointer-events:none;white-space:nowrap}
+.iti-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:2000;align-items:center;justify-content:center;padding:1rem}
+.iti-modal.open{display:flex}
+.iti-modal-box{background:#0f172a;border:1px solid rgba(255,255,255,0.1);border-radius:var(--r);padding:1.25rem;width:100%;max-width:320px}
+.iti-modal-title{font-size:14px;font-weight:600;margin-bottom:12px;text-align:center;color:#fff}
+.iti-modal-btn{width:100%;padding:13px;margin-bottom:8px;background:rgba(14,165,233,0.15);border:1px solid rgba(14,165,233,0.3);border-radius:var(--rs);color:#fff;font-family:'Inter',sans-serif;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.iti-modal-btn:hover{background:rgba(14,165,233,0.25)}
+.iti-modal-cancel{width:100%;padding:11px;background:none;border:1px solid rgba(255,255,255,0.1);border-radius:var(--rs);color:var(--g400);font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;margin-top:2px}
 </style>
 </head>
 <body>
+<div id="itineraire-modal" class="iti-modal">
+  <div class="iti-modal-box">
+    <div class="iti-modal-title">Ouvrir l'itinéraire avec</div>
+    <button class="iti-modal-btn" onclick="openWith('waze')">🚗 Waze</button>
+    <button class="iti-modal-btn" onclick="openWith('gmaps')">🗺️ Google Maps</button>
+    <button class="iti-modal-cancel" onclick="closeItiModal()">Annuler</button>
+  </div>
+</div>
 <div class="header">
   <div class="header-icon">🚁</div>
   <div><h1>Drone Checker</h1><p>DJI Air 3S — Bretagne Été 2026</p></div>
@@ -277,17 +292,17 @@ function checkNotams(){
 checkNotams();
 // Onglet Loisir — sites remarquables (rayon ~80 km autour de Kerlouan), sources : offices de tourisme locaux + mairies
 const LOISIR=[
-  {name:"Phare de l'Île Vierge",dist:"~14 km",desc:"Le plus haut phare d'Europe en pierre de taille (82,5 m), à Plouguerneau. Accessible à pied par le sentier des douaniers ou en bateau selon la marée.",status:"green",note:"Côte continentale — couloir libre jusqu'à 1850 m en mer / 120 m d'altitude (SUP AIP 077/26). Aucune zone P ou CTR identifiée ici. Vérifie tout de même cartes.gouv.fr avant de décoller.",src:"Office de tourisme Pays des Abers"},
-  {name:"Aber Wrac'h",dist:"~20 km",desc:"Estuaire encaissé à Landéda, port de plaisance, sentier des douaniers (GR34), dunes de Sainte-Marguerite et plage de la Palue.",status:"green",note:"Côte continentale — couloir libre jusqu'à 1850 m en mer / 120 m d'altitude. Pas de restriction identifiée.",src:"Office de tourisme Pays des Abers"},
-  {name:"Aber Benoît",dist:"~22 km",desc:"Deuxième aber du Pays des Abers (Tréglonou / Lannilis), chapelle Notre-Dame de Traon, sentiers le long de la rivière.",status:"green",note:"Zone rurale, aucune restriction aéronautique identifiée. Vérifie cartes.gouv.fr par précaution.",src:"Office de tourisme Pays des Abers"},
-  {name:"Portsall",dist:"~28 km",desc:"Port typique de Ploudalmézeau, mémorial du naufrage de l'Amoco Cadiz (1978), longues plages de sable fin.",status:"green",note:"Côte continentale — couloir libre jusqu'à 1850 m en mer / 120 m d'altitude.",src:"Office de tourisme Pays d'Iroise"},
-  {name:"Argenton",dist:"~30 km",desc:"Petit port pittoresque de la Côte des Légendes (Landunvez), chaos rocheux et îlot accessible à marée basse.",status:"green",note:"Côte continentale — couloir libre jusqu'à 1850 m en mer / 120 m d'altitude.",src:"Office de tourisme Pays d'Iroise"},
-  {name:"Roscoff",dist:"~32 km",desc:"Vieux port et maisons d'armateurs, chapelle Sainte-Barbe, jardin exotique, départ des vedettes vers l'Île de Batz.",status:"green",note:"Côte continentale — couloir libre en mer. Vérifie un éventuel arrêté municipal en cœur de ville avant de décoller au-dessus des habitations.",src:"Office de tourisme Roscoff-Baie de Morlaix"},
-  {name:"Saint-Pol-de-Léon",dist:"~30 km",desc:"Cathédrale et clocher « Kreisker », ville historique du Léon, halles et marchés anciens.",status:"green",note:"Zone urbaine — vol possible en catégorie ouverte en dehors des rassemblements de personnes, pas de restriction aéronautique identifiée.",src:"Office de tourisme Roscoff-Baie de Morlaix"},
-  {name:"Île de Batz",dist:"~35 km (via Roscoff)",desc:"Jardin exotique Georges Delaselle, phare, plages de sable blanc — se visite à pied ou à vélo depuis Roscoff.",status:"orange",note:"Île — ne bénéficie pas du couloir continental de 1850 m. Vérifie cartes.gouv.fr avant tout vol, en particulier autour du phare.",src:"Office de tourisme Roscoff-Baie de Morlaix"},
-  {name:"Pointe de Corsen",dist:"~35 km",desc:"Point le plus occidental de la France continentale (Plouarzel), sémaphore, vue sur Ouessant et le rail d'Ouessant, l'un des plus fréquentés au monde.",status:"orange",note:"En limite de la zone offshore R17 CORSEN — le couloir de 1850 m s'applique côté continental, mais vérifie le contour exact avant de voler vers le large.",src:"Office de tourisme Pays d'Iroise"},
-  {name:"Pointe Saint-Mathieu",dist:"~48 km",desc:"Phare et abbaye en ruines côte à côte (Plougonvelin) — l'un des sites les plus photographiés du Finistère, vue sur le Four et Ouessant.",status:"red",note:"Exception à la règle du couloir côtier (SUP AIP 077/26) : ici la zone R17 touche directement la côte, sans couloir libre. Vol drone interdit sans autorisation.",src:"Office de tourisme Pays d'Iroise"},
-  {name:"Le Conquet",dist:"~43 km",desc:"Un des plus jolis ports du Finistère, ruelles de granit, départs de bateaux vers Ouessant et Molène.",status:"red",note:"CTR Bretagne (Brest) à proximité immédiate — vol drone interdit sans autorisation AlphaTango. Visite à pied uniquement.",src:"Office de tourisme Pays d'Iroise"},
+  {name:"Phare de l'Île Vierge",lat:48.6388517,lon:-4.5675014,dist:"~14 km",desc:"Le plus haut phare d'Europe en pierre de taille (82,5 m), à Plouguerneau. Accessible à pied par le sentier des douaniers ou en bateau selon la marée.",status:"green",note:"Côte continentale — couloir libre jusqu'à 1850 m en mer / 120 m d'altitude (SUP AIP 077/26). Aucune zone P ou CTR identifiée ici. Vérifie tout de même cartes.gouv.fr avant de décoller.",src:"Office de tourisme Pays des Abers"},
+  {name:"Aber Wrac'h",lat:48.5969163,lon:-4.5615188,dist:"~20 km",desc:"Estuaire encaissé à Landéda, port de plaisance, sentier des douaniers (GR34), dunes de Sainte-Marguerite et plage de la Palue.",status:"green",note:"Côte continentale — couloir libre jusqu'à 1850 m en mer / 120 m d'altitude. Pas de restriction identifiée.",src:"Office de tourisme Pays des Abers"},
+  {name:"Aber Benoît",lat:48.5525800,lon:-4.5424917,dist:"~22 km",desc:"Deuxième aber du Pays des Abers (Tréglonou / Lannilis), chapelle Notre-Dame de Traon, sentiers le long de la rivière.",status:"green",note:"Zone rurale, aucune restriction aéronautique identifiée. Vérifie cartes.gouv.fr par précaution.",src:"Office de tourisme Pays des Abers"},
+  {name:"Portsall",lat:48.5578742,lon:-4.6982378,dist:"~28 km",desc:"Port typique de Ploudalmézeau, mémorial du naufrage de l'Amoco Cadiz (1978), longues plages de sable fin.",status:"green",note:"Côte continentale — couloir libre jusqu'à 1850 m en mer / 120 m d'altitude.",src:"Office de tourisme Pays d'Iroise"},
+  {name:"Argenton",lat:48.5254921,lon:-4.7564159,dist:"~30 km",desc:"Petit port pittoresque de la Côte des Légendes (Landunvez), chaos rocheux et îlot accessible à marée basse.",status:"green",note:"Côte continentale — couloir libre jusqu'à 1850 m en mer / 120 m d'altitude.",src:"Office de tourisme Pays d'Iroise"},
+  {name:"Roscoff",lat:48.7255816,lon:-3.9828983,dist:"~32 km",desc:"Vieux port et maisons d'armateurs, chapelle Sainte-Barbe, jardin exotique, départ des vedettes vers l'Île de Batz.",status:"green",note:"Côte continentale — couloir libre en mer. Vérifie un éventuel arrêté municipal en cœur de ville avant de décoller au-dessus des habitations.",src:"Office de tourisme Roscoff-Baie de Morlaix"},
+  {name:"Saint-Pol-de-Léon",lat:48.6849601,lon:-3.9868641,dist:"~30 km",desc:"Cathédrale et clocher « Kreisker », ville historique du Léon, halles et marchés anciens.",status:"green",note:"Zone urbaine — vol possible en catégorie ouverte en dehors des rassemblements de personnes, pas de restriction aéronautique identifiée.",src:"Office de tourisme Roscoff-Baie de Morlaix"},
+  {name:"Île de Batz",lat:48.7446500,lon:-4.0131095,dist:"~35 km (via Roscoff)",desc:"Jardin exotique Georges Delaselle, phare, plages de sable blanc — se visite à pied ou à vélo depuis Roscoff.",status:"orange",note:"Île — ne bénéficie pas du couloir continental de 1850 m. Vérifie cartes.gouv.fr avant tout vol, en particulier autour du phare.",src:"Office de tourisme Roscoff-Baie de Morlaix"},
+  {name:"Pointe de Corsen",lat:48.4145803,lon:-4.7950894,dist:"~35 km",desc:"Point le plus occidental de la France continentale (Plouarzel), sémaphore, vue sur Ouessant et le rail d'Ouessant, l'un des plus fréquentés au monde.",status:"orange",note:"En limite de la zone offshore R17 CORSEN — le couloir de 1850 m s'applique côté continental, mais vérifie le contour exact avant de voler vers le large.",src:"Office de tourisme Pays d'Iroise"},
+  {name:"Pointe Saint-Mathieu",lat:48.3306410,lon:-4.7737256,dist:"~48 km",desc:"Phare et abbaye en ruines côte à côte (Plougonvelin) — l'un des sites les plus photographiés du Finistère, vue sur le Four et Ouessant.",status:"red",note:"Exception à la règle du couloir côtier (SUP AIP 077/26) : ici la zone R17 touche directement la côte, sans couloir libre. Vol drone interdit sans autorisation.",src:"Office de tourisme Pays d'Iroise"},
+  {name:"Le Conquet",lat:48.3605295,lon:-4.7709059,dist:"~43 km",desc:"Un des plus jolis ports du Finistère, ruelles de granit, départs de bateaux vers Ouessant et Molène.",status:"red",note:"CTR Bretagne (Brest) à proximité immédiate — vol drone interdit sans autorisation AlphaTango. Visite à pied uniquement.",src:"Office de tourisme Pays d'Iroise"},
 ];
 function loisirBadge(s){return s==='green'?{icon:'✅',label:'Vol drone libre'}:s==='orange'?{icon:'⚠️',label:'Vérifier avant de voler'}:{icon:'🚫',label:'Vol drone interdit — à pied uniquement'}}
 function renderLoisir(){
@@ -299,12 +314,31 @@ function renderLoisir(){
       <div class="loisir-desc">${l.desc}</div>
       <span class="loisir-pill ${l.status}">${b.icon} ${b.label}</span>
       <div class="loisir-desc" style="margin-top:8px">${l.note}</div>
-      <div class="loisir-dist">Source : ${l.src}</div><a class="link-btn" href="#" onclick="openItineraire('${l.name.replace(/'/g," ")}');return false;">🧭 Itinéraire <span>→</span></a>
+      <div class="loisir-dist">Source : ${l.src}</div><a class="link-btn" href="#" onclick="openItineraire('${l.lat},${l.lon}');return false;">🧭 Itinéraire <span>→</span></a>
     </div>`;
   }
   document.getElementById('loisir-list').innerHTML=html;
 }
-renderLoisir();function openItineraire(dest){const isCoord=/^-?\d+(\.\d+)?,-?\d+(\.\d+)?$/.test(dest);const q=encodeURIComponent(isCoord?dest:(dest+', France'));const waze=isCoord?('https://waze.com/ul?ll='+dest+'&navigate=yes'):('https://waze.com/ul?q='+q+'&navigate=yes');const gmaps='https://www.google.com/maps/dir/?api=1&destination='+q;const fb=setTimeout(function(){window.location.href=gmaps;},1500);window.addEventListener('blur',function(){clearTimeout(fb);},{once:true});window.location.href=waze;}
+renderLoisir();
+let itiDest=null;
+function openItineraire(dest){
+  itiDest=dest;
+  document.getElementById('itineraire-modal').classList.add('open');
+}
+function closeItiModal(){
+  document.getElementById('itineraire-modal').classList.remove('open');
+  itiDest=null;
+}
+function openWith(app){
+  if(!itiDest)return;
+  const isCoord=/^-?\d+(\.\d+)?,-?\d+(\.\d+)?$/.test(itiDest);
+  const q=encodeURIComponent(isCoord?itiDest:(itiDest+', France'));
+  const url=app==='waze'
+    ? (isCoord?('https://waze.com/ul?ll='+itiDest+'&navigate=yes'):('https://waze.com/ul?q='+q+'&navigate=yes'))
+    : ('https://www.google.com/maps/dir/?api=1&destination='+q);
+  window.location.href=url;
+  closeItiModal();
+}
 const SEASONAL={
   "cap fréhel":{months:[3,4,5,6,7],bad:"🦅 <strong>Période de nidification active</strong> — Les oiseaux nichent dans les falaises en ce moment. Vol déconseillé et potentiellement interdit par arrêté.",ok:"Les oiseaux ont quitté les falaises pour cet hiver. Vol possible — vérifie quand même Géoportail pour toute restriction temporaire."},
   "île de bréhat":{months:[3,4,5,6,7],bad:"🐦 <strong>Période de reproduction (mars–juillet)</strong> — Faune protégée particulièrement sensible. L'autorisation préfectorale est encore plus importante en ce moment.",ok:"Hors période de reproduction. L'autorisation préfectorale reste recommandée avant tout vol."},
