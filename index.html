@@ -225,6 +225,11 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
       <label class="clp-item"><input type="checkbox" id="lyr-zones" checked onchange="toggleLayer('zones')"><span class="clp-dot" style="background:#ea580c"></span>Zones connues Bretagne</label>
       <label class="clp-item"><input type="checkbox" id="lyr-cadastre" onchange="toggleLayer('cadastre')"><span class="clp-dot" style="background:#a3703a"></span>Parcellaire cadastral</label>
       <label class="clp-item"><input type="checkbox" id="lyr-admin" onchange="toggleLayer('admin')"><span class="clp-dot" style="background:#64748b"></span>Limites communes</label>
+      <div class="clp-title" style="margin-top:12px">Zones UAS (France, SIA)</div>
+      <label class="clp-item"><input type="checkbox" id="lyr-uas-ctr" onchange="toggleUasLayer('ctr')"><span class="clp-dot" style="background:#38bdf8"></span>CTR</label>
+      <label class="clp-item"><input type="checkbox" id="lyr-uas-d" onchange="toggleUasLayer('d')"><span class="clp-dot" style="background:#eab308"></span>Zones D (dangereuses)</label>
+      <label class="clp-item"><input type="checkbox" id="lyr-uas-p" onchange="toggleUasLayer('p')"><span class="clp-dot" style="background:#dc2626"></span>Zones P (interdites)</label>
+      <label class="clp-item"><input type="checkbox" id="lyr-uas-r" onchange="toggleUasLayer('r')"><span class="clp-dot" style="background:#f97316"></span>Zones R (réglementées)</label>
       <div class="clp-title" style="margin-top:12px">Fond de carte</div>
       <label class="clp-item"><input type="radio" name="basemap" id="base-osm" checked onchange="switchBasemap('osm')">OpenStreetMap</label>
       <label class="clp-item"><input type="radio" name="basemap" id="base-sat" onchange="switchBasemap('satellite')">Satellite (IGN)</label>
@@ -678,6 +683,60 @@ async function searchCarte(){
   if(carteMarker)carteMap.removeLayer(carteMarker);
   carteMarker=L.marker([l.lat,l.lon]).addTo(carteMap).bindPopup(`📍 ${l.name}`).openPopup();
   carteMap.setView([l.lat,l.lon],13);
+}
+
+// ===== Couches nationales UAS (CTR / D / P / R) — données SIA converties, hébergées dans le repo =====
+const UAS_URLS={
+  ctr:'https://cdn.jsdelivr.net/gh/guillaume-drone/drone-checker@main/data/uas_ctr.json',
+  d:'https://cdn.jsdelivr.net/gh/guillaume-drone/drone-checker@main/data/uas_d.json',
+  p:'https://cdn.jsdelivr.net/gh/guillaume-drone/drone-checker@main/data/uas_p.json',
+  r:'https://cdn.jsdelivr.net/gh/guillaume-drone/drone-checker@main/data/uas_r.json',
+};
+const UAS_COLOR={PROHIBITED:'#dc2626',REQ_AUTHORISATION:'#ea580c',CONDITIONAL:'#f59e0b'};
+const uasLayerCache={};
+
+async function loadUasLayer(cat){
+  if(!carteMap)return;
+  if(uasLayerCache[cat]){ carteMap.addLayer(uasLayerCache[cat]); return; }
+  const cb=document.getElementById('lyr-uas-'+cat);
+  if(cb)cb.disabled=true;
+  try{
+    const r=await fetch(UAS_URLS[cat]);
+    if(!r.ok)throw new Error('http '+r.status);
+    const items=await r.json();
+    const lg=L.layerGroup();
+    items.forEach(it=>{
+      const color=UAS_COLOR[it.restriction]||'#94a3b8';
+      const popup=`<strong>${it.name}</strong><br>${it.restriction}${it.msg?('<br>'+it.msg):''}`;
+      (it.geom||[]).forEach(g=>{
+        try{
+          if(g.t==='poly'){
+            const latlngs=g.c.map(ring=>ring.map(pt=>[pt[1],pt[0]]));
+            L.polygon(latlngs,{color,weight:1.5,fillOpacity:0.07}).bindPopup(popup).addTo(lg);
+          }else if(g.t==='circ'){
+            L.circle([g.c[1],g.c[0]],{radius:g.r,color,weight:1.5,fillOpacity:0.07}).bindPopup(popup).addTo(lg);
+          }
+        }catch(e){}
+      });
+    });
+    uasLayerCache[cat]=lg;
+    lg.addTo(carteMap);
+  }catch(e){
+    if(cb)cb.checked=false;
+    alert('Chargement de la couche impossible pour le moment (réseau ou format).');
+  }finally{
+    if(cb)cb.disabled=false;
+  }
+}
+
+function toggleUasLayer(cat){
+  const cb=document.getElementById('lyr-uas-'+cat);
+  if(!cb)return;
+  if(cb.checked){
+    loadUasLayer(cat);
+  }else if(uasLayerCache[cat]){
+    carteMap.removeLayer(uasLayerCache[cat]);
+  }
 }
 
 function signalIssue(locName){
