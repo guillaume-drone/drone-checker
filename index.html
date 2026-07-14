@@ -223,7 +223,12 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
       <div class="clp-title">Couches</div>
       <label class="clp-item"><input type="checkbox" id="lyr-dgac" checked onchange="toggleLayer('dgac')"><span class="clp-dot" style="background:#0ea5e9"></span>Restrictions DGAC (France)</label>
       <label class="clp-item"><input type="checkbox" id="lyr-zones" checked onchange="toggleLayer('zones')"><span class="clp-dot" style="background:#ea580c"></span>Zones connues Bretagne</label>
-      <div class="clp-note">La couche DGAC se charge automatiquement sur la zone affichée (France entière) — zoome pour la faire apparaître.</div>
+      <label class="clp-item"><input type="checkbox" id="lyr-cadastre" onchange="toggleLayer('cadastre')"><span class="clp-dot" style="background:#a3703a"></span>Parcellaire cadastral</label>
+      <label class="clp-item"><input type="checkbox" id="lyr-admin" onchange="toggleLayer('admin')"><span class="clp-dot" style="background:#64748b"></span>Limites communes</label>
+      <div class="clp-title" style="margin-top:12px">Fond de carte</div>
+      <label class="clp-item"><input type="radio" name="basemap" id="base-osm" checked onchange="switchBasemap('osm')">OpenStreetMap</label>
+      <label class="clp-item"><input type="radio" name="basemap" id="base-sat" onchange="switchBasemap('satellite')">Satellite (IGN)</label>
+      <div class="clp-note">La couche DGAC se charge automatiquement sur la zone affichée (France entière) — zoome pour la faire apparaître. Cadastre et limites communes se chargent à partir d'un certain niveau de zoom.</div>
     </div>
     <div id="carte-inner" class="carte-inner"></div>
     <div id="carte-zoom-hint" class="carte-zoom-hint" style="display:none">Zoome pour charger les restrictions DGAC ici</div>
@@ -502,28 +507,48 @@ function toggleMap(lat,lon,locName){
   },100);
 }
 // ===== Onglet Carte — vue France entière façon AirOps =====
-let carteMap=null, carteMarker=null, dgacDebounce=null;
-const carteLayers={dgac:null, zones:null};
+let carteMap=null, carteMarker=null, dgacDebounce=null, carteBaseLayer=null;
+const carteLayers={dgac:null, zones:null, cadastre:null, admin:null};
+const BASEMAPS={
+  osm: ()=>L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19}),
+  satellite: ()=>L.tileLayer('https://data.geopf.fr/wmts?SERVICE=WMTS&VERSION=1.0.0&REQUEST=GetTile&LAYER=ORTHOIMAGERY.ORTHOPHOTOS&STYLE=normal&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/jpeg',{attribution:'© IGN-F/Géoportail',maxZoom:19}),
+};
 
 function toggleLayerPanel(){
   document.getElementById('carte-layer-panel').classList.toggle('open');
 }
 
+function switchBasemap(type){
+  if(!carteMap||!BASEMAPS[type])return;
+  if(carteBaseLayer)carteMap.removeLayer(carteBaseLayer);
+  carteBaseLayer=BASEMAPS[type]();
+  carteBaseLayer.addTo(carteMap);
+  carteBaseLayer.bringToBack();
+}
+
 function initCarte(){
   if(carteMap)return;
   carteMap=L.map('carte-inner').setView([46.6,2.4],6);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:18}).addTo(carteMap);
+  switchBasemap('osm');
   carteLayers.zones=L.layerGroup().addTo(carteMap);
   ZONES.forEach(z=>{
     const color=z.status==='red'?'#dc2626':'#ea580c';
     L.circle([z.lat,z.lon],{radius:z.radius*1000,color,fillColor:color,fillOpacity:0.12,weight:2}).addTo(carteLayers.zones).bindPopup(`<strong>${z.emoji} ${z.name}</strong><br>${z.title}`);
   });
   carteLayers.dgac=L.layerGroup().addTo(carteMap);
+  carteLayers.cadastre=L.layerGroup();
+  carteLayers.admin=L.layerGroup();
   carteMap.on('moveend',()=>{
     clearTimeout(dgacDebounce);
-    dgacDebounce=setTimeout(loadDGACForView,400);
+    dgacDebounce=setTimeout(loadLayersForView,400);
   });
+  loadLayersForView();
+}
+
+function loadLayersForView(){
   loadDGACForView();
+  loadCadastreForView();
+  loadAdminForView();
 }
 
 // Charge la couche officielle DGAC (data.geopf.fr) sur la zone actuellement affichée.
@@ -562,12 +587,66 @@ async function loadDGACForView(){
   }
 }
 
+// Parcellaire cadastral (IGN) — utile seulement très zoomé (parcelles minuscules)
+async function loadCadastreForView(){
+  if(!carteMap)return;
+  const cb=document.getElementById('lyr-cadastre');
+  if(!cb||!cb.checked)return;
+  const zoom=carteMap.getZoom();
+  if(zoom<17){ carteLayers.cadastre.clearLayers(); return; }
+  const b=carteMap.getBounds();
+  const bbox=`${b.getWest()},${b.getSouth()},${b.getEast()},${b.getNorth()},EPSG:4326`;
+  const url=`https://data.geopf.fr/wfs/ows?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=CADASTRALPARCELS.PARCELLAIRE_EXPRESS:parcelle&OUTPUTFORMAT=application/json&SRSNAME=EPSG:4326&BBOX=${bbox}&COUNT=500`;
+  try{
+    const r=await fetch(url);
+    if(!r.ok)return;
+    const data=await r.json();
+    carteLayers.cadastre.clearLayers();
+    if(!data.features)return;
+    data.features.forEach(f=>{
+      const p=f.properties||{};
+      const label=`Parcelle ${p.idu||''}${p.contenance?(' — '+p.contenance+' m²'):''}`;
+      try{
+        L.geoJSON(f.geometry,{style:{color:'#a3703a',weight:1,fillOpacity:0.03}}).bindPopup(label).addTo(carteLayers.cadastre);
+      }catch(e){}
+    });
+  }catch(e){}
+}
+
+// Limites communales (IGN)
+async function loadAdminForView(){
+  if(!carteMap)return;
+  const cb=document.getElementById('lyr-admin');
+  if(!cb||!cb.checked)return;
+  const zoom=carteMap.getZoom();
+  if(zoom<9){ carteLayers.admin.clearLayers(); return; }
+  const b=carteMap.getBounds();
+  const bbox=`${b.getWest()},${b.getSouth()},${b.getEast()},${b.getNorth()},EPSG:4326`;
+  const url=`https://data.geopf.fr/wfs/ows?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=LIMITES_ADMINISTRATIVES_EXPRESS.LATEST:commune&OUTPUTFORMAT=application/json&SRSNAME=EPSG:4326&BBOX=${bbox}&COUNT=100`;
+  try{
+    const r=await fetch(url);
+    if(!r.ok)return;
+    const data=await r.json();
+    carteLayers.admin.clearLayers();
+    if(!data.features)return;
+    data.features.forEach(f=>{
+      const p=f.properties||{};
+      const label=`${p.nom_officiel||'Commune'} (${p.code_insee||''})`;
+      try{
+        L.geoJSON(f.geometry,{style:{color:'#64748b',weight:1.5,fillOpacity:0,dashArray:'4,3'}}).bindPopup(label).addTo(carteLayers.admin);
+      }catch(e){}
+    });
+  }catch(e){}
+}
+
 function toggleLayer(name){
   if(!carteMap)return;
   const cb=document.getElementById('lyr-'+name);
   if(cb.checked){
     carteMap.addLayer(carteLayers[name]);
     if(name==='dgac')loadDGACForView();
+    if(name==='cadastre')loadCadastreForView();
+    if(name==='admin')loadAdminForView();
   }else{
     carteMap.removeLayer(carteLayers[name]);
   }
