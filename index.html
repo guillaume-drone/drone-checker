@@ -562,7 +562,25 @@ function loadLayersForView(){
 
 // Charge la couche officielle DGAC (data.geopf.fr) sur la zone actuellement affichée.
 // Volontairement limitée à partir d'un certain niveau de zoom pour ne pas surcharger le WFS sur la France entière.
-async function loadDGACForView(){
+async function dgacColor(limite){
+  if(!limite)return '#0ea5e9';
+  if(/interdit/i.test(limite))return '#dc2626';
+  const m=limite.match(/(\d+)\s*m/);
+  if(m){
+    const h=parseInt(m[1],10);
+    if(h<=30)return '#ea580c';
+    if(h<=50)return '#f97316';
+    if(h<=60)return '#f59e0b';
+    return '#fbbf24';
+  }
+  return '#0ea5e9';
+}
+function dgacPopup(limite){
+  const c=dgacColor(limite);
+  const txt=limite||'Restriction UAS — DGAC';
+  return `<div style="border-left:4px solid ${c};padding-left:8px;max-width:220px"><div style="font-weight:700;font-size:13px;color:${c}">${txt}</div></div>`;
+}
+function loadDGACForView(){
   if(!carteMap)return;
   const hint=document.getElementById('carte-zoom-hint');
   const zoom=carteMap.getZoom();
@@ -586,9 +604,9 @@ async function loadDGACForView(){
     data.features.forEach(f=>{
       const limite=(f.properties&&f.properties.limite)?f.properties.limite.toString().replace(/\*/g,'').trim():'';
       const isInterdit=limite.toLowerCase().includes('interdit');
-      const style={color:isInterdit?'#dc2626':'#0ea5e9',weight:1.5,fillOpacity:0.15};
+      const style={color:dgacColor(limite),weight:1.5,fillOpacity:0.15};
       try{
-        L.geoJSON(f.geometry,{style}).bindPopup(limite||'Restriction UAS — DGAC').addTo(carteLayers.dgac);
+        L.geoJSON(f.geometry,{style}).bindPopup(dgacPopup(limite)).addTo(carteLayers.dgac);
       }catch(e){}
     });
   }catch(e){
