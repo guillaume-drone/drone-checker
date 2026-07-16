@@ -568,13 +568,14 @@ function dgacColor(limite){
   const m=limite.match(/(\d+)\s*m/);
   if(m){
     const h=parseInt(m[1],10);
-    if(h<=30)return '#ea580c';
-    if(h<=50)return '#f97316';
+    if(h<=30)return '#f43f5e';
+    if(h<=50)return '#fb923c';
     if(h<=60)return '#f59e0b';
-    return '#fbbf24';
+    return '#facc15';
   }
   return '#0ea5e9';
 }
+
 function dgacPopup(limite){
   const c=dgacColor(limite);
   const txt=limite||'Restriction UAS — DGAC';
@@ -604,7 +605,7 @@ async function loadDGACForView(){
     data.features.forEach(f=>{
       const limite=(f.properties&&f.properties.limite)?f.properties.limite.toString().replace(/\*/g,'').trim():'';
       const isInterdit=limite.toLowerCase().includes('interdit');
-      const style={color:dgacColor(limite),weight:1.5,fillOpacity:0.15};
+      const style={color:dgacColor(limite),weight:2,fillOpacity:0.4};
       try{
         L.geoJSON(f.geometry,{style}).bindPopup(dgacPopup(limite)).addTo(carteLayers.dgac);
       }catch(e){}
