@@ -139,6 +139,10 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
 .carte-wrap:-webkit-full-screen{width:100vw;height:100vh}
 .carte-wrap:fullscreen .carte-inner{height:100%}
 .carte-wrap:-webkit-full-screen .carte-inner{height:100%}
+.carte-fs-target:fullscreen{background:#0f172a;padding:10px;overflow-y:auto;height:100vh}
+.carte-fs-target:-webkit-full-screen{background:#0f172a;padding:10px;overflow-y:auto;height:100vh}
+.carte-fs-target:fullscreen .carte-inner{height:60vh}
+.carte-fs-target:-webkit-full-screen .carte-inner{height:60vh}
 .carte-layer-panel{position:absolute;top:0;left:0;bottom:0;width:210px;background:rgba(10,15,25,0.96);backdrop-filter:blur(4px);z-index:1000;padding:14px;transform:translateX(-100%);transition:transform .2s ease;overflow-y:auto}
 .carte-layer-panel.open{transform:translateX(0)}
 .clp-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--g400);margin-bottom:10px}
@@ -213,6 +217,7 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
 <div id="tab-carte" class="section">
   <br>
   <div id="notam-banner-carte"></div>
+  <div class="carte-fs-target">
   <div class="carte-toolbar">
     <button class="btn-gps" style="margin-bottom:0;flex:1" onclick="carteGPS()">📍 Ma position</button>
     <button class="layer-toggle-btn" onclick="toggleLayerPanel()">☰ Couches</button>
@@ -246,6 +251,7 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
     </div>
     <div id="carte-inner" class="carte-inner"></div>
     <div id="carte-zoom-hint" class="carte-zoom-hint" style="display:none">Zoome pour charger les restrictions DGAC ici</div>
+  </div>
   </div>
   <div class="map-legend">
     <span><span class="map-dot you"></span>Toi</span>
@@ -533,7 +539,7 @@ function toggleLayerPanel(){
 }
 
 function toggleFullscreen(){
-  const el=document.querySelector('.carte-wrap');
+  const el=document.querySelector('.carte-fs-target');
   if(!el)return;
   const isFs=document.fullscreenElement||document.webkitFullscreenElement;
   if(!isFs){
