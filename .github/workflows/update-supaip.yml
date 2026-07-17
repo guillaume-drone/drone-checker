@@ -1,0 +1,33 @@
+name: Mise a jour zones SUP-AIP
+
+on:
+  schedule:
+    - cron: '0 4 * * 1,4'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests pdfplumber beautifulsoup4
+
+      - name: Update SUP-AIP data
+        run: python3 scripts/update_supaip.py
+
+      - name: Commit if changed
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Mise a jour automatique des zones SUP-AIP (SIA)"
+          file_pattern: data/uas_supaip.json
