@@ -178,7 +178,7 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
 <div class="tabs">
   <button class="tab active" onclick="switchTab('zones')">🗺️ Zones</button>
   <button class="tab" onclick="switchTab('meteo')">🌤️ Météo drone</button>
-  <button class="tab" onclick="switchTab('loisir')">🏞️ Loisir</button><button class="tab" onclick="switchTab('supplements')">📎 Suppléments</button><button class="tab" onclick="switchTab('carte')">🧭 Carte</button>
+  <button class="tab" onclick="switchTab('loisir')">🏞️ Loisir</button><button class="tab" onclick="switchTab('supplements')">📎 Suppléments</button>
 </div>
 <div class="content"><div id="tab-supplements" class="section"><br><div class="drone-badge">📎 Suppléments</div><div class="loisir-card"><div class="loisir-top"><div class="loisir-title">Chapelle Saint-Honoré</div><div class="loisir-dist">Plogastel-Saint-Germain</div></div><div class="loisir-desc">Ruines de chapelle (17e siècle), en zone CTR Quimper (LFRQ) - plafond drone 30 m à cet endroit (catégorie Ouverte, cartes.gouv.fr).</div><a class="link-btn" href="#" onclick="openItineraire('47.944363,-4.233224');return false;">🧭 Itinéraire <span>→</span></a></div></div>
 <!-- ZONES -->
@@ -192,40 +192,12 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
     <button onclick="searchZone()">🔍</button>
   </div>
   <div id="zone-result"><div class="empty"><span class="empty-icon">🗺️</span><p>Indique ta position ou choisis un spot pour voir les restrictions.</p></div></div>
-</div>
-<!-- MÉTÉO -->
-<div id="tab-meteo" class="section">
+<div id="zones-fullmap" class="section">
   <br>
-  <div class="drone-badge">🚁 Calibré DJI Air 3S — limite vent : 43 km/h</div>
-  <button class="btn-gps" onclick="useGPS('meteo')">📍 Météo à ma position</button>
-  <div class="divider">ou recherche un lieu</div>
-  <div class="search-row">
-    <input type="text" id="meteoInput" placeholder="Cap Fréhel, Lannion, Ploumanac'h..." onkeydown="if(event.key==='Enter')searchMeteo()"/>
-    <button onclick="searchMeteo()">🔍</button>
-  </div>
-  <div id="meteo-result"><div class="empty"><span class="empty-icon">🌤️</span><p>Indique ta position pour voir les conditions météo pour ton Air 3S.</p></div></div>
-</div>
-<!-- LOISIR -->
-<div id="tab-loisir" class="section">
-  <br>
-  <div class="drone-badge">🏞️ Sites remarquables — rayon ~80 km autour de Kerlouan</div>
-  <div id="loisir-list"></div>
-  <div class="footer">Sources : offices de tourisme du Pays des Abers, du Pays de Landerneau-Daoulas, du Pays d'Iroise, de Roscoff et de Perros-Guirec, et sites des mairies concernées. Statuts drone à titre indicatif — vérifie toujours cartes.gouv.fr avant de voler.</div>
-</div>
-
-<!-- CARTE -->
-<div id="tab-carte" class="section">
-  <br>
-  <div id="notam-banner-carte"></div>
   <div class="carte-fs-target">
   <div class="carte-toolbar">
-    <button class="btn-gps" style="margin-bottom:0;flex:1" onclick="carteGPS()">📍 Ma position</button>
     <button class="layer-toggle-btn" onclick="toggleLayerPanel()">☰ Couches</button>
     <button class="layer-toggle-btn" onclick="toggleFullscreen()">⛶ Plein écran</button>
-  </div>
-  <div class="search-row">
-    <input type="text" id="carteInput" placeholder="N'importe où en France..." onkeydown="if(event.key==='Enter')searchCarte()"/>
-    <button onclick="searchCarte()">🔍</button>
   </div>
   <div class="carte-wrap">
     <div id="carte-layer-panel" class="carte-layer-panel">
@@ -260,24 +232,41 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
   </div>
   <div class="footer">Carte interactive · Restrictions DGAC en direct (data.geopf.fr) · OpenStreetMap · Zones Bretagne codées en dur</div>
 </div>
+</div>
+<!-- MÉTÉO -->
+<div id="tab-meteo" class="section">
+  <br>
+  <div class="drone-badge">🚁 Calibré DJI Air 3S — limite vent : 43 km/h</div>
+  <button class="btn-gps" onclick="useGPS('meteo')">📍 Météo à ma position</button>
+  <div class="divider">ou recherche un lieu</div>
+  <div class="search-row">
+    <input type="text" id="meteoInput" placeholder="Cap Fréhel, Lannion, Ploumanac'h..." onkeydown="if(event.key==='Enter')searchMeteo()"/>
+    <button onclick="searchMeteo()">🔍</button>
+  </div>
+  <div id="meteo-result"><div class="empty"><span class="empty-icon">🌤️</span><p>Indique ta position pour voir les conditions météo pour ton Air 3S.</p></div></div>
+</div>
+<!-- LOISIR -->
+<div id="tab-loisir" class="section">
+  <br>
+  <div class="drone-badge">🏞️ Sites remarquables — rayon ~80 km autour de Kerlouan</div>
+  <div id="loisir-list"></div>
+  <div class="footer">Sources : offices de tourisme du Pays des Abers, du Pays de Landerneau-Daoulas, du Pays d'Iroise, de Roscoff et de Perros-Guirec, et sites des mairies concernées. Statuts drone à titre indicatif — vérifie toujours cartes.gouv.fr avant de voler.</div>
+</div>
+
+
 
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 function switchTab(t){
-  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',(i===0&&t==='zones')||(i===1&&t==='meteo')||(i===2&&t==='loisir')||(i===3&&t==='supplements')||(i===4&&t==='carte')));
+  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',(i===0&&t==='zones')||(i===1&&t==='meteo')||(i===2&&t==='loisir')||(i===3&&t==='supplements')));
   document.getElementById('tab-zones').classList.toggle('active',t==='zones');
   document.getElementById('tab-meteo').classList.toggle('active',t==='meteo');
   document.getElementById('tab-loisir').classList.toggle('active',t==='loisir');document.getElementById('tab-supplements').classList.toggle('active',t==='supplements');
-  document.getElementById('tab-carte').classList.toggle('active',t==='carte');
   if(t==='meteo'&&sharedLoc&&meteoLoadedFor!==(sharedLoc.name+'|'+sharedLoc.lat+'|'+sharedLoc.lon)){
     const mi=document.getElementById('meteoInput');
     if(mi)mi.value=sharedLoc.name;
     loadMeteo(sharedLoc.lat,sharedLoc.lon,sharedLoc.name);
-  }
-  if(t==='carte'){
-    initCarte();
-    setTimeout(()=>{if(carteMap)carteMap.invalidateSize()},150);
   }
 }
 const ZONES=[
@@ -457,8 +446,7 @@ function renderZone(lat,lon,locName,placeInfo=null){
     html+=seasonNote(locName);
   }
   html+=`<div id="wfs-live"></div>`;
-  html+=`<button class="map-btn" onclick="toggleMap(${lat},${lon},'${locName.replace(/'/g,"\\'")}')">🗺️ Voir la carte autour de moi</button>
-  <div class="map-container" id="map-container"><div id="map-inner" class="map-inner"></div><div class="map-legend"><span><span class="map-dot you"></span>Toi</span><span><span class="map-dot red"></span>Zone habitée</span></div></div>`;
+  html+=`<button class="map-btn" onclick="toggleFullMap(${lat},${lon},'${locName.replace(/'/g,"\\'")}')">🗺️ Voir la carte complète (zones, DGAC, cadastre...)</button>`;
   html+=`<button class="map-btn" onclick="toggleOfficialMap(${lat},${lon})">🛰️ Carte officielle DGAC (restrictions)</button>
   <div class="iframe-container" id="iframe-container">
     <iframe id="official-iframe" src="" sandbox="allow-forms allow-scripts allow-same-origin" allowfullscreen loading="lazy"></iframe>
@@ -532,6 +520,22 @@ function toggleMap(lat,lon,locName){
     }
   },100);
 }
+function toggleFullMap(lat,lon,locName){
+  const el=document.getElementById('zones-fullmap');
+  if(!el)return;
+  const willShow=!el.classList.contains('active');
+  el.classList.toggle('active');
+  if(willShow){
+    initCarte();
+    setTimeout(()=>{
+      if(carteMap){
+        carteMap.invalidateSize();
+        carteMap.setView([lat,lon],13);
+      }
+    },150);
+  }
+}
+
 // ===== Onglet Carte — vue France entière façon AirOps =====
 let carteMap=null, carteMarker=null, dgacDebounce=null, carteBaseLayer=null;
 const carteLayers={dgac:null, zones:null, cadastre:null, admin:null};
