@@ -270,6 +270,11 @@ function switchTab(t){
   document.getElementById('tab-meteo').classList.toggle('active',t==='meteo');
   document.getElementById('tab-loisir').classList.toggle('active',t==='loisir');document.getElementById('tab-supplements').classList.toggle('active',t==='supplements');
   document.getElementById('tab-carte').classList.toggle('active',t==='carte');
+  if(t==='meteo'&&sharedLoc&&meteoLoadedFor!==(sharedLoc.name+'|'+sharedLoc.lat+'|'+sharedLoc.lon)){
+    const mi=document.getElementById('meteoInput');
+    if(mi)mi.value=sharedLoc.name;
+    loadMeteo(sharedLoc.lat,sharedLoc.lon,sharedLoc.name);
+  }
   if(t==='carte'){
     initCarte();
     setTimeout(()=>{if(carteMap)carteMap.invalidateSize()},150);
@@ -422,6 +427,7 @@ function aggloExtraNote(label,locName){
   return`<div class="note-card red"><div class="note-header red">🏘️ "${locName}" est ${label}</div>Indépendamment de la zone ci-dessus, le survol de <strong>personnes, routes, véhicules et propriétés privées</strong> est réglementé partout en France. Reste à distance des habitations et rassemblements. La forme rouge sur la carte indique le contour approximatif de cette zone habitée.</div>`;
 }
 function renderZone(lat,lon,locName,placeInfo=null){
+  sharedLoc={lat,lon,name:locName};
   let inside=[],nearest=null,minD=Infinity;
   for(const z of ZONES){const d=dist(lat,lon,z.lat,z.lon);if(d<z.radius)inside.push({...z});if(d<minD){minD=d;nearest=z}}
   minD=Math.round(minD*10)/10;
@@ -810,6 +816,7 @@ async function fetchKp(){
   try{const r=await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json');const d=await r.json();return parseFloat(d[d.length-1][1])||0}catch{return null}
 }
 async function loadMeteo(lat,lon,locName){
+  sharedLoc={lat,lon,name:locName};meteoLoadedFor=locName+'|'+lat+'|'+lon;
   document.getElementById('meteo-result').innerHTML='<div class="loading"><div class="spinner"></div>Chargement météo en cours...</div>';
   try{
     const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m,precipitation,visibility,cloud_cover,relative_humidity_2m,weather_code&hourly=wind_speed_10m,wind_gusts_10m,precipitation_probability,cloud_cover,temperature_2m&daily=sunrise,sunset,weathercode,temperature_2m_max,temperature_2m_min,windspeed_10m_max,windgusts_10m_max,precipitation_sum&wind_speed_unit=kmh&timezone=Europe/Paris&forecast_days=4`;
@@ -911,6 +918,7 @@ async function loadMeteo(lat,lon,locName){
   }
 }
 function loading(id,msg){document.getElementById(id).innerHTML=`<div class="loading"><div class="spinner"></div>${msg}</div>`}
+let sharedLoc=null,meteoLoadedFor=null;
 function useGPS(mode){
   if(!navigator.geolocation){alert('GPS non disponible.');return}
   const rid=mode==='zones'?'zone-result':'meteo-result';
