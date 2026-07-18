@@ -199,6 +199,7 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
   <div class="carte-fs-target">
   <div class="carte-toolbar">
     <button class="layer-toggle-btn" onclick="toggleLayerPanel()">☰ Couches</button>
+    <button class="layer-toggle-btn" onclick="carteGPS()">📍 Ma position</button>
     <button class="layer-toggle-btn" onclick="toggleFullscreen()">⛶ Plein écran</button>
   </div>
   <div class="carte-wrap">
@@ -540,7 +541,7 @@ function toggleFullMap(lat,lon,locName){
 }
 
 // ===== Onglet Carte — vue France entière façon AirOps =====
-let carteMap=null, carteMarker=null, dgacDebounce=null, carteBaseLayer=null;
+let carteMap=null, carteMarker=null, carteGpsMarker=null, dgacDebounce=null, carteBaseLayer=null;
 const carteLayers={dgac:null, zones:null, cadastre:null, admin:null};
 const BASEMAPS={
   osm: ()=>L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19}),
@@ -723,8 +724,8 @@ function carteGPS(){
     p=>{
       const la=p.coords.latitude,lo=p.coords.longitude;
       if(!carteMap)return;
-      if(carteMarker)carteMap.removeLayer(carteMarker);
-      carteMarker=L.circleMarker([la,lo],{radius:8,color:'#0ea5e9',fillColor:'#0ea5e9',fillOpacity:0.9,weight:2}).addTo(carteMap).bindPopup('📍 Ta position').openPopup();
+      if(carteGpsMarker)carteMap.removeLayer(carteGpsMarker);
+      carteGpsMarker=L.circleMarker([la,lo],{radius:8,color:'#0ea5e9',fillColor:'#0ea5e9',fillOpacity:0.9,weight:2}).addTo(carteMap).bindPopup('📍 Ta position').openPopup();
       carteMap.setView([la,lo],13);
     },
     e=>{
