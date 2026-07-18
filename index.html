@@ -139,10 +139,12 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
 .carte-wrap:-webkit-full-screen{width:100vw;height:100vh}
 .carte-wrap:fullscreen .carte-inner{height:100%}
 .carte-wrap:-webkit-full-screen .carte-inner{height:100%}
-.carte-fs-target:fullscreen{background:#0f172a;padding:10px;overflow-y:auto;height:100vh}
-.carte-fs-target:-webkit-full-screen{background:#0f172a;padding:10px;overflow-y:auto;height:100vh}
-.carte-fs-target:fullscreen .carte-inner{height:60vh}
-.carte-fs-target:-webkit-full-screen .carte-inner{height:60vh}
+.carte-fs-target:fullscreen{background:#0f172a;padding:10px;overflow:hidden;height:100vh;display:flex;flex-direction:column}
+.carte-fs-target:-webkit-full-screen{background:#0f172a;padding:10px;overflow:hidden;height:100vh;display:flex;flex-direction:column}
+.carte-fs-target:fullscreen .carte-wrap{flex:1;min-height:0;margin-bottom:0}
+.carte-fs-target:-webkit-full-screen .carte-wrap{flex:1;min-height:0;margin-bottom:0}
+.carte-fs-target:fullscreen .carte-inner{height:100%}
+.carte-fs-target:-webkit-full-screen .carte-inner{height:100%}
 .carte-layer-panel{position:absolute;top:0;left:0;bottom:0;width:210px;background:rgba(10,15,25,0.96);backdrop-filter:blur(4px);z-index:1000;padding:14px;transform:translateX(-100%);transition:transform .2s ease;overflow-y:auto}
 .carte-layer-panel.open{transform:translateX(0)}
 .clp-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--g400);margin-bottom:10px}
@@ -620,7 +622,7 @@ async function loadDGACForView(){
   if(!carteMap)return;
   const hint=document.getElementById('carte-zoom-hint');
   const zoom=carteMap.getZoom();
-  if(zoom<10){
+  if(zoom<8){
     if(hint)hint.style.display='block';
     carteLayers.dgac.clearLayers();
     return;
@@ -630,7 +632,7 @@ async function loadDGACForView(){
   if(!cb||!cb.checked)return;
   const b=carteMap.getBounds();
   const bbox=`${b.getWest()},${b.getSouth()},${b.getEast()},${b.getNorth()},EPSG:4326`;
-  const url=`https://data.geopf.fr/wfs/ows?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=TRANSPORTS.DRONES.RESTRICTIONS:carte_restriction_drones_lf&OUTPUTFORMAT=application/json&SRSNAME=EPSG:4326&BBOX=${bbox}&COUNT=300`;
+  const url=`https://data.geopf.fr/wfs/ows?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=TRANSPORTS.DRONES.RESTRICTIONS:carte_restriction_drones_lf&OUTPUTFORMAT=application/json&SRSNAME=EPSG:4326&BBOX=${bbox}&COUNT=600`;
   try{
     const r=await fetch(url);
     if(!r.ok)return;
