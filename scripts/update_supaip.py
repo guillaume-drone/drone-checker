@@ -15,7 +15,13 @@ Logique :
   4. Parse les coordonnees (cercle ou polygone), limites verticales, dates.
   5. Ne garde que les zones dont le plancher est SFC (sol) -- pertinent pour
      un drone ; les zones en altitude (FL/AMSL eleve) sont ignorees.
-  6. Ecrit data/uas_supaip.json (meme format que les autres couches uas_*.json).
+  6. FUSIONNE le resultat avec data/uas_supaip.json existant (par numero de
+     bulletin) au lieu de tout ecraser : un echec de parsing ponctuel sur un
+     bulletin deja connu ne fait pas disparaitre la zone. Seuls les bulletins
+     confirmes annules ou expires sont retires.
+  7. Garde-fou : si la fusion ferait chuter le nombre de zones de plus de 50%
+     par rapport au fichier existant, l'ecriture est annulee (le fichier
+     existant est conserve tel quel) et le job se termine en erreur.
 
 Concu pour tourner en CI (GitHub Actions) via .github/workflows/update-supaip.yml,
 mais fonctionne aussi en local (python3 scripts/update_supaip.py).
@@ -203,7 +209,9 @@ def fetch_list_entries():
         if not href.startswith("http"):
             href = "https://www.sia.aviation-civile.gouv.fr" + href
         title_text = a.get_text(" ", strip=True)
-        m = re.match(r"(\d+/\d{4})\s*(.*)", title_text)
+        # Le site formate le numero de bulletin tantot en annee sur 2 chiffres
+        # (ex "035/26"), tantot sur 4 (ex "137/2026") -- on accepte les deux.
+        m = re.match(r"(\d+/\d{2,4})\s*(.*)", title_text)
         if not m:
             continue
         num, title = m.group(1), m.group(2)
@@ -286,6 +294,18 @@ def to_feature(fid, name, geom, restriction, msg, link, reason):
     }
 
 
+def bulletin_num_from_reason(reason):
+    return (reason or "").replace("SUP-AIP", "").strip()
+
+
+def load_existing():
+    try:
+        with open(OUT_PATH, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return []
+
+
 def main():
     print("Recuperation de la liste SUP-AIP SIA...")
     entries = fetch_list_entries()
@@ -293,41 +313,94 @@ def main():
     candidates = filter_candidates(entries)
     print(f"  {len(candidates)} bulletins candidats (creation ZRT/ZIT/ZDT, valides, non annules).")
 
-    features = []
+    existing = load_existing()
+    print(f"  {len(existing)} zones existantes dans {OUT_PATH} avant mise a jour.")
+
+    # Bulletins desormais annules ou expires (pour purge), meme s'ils ne sont
+    # plus dans la liste de candidats.
+    today = datetime.now(timezone.utc).date()
+    dead_nums = set()
+    for e in entries:
+        dead = e["cancelled"]
+        if not dead:
+            try:
+                dead = datetime.strptime(e["end"], "%Y-%m-%d").date() < today
+            except ValueError:
+                dead = False
+        if dead:
+            dead_nums.add(e["num"])
+
+    new_by_bulletin = {}
     fid = 1
     ok, fail, no_sfc = 0, 0, 0
+    fail_details = []
     for e in candidates:
         text = fetch_pdf_text(e["pdf"])
         if not text:
             fail += 1
+            fail_details.append(f"{e['num']} : echec telechargement/extraction PDF")
             continue
         r = parse_sup(text, e["num"], e["pdf"])
         if not r.get("parseable") or r.get("cancelled"):
             fail += 1
+            fail_details.append(f"{e['num']} : echec parsing (structure non reconnue)")
             continue
         title = r.get("title") or e["title"]
         is_zit = "INTERDIT" in title.upper() or bool(re.search(r"\bZIT\b", title))
         restriction = "PROHIBITED" if is_zit else "REQ_AUTHORISATION"
-        any_kept = False
+        feats = []
         for z in r["zones"]:
             if not z["sfc"] or not z["geom"]:
                 continue
             msg = f"{title} — SUP AIP {e['num']}. Valide {r.get('validity_raw') or ''}. Plafond {z['ceiling'] or '?'}."
-            features.append(to_feature(fid, z["name"], z["geom"], restriction, msg, e["pdf"], reason=f"SUP-AIP {e['num']}"))
+            feats.append(to_feature(fid, z["name"], z["geom"], restriction, msg, e["pdf"], reason=f"SUP-AIP {e['num']}"))
             fid += 1
-            any_kept = True
-        if any_kept:
+        if feats:
+            new_by_bulletin[e["num"]] = feats
             ok += 1
         else:
             no_sfc += 1
+
         time.sleep(0.5)
 
+    if fail_details:
+        print("  Details des echecs :")
+        for d in fail_details:
+            print(f"    - {d}")
+
+    # Fusion : on garde les zones existantes dont le bulletin n'a pas ete
+    # re-traite avec succes cette fois-ci (echec de parsing ponctuel ou
+    # bulletin plus dans la liste de candidats), sauf si le bulletin est
+    # desormais confirme annule/expire. Les bulletins re-parses avec succes
+    # remplacent leur ancienne version.
+    merged = []
+    for feat in existing:
+        num = bulletin_num_from_reason(feat.get("reason"))
+        if num in dead_nums:
+            continue
+        if num in new_by_bulletin:
+            continue
+        merged.append(feat)
+    for feats in new_by_bulletin.values():
+        merged.extend(feats)
+
+    for i, feat in enumerate(merged, start=1):
+        feat["id"] = f"supaip-{i}"
+
     print(f"  Bulletins traites avec succes : {ok} | echecs : {fail} | sans zone SFC exploitable : {no_sfc}")
-    print(f"  Total zones retenues : {len(features)}")
+    print(f"  Total zones apres fusion : {len(merged)} (etait {len(existing)} avant).")
+
+    if len(existing) >= 10 and len(merged) < len(existing) * 0.5:
+        print(
+            f"  ALERTE : la fusion ferait chuter le nombre de zones de {len(existing)} a {len(merged)} "
+            "(plus de 50% de perte). Ecriture annulee par securite, fichier existant conserve.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
 
     with open(OUT_PATH, "w", encoding="utf-8") as f:
-        json.dump(features, f, ensure_ascii=False, separators=(",", ":"))
-    print(f"Ecrit {OUT_PATH} ({len(features)} zones).")
+     json.dump(merged, f, ensure_ascii=False, separators=(",", ":"))
+    print(f"Ecrit {OUT_PATH} ({len(merged)} zones).")
 
 
 if __name__ == "__main__":
