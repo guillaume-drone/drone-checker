@@ -403,17 +403,21 @@ function spanTooLarge(minLat,maxLat,minLon,maxLon){
 function aggloInfo(placeInfo){
   currentAggloShape=null;
   if(!placeInfo||!placeInfo.type||!AGGLO_TYPES[placeInfo.type])return{isAgglo:false};
+  let tooLarge=false;
   if(placeInfo.geojson&&placeInfo.geojson.type!=='Point'){
     const[minLat,maxLat,minLon,maxLon]=geojsonBounds(placeInfo.geojson);
-    if(!spanTooLarge(minLat,maxLat,minLon,maxLon)){
+    tooLarge=spanTooLarge(minLat,maxLat,minLon,maxLon);
+    if(!tooLarge){
       currentAggloShape={type:'geojson',data:placeInfo.geojson};
     }
   }else if(placeInfo.bbox){
     const[s,n,w,e]=placeInfo.bbox;
-    if(!spanTooLarge(s,n,w,e)){
+    tooLarge=spanTooLarge(s,n,w,e);
+    if(!tooLarge){
       currentAggloShape={type:'bbox',data:[[s,w],[n,e]]};
     }
   }
+  if(tooLarge)return{isAgglo:false};
   return{isAgglo:true,label:AGGLO_TYPES[placeInfo.type]};
 }
 function aggloExtraNote(label,locName){
