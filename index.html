@@ -604,9 +604,9 @@ function loadLayersForView(){
 
 // Charge la couche officielle DGAC (data.geopf.fr) sur la zone actuellement affichée.
 // Volontairement limitée à partir d'un certain niveau de zoom pour ne pas surcharger le WFS sur la France entière.
-function dgacColor(limite){
+function dgacColor(limite,starred){
   if(!limite)return '#0ea5e9';
-  if(/interdit/i.test(limite))return '#dc2626';
+  if(/interdit/i.test(limite))return starred?'#f59e0b':'#dc2626';
   const m=limite.match(/(\d+)\s*m/);
   if(m){
     const h=parseInt(m[1],10);
@@ -618,10 +618,11 @@ function dgacColor(limite){
   return '#0ea5e9';
 }
 
-function dgacPopup(limite){
-  const c=dgacColor(limite);
+function dgacPopup(limite,starred){
+  const c=dgacColor(limite,starred);
   const txt=limite||'Restriction UAS — DGAC';
-  return `<div style="border-left:4px solid ${c};padding-left:8px;max-width:220px"><div style="font-weight:700;font-size:13px;color:${c}">${txt}</div></div>`;
+  const note=starred?'<div style="font-size:11px;color:#94a3b8;margin-top:4px">* Règle standard en agglomération (arrêté « Espace ») — vol généralement possible en évitant personnes, routes et bâtiments habités, selon ta catégorie de télépilote.</div>':'';
+  return '<div style="border-left:4px solid '+c+';padding-left:8px;max-width:220px"><div style="font-weight:700;font-size:13px;color:'+c+'">'+txt+'</div>'+note+'</div>';
 }
 async function loadDGACForView(){
   if(!carteMap)return;
@@ -645,11 +646,12 @@ async function loadDGACForView(){
     carteLayers.dgac.clearLayers();
     if(!data.features)return;
     data.features.forEach(f=>{
-      const limite=(f.properties&&f.properties.limite)?f.properties.limite.toString().replace(/\*/g,'').trim():'';
-      const isInterdit=limite.toLowerCase().includes('interdit');
-      const style={color:dgacColor(limite),weight:2,fillOpacity:0.4};
+      const raw=(f.properties&&f.properties.limite)?f.properties.limite.toString():'';
+      const starred=raw.indexOf('*')!==-1;
+      const limite=raw.replace(/\*/g,'').trim();
+      const style={color:dgacColor(limite,starred),weight:2,fillOpacity:starred?0.22:0.4};
       try{
-        L.geoJSON(f.geometry,{style}).bindPopup(dgacPopup(limite)).addTo(carteLayers.dgac);
+        L.geoJSON(f.geometry,{style}).bindPopup(dgacPopup(limite,starred)).addTo(carteLayers.dgac);
       }catch(e){}
     });
   }catch(e){
