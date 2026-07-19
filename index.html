@@ -196,11 +196,46 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
   <div id="zone-result"><div class="empty"><span class="empty-icon">🗺️</span><p>Indique ta position ou choisis un spot pour voir les restrictions.</p></div></div>
 <div id="zones-fullmap" class="section">
   <br>
-  <div class="carte-fs-target" style="position:relative">
-    <button onclick="toggleFullMap()" style="position:absolute;top:10px;right:10px;z-index:1000;background:#0f172a;color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer">✕ Fermer</button>
-    <div id="airops-map" style="width:100%;height:75vh;border-radius:12px;background:#0f172a"></div>
+  <div class="carte-fs-target">
+  <div class="carte-toolbar">
+    <button class="layer-toggle-btn" onclick="toggleLayerPanel()">☰ Couches</button>
+    <button class="layer-toggle-btn" onclick="carteGPS()">📍 Ma position</button>
+    <button class="layer-toggle-btn" onclick="toggleFullscreen()">⛶ Plein écran</button>
   </div>
-  <div class="footer">Couche officielle IGN (TRANSPORTS.DRONES.RESTRICTIONS) · même rendu que AirOps</div>
+  <div class="carte-wrap">
+    <div id="carte-layer-panel" class="carte-layer-panel">
+      <div class="clp-close"><button onclick="toggleLayerPanel()">✕</button></div>
+      <div class="clp-title">Couches</div>
+      <label class="clp-item"><input type="checkbox" id="lyr-dgac" checked onchange="toggleLayer('dgac')"><span class="clp-dot" style="background:#0ea5e9"></span>Restrictions DGAC (France)</label>
+      <label class="clp-item"><input type="checkbox" id="lyr-zones" checked onchange="toggleLayer('zones')"><span class="clp-dot" style="background:#ea580c"></span>Zones connues Bretagne</label>
+      <label class="clp-item"><input type="checkbox" id="lyr-cadastre" onchange="toggleLayer('cadastre')"><span class="clp-dot" style="background:#a3703a"></span>Parcellaire cadastral</label>
+      <label class="clp-item"><input type="checkbox" id="lyr-admin" onchange="toggleLayer('admin')"><span class="clp-dot" style="background:#64748b"></span>Limites communes</label>
+      <div class="clp-title" style="margin-top:12px">Zones UAS (France, SIA)</div>
+      <label class="clp-item"><input type="checkbox" id="lyr-uas-ctr" onchange="toggleUasLayer('ctr')"><span class="clp-dot" style="background:#38bdf8"></span>CTR</label>
+      <label class="clp-item"><input type="checkbox" id="lyr-uas-d" onchange="toggleUasLayer('d')"><span class="clp-dot" style="background:#eab308"></span>Zones D (dangereuses)</label>
+      <label class="clp-item"><input type="checkbox" id="lyr-uas-p" onchange="toggleUasLayer('p')"><span class="clp-dot" style="background:#dc2626"></span>Zones P (interdites)</label>
+      <label class="clp-item"><input type="checkbox" id="lyr-uas-r" onchange="toggleUasLayer('r')"><span class="clp-dot" style="background:#f97316"></span>Zones R (réglementées)</label>
+      <label class="clp-item"><input type="checkbox" id="lyr-uas-voltac" onchange="toggleUasLayer('voltac')"><span class="clp-dot" style="background:#7c3aed"></span>VOLTAC / SETBA / SEBAH</label>
+      <label class="clp-item"><input type="checkbox" id="lyr-uas-parcs" onchange="toggleUasLayer('parcs')"><span class="clp-dot" style="background:#16a34a"></span>Parcs nationaux</label>
+      <label class="clp-item"><input type="checkbox" id="lyr-uas-piste" onchange="toggleUasLayer('piste')"><span class="clp-dot" style="background:#ea580c"></span>Pistes aérodromes</label>
+      <label class="clp-item"><input type="checkbox" id="lyr-uas-helistation" onchange="toggleUasLayer('helistation')"><span class="clp-dot" style="background:#ea580c"></span>Hélistations</label>
+      <label class="clp-item"><input type="checkbox" id="lyr-uas-supaip" onchange="toggleUasLayer('supaip')"><span class="clp-dot" style="background:#db2777"></span>SUP-AIP (restrictions temporaires)</label>
+      <div class="clp-title" style="margin-top:12px">Fond de carte</div>
+      <label class="clp-item"><input type="radio" name="basemap" id="base-osm" checked onchange="switchBasemap('osm')">OpenStreetMap</label>
+      <label class="clp-item"><input type="radio" name="basemap" id="base-sat" onchange="switchBasemap('satellite')">Satellite (IGN)</label>
+      <div class="clp-note">La couche DGAC se charge automatiquement sur la zone affichée (France entière) — zoome pour la faire apparaître. Cadastre et limites communes se chargent à partir d'un certain niveau de zoom.</div>
+    </div>
+    <div id="carte-inner" class="carte-inner"></div>
+    <div id="carte-zoom-hint" class="carte-zoom-hint" style="display:none">Zoome pour charger les restrictions DGAC ici</div>
+  </div>
+  </div>
+  <div class="map-legend">
+    <span><span class="map-dot you"></span>Toi</span>
+    <span><span class="map-dot red"></span>Interdit / actif</span>
+    <span><span class="map-dot orange"></span>Prudence / vérif. requise</span>
+  </div>
+  <div class="footer">Carte interactive · Restrictions DGAC en direct (data.geopf.fr) · OpenStreetMap · Zones Bretagne codées en dur</div>
+</div>
 </div>
 <!-- MÉTÉO -->
 <div id="tab-meteo" class="section">
@@ -420,11 +455,7 @@ function renderZone(lat,lon,locName,placeInfo=null){
   }
   html+=`<div id="wfs-live"></div>`;
   html+=`<button class="map-btn" onclick="toggleFullMap(${lat},${lon},'${locName.replace(/'/g,"\\'")}')">🗺️ Voir la carte complète (zones, DGAC, cadastre...)</button>`;
-  html+=`<button class="map-btn" onclick="toggleOfficialMap(${lat},${lon})">🛰️ Carte officielle DGAC (restrictions)</button>
-  <div class="iframe-container" id="iframe-container">
-    <iframe id="official-iframe" src="" sandbox="allow-forms allow-scripts allow-same-origin" allowfullscreen loading="lazy"></iframe>
-    <div class="iframe-caption">Restrictions UAS — DGAC / cartes.gouv.fr · <a href="${geo}" target="_blank" style="color:var(--sky)">Plein écran ↗</a> · <a href="javascript:void(0)" onclick="reloadOfficialMap()" style="color:var(--sky)">Réessayer 🔄</a></div>
-  </div>`;
+  html+=`<a class="map-btn" href="${geo}" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none;box-sizing:border-box">🛰️ Carte officielle DGAC (restrictions) ↗</a>`;
   html+=`<button class="signal-btn" onclick="signalIssue('${locName.replace(/'/g,"\\'")}')">🚩 Signaler une info obsolète sur ce lieu</button>
   <div class="footer">Données indicatives · DGAC · AlphaTango · SUP AIP 077/26 · Maj ${new Date().toLocaleDateString('fr-FR')}</div>`;
   document.getElementById('zone-result').innerHTML=html;
@@ -497,24 +528,18 @@ function toggleMap(lat,lon,locName){
     }
   },100);
 }
-let airopsMap=null, airopsMarker=null;
 function toggleFullMap(lat,lon,locName){
   const el=document.getElementById('zones-fullmap');
   if(!el)return;
   const willShow=!el.classList.contains('active');
   el.classList.toggle('active');
-  if(willShow&&lat!=null&&lon!=null){
+  if(willShow){
+    initCarte();
     setTimeout(()=>{
-      if(!airopsMap){
-        airopsMap=L.map('airops-map').setView([lat,lon],14);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(airopsMap);
-        L.tileLayer('https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=TRANSPORTS.DRONES.RESTRICTIONS&STYLE=normal&FORMAT=image/png&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}',{maxZoom:19,opacity:0.65,attribution:'IGN/DGAC'}).addTo(airopsMap);
-      }else{
-        airopsMap.setView([lat,lon],14);
+      if(carteMap){
+        carteMap.invalidateSize();
+        carteMap.setView([lat,lon],13);
       }
-      if(airopsMarker)airopsMap.removeLayer(airopsMarker);
-      airopsMarker=L.marker([lat,lon]).addTo(airopsMap);
-      airopsMap.invalidateSize();
     },150);
   }
 }
