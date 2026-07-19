@@ -208,7 +208,7 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
     <div id="carte-layer-panel" class="carte-layer-panel">
       <div class="clp-close"><button onclick="toggleLayerPanel()">✕</button></div>
       <div class="clp-title">Couches</div>
-      <label class="clp-item"><input type="checkbox" id="lyr-dgac" checked onchange="toggleLayer('dgac')"><span class="clp-dot" style="background:#0ea5e9"></span>Restrictions DGAC (France)</label>
+      <label class="clp-item"><input type="checkbox" id="lyr-dgac" checked onchange="toggleLayer('dgac')"><span class="clp-dot" style="background:#0ea5e9"></span>Restrictions DGAC (France)</label><label class="clp-item"><input type="checkbox" id="lyr-official-tiles" checked onchange="toggleLayer('officialTiles')"><span class="clp-dot" style="background:#fff"></span>Carte officielle DGAC (image IGN)</label>
       <label class="clp-item"><input type="checkbox" id="lyr-zones" checked onchange="toggleLayer('zones')"><span class="clp-dot" style="background:#ea580c"></span>Zones connues Bretagne</label>
       <label class="clp-item"><input type="checkbox" id="lyr-cadastre" onchange="toggleLayer('cadastre')"><span class="clp-dot" style="background:#a3703a"></span>Parcellaire cadastral</label>
       <label class="clp-item"><input type="checkbox" id="lyr-admin" onchange="toggleLayer('admin')"><span class="clp-dot" style="background:#64748b"></span>Limites communes</label>
@@ -457,7 +457,7 @@ function renderZone(lat,lon,locName,placeInfo=null){
   }
   html+=`<div id="wfs-live"></div>`;
   html+=`<button class="map-btn" onclick="toggleFullMap(${lat},${lon},'${locName.replace(/'/g,"\\'")}')">🗺️ Voir les restrictions officielles DGAC (carte en direct)</button>`;
-  html+=`<div style="font-size:11px;color:var(--g400);margin-top:4px;line-height:1.4">Données DGAC en direct (data.geopf.fr) affichées sur notre carte — le site cartes.gouv.fr bloque son intégration dans d'autres sites, donc on ne peut pas l'afficher ici directement.</div>`;
+  html+=`<div style="font-size:11px;color:var(--g400);margin-top:4px;line-height:1.4">Inclut la couche « Carte officielle DGAC (image IGN) » — les vraies tuiles officielles cartes.gouv.fr, affichées directement sur notre carte (activable/désactivable dans Couches).</div>`;
   html+=`<button class="signal-btn" onclick="signalIssue('${locName.replace(/'/g,"\\'")}')">🚩 Signaler une info obsolète sur ce lieu</button>
   <div class="footer">Données indicatives · DGAC · AlphaTango · SUP AIP 077/26 · Maj ${new Date().toLocaleDateString('fr-FR')}</div>`;
   document.getElementById('zone-result').innerHTML=html;
@@ -592,6 +592,7 @@ function initCarte(){
   carteLayers.dgac=L.layerGroup().addTo(carteMap);
   carteLayers.cadastre=L.layerGroup();
   carteLayers.admin=L.layerGroup();
+  carteLayers.officialTiles=L.tileLayer('https://data.geopf.fr/wmts?SERVICE=WMTS&VERSION=1.0.0&REQUEST=GetTile&LAYER=TRANSPORTS.DRONES.RESTRICTIONS&STYLE=normal&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/png',{opacity:0.75,maxZoom:19,attribution:'IGN/DGAC'}).addTo(carteMap);
   carteMap.on('moveend',()=>{
     clearTimeout(dgacDebounce);
     dgacDebounce=setTimeout(loadLayersForView,400);
