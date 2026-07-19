@@ -810,7 +810,7 @@ function uasZoneCenter(geom){
 function sofiaNote(geom){
   var zc=uasZoneCenter(geom);
   var base='<div style="font-size:11px;color:#94a3b8;margin-top:4px;line-height:1.6">';
-  var steps='<b style="color:#e2e8f0">Marche à suivre :</b><br>1) Compte gratuit (une fois) → 2) « Préparation de vol » → « Local » → « Trajet » → 3) Colle la position ci-dessous → 4) Choisis une heure UTC future → 5) « Rechercher ».';
+  var steps='<b style="color:#e2e8f0">Marche à suivre (sans compte) :</b><br>1) « Préparation » → 2) section NOTAM, « Autres options » → 3) « Zone (PIB Area) » → « Cylindre » → 4) Colle la position ci-dessous, une heure UTC future et un rayon (ex: 5 NM) → 5) « Rechercher ».';
   if(zc){
     return base+steps+'<br>Position à copier : <b style="color:#e2e8f0">'+toDMS5(zc.lat,zc.lon)+'</b></div>';
   }
