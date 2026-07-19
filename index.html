@@ -498,8 +498,9 @@ async function queryDGACWFS(lat,lon){
       const starred=raw.indexOf('*')!==-1;
       const l=raw.replace(/\*/g,'').trim();
       const isInterdit=l.toLowerCase().includes('interdit')&&!starred;
-      const note=starred?' <span style="color:#94a3b8;font-size:11px">— vol généralement possible sous conditions standard (arrêté « Espace »)</span>':'';
-      return`<div class="rule-item"><div class="rule-dot ${isInterdit?'red':'orange'}"></div>${l}${note}</div>`;
+      const dotClass=starred?'green':(isInterdit?'red':'orange');
+      const text=starred?'Zone habitée — vol autorisé sous conditions standard (arrêté « Espace »)':l;
+      return`<div class="rule-item"><div class="rule-dot ${dotClass}"></div>${text}</div>`;
     }).join('');
     const html=`<div class="result-card" style="margin-top:.75rem"><div class="status-banner orange" style="padding:1rem 1.25rem 0.5rem"><div class="s-emoji">🔬</div><div><div class="s-title orange" style="font-size:15px">Donnée officielle DGAC en direct</div><div class="s-loc">Couche cartes.gouv.fr — TRANSPORTS.DRONES.RESTRICTIONS</div></div></div><div class="rules-list">${items}</div></div>`;
     const el=document.getElementById('wfs-live');
@@ -609,7 +610,7 @@ function loadLayersForView(){
 // Volontairement limitée à partir d'un certain niveau de zoom pour ne pas surcharger le WFS sur la France entière.
 function dgacColor(limite,starred){
   if(!limite)return '#0ea5e9';
-  if(/interdit/i.test(limite))return starred?'#f59e0b':'#dc2626';
+  if(/interdit/i.test(limite))return starred?'#4ade80':'#dc2626';
   const m=limite.match(/(\d+)\s*m/);
   if(m){
     const h=parseInt(m[1],10);
@@ -623,9 +624,8 @@ function dgacColor(limite,starred){
 
 function dgacPopup(limite,starred){
   const c=dgacColor(limite,starred);
-  const txt=limite||'Restriction UAS — DGAC';
-  const note=starred?'<div style="font-size:11px;color:#94a3b8;margin-top:4px">* Règle standard en agglomération (arrêté « Espace ») — vol généralement possible en évitant personnes, routes et bâtiments habités, selon ta catégorie de télépilote.</div>':'';
-  return '<div style="border-left:4px solid '+c+';padding-left:8px;max-width:220px"><div style="font-weight:700;font-size:13px;color:'+c+'">'+txt+'</div>'+note+'</div>';
+  const txt=starred?'Zone habitée — vol autorisé sous conditions standard (arrêté « Espace »)':(limite||'Restriction UAS — DGAC');
+  return '<div style="border-left:4px solid '+c+';padding-left:8px;max-width:220px"><div style="font-weight:700;font-size:13px;color:'+c+'">'+txt+'</div></div>';
 }
 async function loadDGACForView(){
   if(!carteMap)return;
