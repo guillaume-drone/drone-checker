@@ -456,8 +456,8 @@ function renderZone(lat,lon,locName,placeInfo=null){
     html+=seasonNote(locName);
   }
   html+=`<div id="wfs-live"></div>`;
-  html+=`<button class="map-btn" onclick="toggleFullMap(${lat},${lon},'${locName.replace(/'/g,"\\'")}')">🗺️ Voir la carte complète (zones, DGAC, cadastre...)</button>`;
-  html+=`<button class="map-btn" onclick="var w=window.open('${geo}','carteOfficielle','width=430,height=720'); if(!w) window.open('${geo}','_blank')" style="width:100%">🛰️ Carte officielle DGAC (restrictions) ↗</button>`;
+  html+=`<button class="map-btn" onclick="toggleFullMap(${lat},${lon},'${locName.replace(/'/g,"\\'")}')">🗺️ Voir les restrictions officielles DGAC (carte en direct)</button>`;
+  html+=`<div style="font-size:11px;color:var(--g400);margin-top:4px;line-height:1.4">Données DGAC en direct (data.geopf.fr) affichées sur notre carte — le site cartes.gouv.fr bloque son intégration dans d'autres sites, donc on ne peut pas l'afficher ici directement.</div>`;
   html+=`<button class="signal-btn" onclick="signalIssue('${locName.replace(/'/g,"\\'")}')">🚩 Signaler une info obsolète sur ce lieu</button>
   <div class="footer">Données indicatives · DGAC · AlphaTango · SUP AIP 077/26 · Maj ${new Date().toLocaleDateString('fr-FR')}</div>`;
   document.getElementById('zone-result').innerHTML=html;
