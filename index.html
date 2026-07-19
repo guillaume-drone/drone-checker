@@ -198,9 +198,9 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
   <br>
   <div class="carte-fs-target" style="position:relative">
     <button onclick="toggleFullMap()" style="position:absolute;top:10px;right:10px;z-index:1000;background:#0f172a;color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer">✕ Fermer</button>
-    <iframe id="geoportail-embed" style="width:100%;height:75vh;border:0;border-radius:12px;background:#0f172a" src="" title="Carte officielle IGN Géoportail — Restrictions DGAC"></iframe>
+    <div id="airops-map" style="width:100%;height:75vh;border-radius:12px;background:#0f172a"></div>
   </div>
-  <div class="footer">Carte officielle IGN Géoportail (cartes.gouv.fr) · Restrictions DGAC en direct · même source que AirOps</div>
+  <div class="footer">Couche officielle IGN (TRANSPORTS.DRONES.RESTRICTIONS) · même rendu que AirOps</div>
 </div>
 <!-- MÉTÉO -->
 <div id="tab-meteo" class="section">
@@ -497,16 +497,25 @@ function toggleMap(lat,lon,locName){
     }
   },100);
 }
+let airopsMap=null, airopsMarker=null;
 function toggleFullMap(lat,lon,locName){
   const el=document.getElementById('zones-fullmap');
   if(!el)return;
   const willShow=!el.classList.contains('active');
   el.classList.toggle('active');
-  if(willShow){
-    const frame=document.getElementById('geoportail-embed');
-    if(frame&&lat!=null&&lon!=null){
-      frame.src='https://www.geoportail.gouv.fr/embed/visu.html?c='+lon+','+lat+'&z=15&l0=GEOGRAPHICALGRIDSYSTEMS.MAPS::GEOPORTAIL:OGC:WMTS(1)&l1=TRANSPORTS.DRONES.RESTRICTIONS::GEOPORTAIL:OGC:WMTS(0.79)&permalink=yes';
-    }
+  if(willShow&&lat!=null&&lon!=null){
+    setTimeout(()=>{
+      if(!airopsMap){
+        airopsMap=L.map('airops-map').setView([lat,lon],14);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(airopsMap);
+        L.tileLayer('https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=TRANSPORTS.DRONES.RESTRICTIONS&STYLE=normal&FORMAT=image/png&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}',{maxZoom:19,opacity:0.65,attribution:'IGN/DGAC'}).addTo(airopsMap);
+      }else{
+        airopsMap.setView([lat,lon],14);
+      }
+      if(airopsMarker)airopsMap.removeLayer(airopsMarker);
+      airopsMarker=L.marker([lat,lon]).addTo(airopsMap);
+      airopsMap.invalidateSize();
+    },150);
   }
 }
 
