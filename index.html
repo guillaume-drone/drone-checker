@@ -491,12 +491,15 @@ async function queryDGACWFS(lat,lon){
     const limites=new Set();
     data.features.forEach(f=>{
       const v=f.properties&&f.properties.limite;
-      if(v)limites.add(v.toString().replace(/\*/g,'').trim());
+      if(v)limites.add(v.toString().trim());
     });
     if(!limites.size)return;
-    const items=[...limites].map(l=>{
-      const isInterdit=l.toLowerCase().includes('interdit');
-      return`<div class="rule-item"><div class="rule-dot ${isInterdit?'red':'orange'}"></div>${l}</div>`;
+    const items=[...limites].map(raw=>{
+      const starred=raw.indexOf('*')!==-1;
+      const l=raw.replace(/\*/g,'').trim();
+      const isInterdit=l.toLowerCase().includes('interdit')&&!starred;
+      const note=starred?' <span style="color:#94a3b8;font-size:11px">— vol généralement possible sous conditions standard (arrêté « Espace »)</span>':'';
+      return`<div class="rule-item"><div class="rule-dot ${isInterdit?'red':'orange'}"></div>${l}${note}</div>`;
     }).join('');
     const html=`<div class="result-card" style="margin-top:.75rem"><div class="status-banner orange" style="padding:1rem 1.25rem 0.5rem"><div class="s-emoji">🔬</div><div><div class="s-title orange" style="font-size:15px">Donnée officielle DGAC en direct</div><div class="s-loc">Couche cartes.gouv.fr — TRANSPORTS.DRONES.RESTRICTIONS</div></div></div><div class="rules-list">${items}</div></div>`;
     const el=document.getElementById('wfs-live');
