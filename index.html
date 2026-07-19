@@ -79,9 +79,11 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
 .note-card.green{background:rgba(22,163,74,0.1);border:1px solid rgba(22,163,74,0.2)}
 .note-card.orange{background:rgba(234,88,12,0.1);border:1px solid rgba(234,88,12,0.2)}
 .note-card.red{background:rgba(220,38,38,0.1);border:1px solid rgba(220,38,38,0.2)}
+.note-card.info{background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.2)}
 .note-card strong{color:#fff;font-weight:500}
 .note-header{font-size:12px;font-weight:500;margin-bottom:5px}
 .note-header.green{color:#4ade80}.note-header.orange{color:#fb923c}.note-header.red{color:#f87171}
+.note-header.info{color:#38bdf8}
 .link-btn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:13px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:var(--rs);color:#fff;font-family:'Inter',sans-serif;font-size:14px;cursor:pointer;margin-bottom:8px;text-decoration:none}
 .link-btn:hover{background:rgba(255,255,255,0.08)}
 .link-btn span{color:var(--g400);font-size:12px}
@@ -421,7 +423,7 @@ function aggloInfo(placeInfo){
   return{isAgglo:true,label:AGGLO_TYPES[placeInfo.type]};
 }
 function aggloExtraNote(label,locName){
-  return`<div class="note-card red"><div class="note-header red">🏘️ "${locName}" est ${label}</div>Indépendamment de la zone ci-dessus, le survol de <strong>personnes, routes, véhicules et propriétés privées</strong> est réglementé partout en France. Reste à distance des habitations et rassemblements. La forme rouge sur la carte indique le contour approximatif de cette zone habitée.</div>`;
+  return`<div class="note-card info"><div class="note-header info">🏘️ "${locName}" est ${label}</div>Indépendamment de la zone ci-dessus, le survol de <strong>personnes, routes, véhicules et propriétés privées</strong> est réglementé partout en France. Reste à distance des habitations et rassemblements. La forme bleue sur la carte (bouton « Voir sur la carte ») indique le contour approximatif de cette zone habitée — ce n’est pas une interdiction de vol, juste un rappel.</div>`;
 }
 function renderZone(lat,lon,locName,placeInfo=null){
   sharedLoc={lat,lon,name:locName};
@@ -455,7 +457,7 @@ function renderZone(lat,lon,locName,placeInfo=null){
   }
   html+=`<div id="wfs-live"></div>`;
   html+=`<button class="map-btn" onclick="toggleFullMap(${lat},${lon},'${locName.replace(/'/g,"\\'")}')">🗺️ Voir la carte complète (zones, DGAC, cadastre...)</button>`;
-  html+=`<a class="map-btn" href="${geo}" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none;box-sizing:border-box">🛰️ Carte officielle DGAC (restrictions) ↗</a>`;
+  html+=`<button class="map-btn" onclick="window.open('${geo}','carteOfficielle','width=430,height=720,noopener')" style="width:100%">🛰️ Carte officielle DGAC (restrictions) ↗</button>`;
   html+=`<button class="signal-btn" onclick="signalIssue('${locName.replace(/'/g,"\\'")}')">🚩 Signaler une info obsolète sur ce lieu</button>
   <div class="footer">Données indicatives · DGAC · AlphaTango · SUP AIP 077/26 · Maj ${new Date().toLocaleDateString('fr-FR')}</div>`;
   document.getElementById('zone-result').innerHTML=html;
@@ -540,11 +542,12 @@ function toggleFullMap(lat,lon,locName){
         carteMap.invalidateSize();
         carteMap.setView([lat,lon],13);
       }
+      startCarteGPS();
     },150);
+  }else{
+    stopCarteGPS();
   }
 }
-
-// ===== Onglet Carte — vue France entière façon AirOps =====
 let carteMap=null, carteMarker=null, carteGpsMarker=null, dgacDebounce=null, carteBaseLayer=null;
 const carteLayers={dgac:null, zones:null, cadastre:null, admin:null};
 const BASEMAPS={
@@ -723,21 +726,36 @@ function toggleLayer(name){
   }
 }
 
-function carteGPS(){
-  if(!navigator.geolocation){alert('GPS non disponible.');return}
-  navigator.geolocation.getCurrentPosition(
+let carteGpsWatchId=null, carteGpsAccuracyCircle=null;
+function startCarteGPS(){
+  if(!navigator.geolocation)return;
+  if(carteGpsWatchId!==null)return;
+  carteGpsWatchId=navigator.geolocation.watchPosition(
     p=>{
-      const la=p.coords.latitude,lo=p.coords.longitude;
+      const la=p.coords.latitude,lo=p.coords.longitude,acc=p.coords.accuracy||0;
       if(!carteMap)return;
       if(carteGpsMarker)carteMap.removeLayer(carteGpsMarker);
-      carteGpsMarker=L.circleMarker([la,lo],{radius:8,color:'#0ea5e9',fillColor:'#0ea5e9',fillOpacity:0.9,weight:2}).addTo(carteMap).bindPopup('📍 Ta position').openPopup();
-      carteMap.setView([la,lo],13);
+      if(carteGpsAccuracyCircle)carteMap.removeLayer(carteGpsAccuracyCircle);
+      carteGpsAccuracyCircle=L.circle([la,lo],{radius:acc,color:'#0ea5e9',weight:1,fillColor:'#0ea5e9',fillOpacity:0.12}).addTo(carteMap);
+      carteGpsMarker=L.circleMarker([la,lo],{radius:8,color:'#fff',fillColor:'#0ea5e9',fillOpacity:1,weight:3}).addTo(carteMap).bindPopup('📍 Ta position (±'+Math.round(acc)+' m)');
     },
+    e=>{console.warn('GPS carte:',e.code)},
+    {enableHighAccuracy:true,timeout:20000,maximumAge:5000}
+  );
+}
+function stopCarteGPS(){
+  if(carteGpsWatchId!==null){navigator.geolocation.clearWatch(carteGpsWatchId);carteGpsWatchId=null}
+}
+function carteGPS(){
+  if(!navigator.geolocation){alert('GPS non disponible.');return}
+  startCarteGPS();
+  navigator.geolocation.getCurrentPosition(
+    p=>{ if(carteMap)carteMap.setView([p.coords.latitude,p.coords.longitude],14) },
     e=>{
       const msg={1:'Permission refusée — autorise la localisation dans les paramètres',2:'Position indisponible — active le GPS',3:'Délai dépassé — réessaie'}[e.code]||'Erreur GPS';
       alert(msg);
     },
-    {enableHighAccuracy:false,timeout:20000,maximumAge:60000}
+    {enableHighAccuracy:true,timeout:20000,maximumAge:5000}
   );
 }
 
