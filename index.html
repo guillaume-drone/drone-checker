@@ -809,11 +809,12 @@ function uasZoneCenter(geom){
 }
 function sofiaNote(geom){
   var zc=uasZoneCenter(geom);
-  var base='<div style="font-size:11px;color:#94a3b8;margin-top:2px">';
+  var base='<div style="font-size:11px;color:#94a3b8;margin-top:4px;line-height:1.6">';
+  var steps='<b style="color:#e2e8f0">Marche à suivre :</b><br>1) Compte gratuit (une fois) → 2) « Préparation de vol » → « Local » → « Trajet » → 3) Colle la position ci-dessous → 4) Choisis une heure UTC future → 5) « Rechercher ».';
   if(zc){
-    return base+'Position à copier dans SOFIA : <b style="color:#e2e8f0">'+toDMS5(zc.lat,zc.lon)+'</b><br>Choisis une heure UTC future (icône horloge), puis "Rechercher".</div>';
+    return base+steps+'<br>Position à copier : <b style="color:#e2e8f0">'+toDMS5(zc.lat,zc.lon)+'</b></div>';
   }
-  return base+'Outil officiel DGAC, gratuit sans compte — saisis la position (degrés/minutes) et une heure UTC future, puis "Rechercher".</div>';
+  return base+steps+'</div>';
 }
 async function loadUasLayer(cat){
   if(!carteMap)return;
@@ -829,7 +830,7 @@ async function loadUasLayer(cat){
       const color=UAS_COLOR[it.restriction]||'#94a3b8';
       const UAS_LABELS={PROHIBITED:'Vol interdit',REQ_AUTHORISATION:'Autorisation requise',CONDITIONAL:'Conditionnel'};
       const restrLabel=UAS_LABELS[it.restriction]||it.restriction;
-      const popup=`<div style="border-left:4px solid ${color};padding-left:8px;max-width:240px"><div style="font-weight:700;font-size:13px;color:${color}">${restrLabel}</div><div style="font-weight:600;font-size:13px;margin:4px 0">${it.name}</div>${it.msg?`<div style="font-size:12px;color:#444">${it.msg}</div>`:''}${it.link?`<div style="margin-top:6px"><a href="${it.link}" target="_blank" rel="noopener" style="color:#38bdf8;font-size:12px;text-decoration:underline">📄 Bulletin SIA officiel (PDF)</a></div>`:''}<div style="margin-top:6px"><a href="https://sofia-briefing.aviation-civile.gouv.fr/sofia/pages/notamsearcharea.html" target="_blank" rel="noopener" style="color:#f97316;font-size:12px;text-decoration:underline">🛰️ Chercher NOTAM sur cette zone (SOFIA)</a>${sofiaNote(it.geom)}</div></div>`;
+      const popup=`<div style="border-left:4px solid ${color};padding-left:8px;max-width:240px"><div style="font-weight:700;font-size:13px;color:${color}">${restrLabel}</div><div style="font-weight:600;font-size:13px;margin:4px 0">${it.name}</div>${it.msg?`<div style="font-size:12px;color:#444">${it.msg}</div>`:''}${it.link?`<div style="margin-top:6px"><a href="${it.link}" target="_blank" rel="noopener" style="color:#38bdf8;font-size:12px;text-decoration:underline">📄 Bulletin SIA officiel (PDF)</a></div>`:''}<div style="margin-top:6px"><a href="https://sofia-briefing.aviation-civile.gouv.fr/sofia/pages/prepavol.html" target="_blank" rel="noopener" style="color:#f97316;font-size:12px;text-decoration:underline">🪁 Vérifier les NOTAM (SOFIA)</a>${sofiaNote(it.geom)}</div></div>`;
       (it.geom||[]).forEach(g=>{
         try{
           if(g.t==='poly'){
