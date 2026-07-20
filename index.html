@@ -609,9 +609,13 @@ function dgacPopup(limite,starred){
   const caveat=starred?'<div style="font-size:11px;color:#94a3b8;margin-top:4px">⚠️ Une restriction plus large (zone P/R/D/CTR) peut s\'appliquer ici — vérifie les zones colorées ci-dessous.</div>':'';
   return '<div style="border-left:4px solid '+c+';padding-left:8px;max-width:260px"><div style="font-weight:700;font-size:13px;color:'+c+'">'+txt+'</div>'+caveat+'</div>';
 }
+function popupBelongsToLayer(map, layer){
+  if(!map._popup||!layer||!layer.getLayers)return false;
+  return layer.getLayers().some(l=>l.getPopup&&l.getPopup()===map._popup);
+}
 async function loadDgacRestrictions(map, layer, hintElId, checkboxId){
   if(!map||!layer)return;
-  if(map._popup)return; // ne pas rafraîchir (et donc fermer) un popup en cours de lecture
+  if(popupBelongsToLayer(map, layer))return; // ne pas rafraîchir (et donc fermer) un popup de CETTE couche en cours de lecture
   const hint=hintElId?document.getElementById(hintElId):null;
   const zoom=map.getZoom();
   if(zoom<8){
@@ -631,7 +635,7 @@ async function loadDgacRestrictions(map, layer, hintElId, checkboxId){
     const r=await fetch(url);
     if(!r.ok)return;
     const data=await r.json();
-    if(map._popup)return; // le fetch a pu durer assez longtemps pour qu'un popup s'ouvre entre-temps
+    if(popupBelongsToLayer(map, layer))return; // le fetch a pu durer assez longtemps pour qu'un popup s'ouvre entre-temps
     layer.clearLayers();
     if(!data.features)return;
     data.features.forEach(f=>{
@@ -654,7 +658,7 @@ async function loadDGACForView(){
 // Parcellaire cadastral (IGN) — utile seulement très zoomé (parcelles minuscules)
 async function loadCadastreForView(){
   if(!carteMap)return;
-  if(carteMap._popup)return; // ne pas rafraîchir (et donc fermer) un popup en cours de lecture
+  if(popupBelongsToLayer(carteMap, carteLayers.cadastre))return; // ne pas rafraîchir (et donc fermer) un popup de cette couche en cours de lecture
   const cb=document.getElementById('lyr-cadastre');
   if(!cb||!cb.checked)return;
   const zoom=carteMap.getZoom();
@@ -666,7 +670,7 @@ async function loadCadastreForView(){
     const r=await fetch(url);
     if(!r.ok)return;
     const data=await r.json();
-    if(carteMap._popup)return;
+    if(popupBelongsToLayer(carteMap, carteLayers.cadastre))return;
     carteLayers.cadastre.clearLayers();
     if(!data.features)return;
     data.features.forEach(f=>{
@@ -682,7 +686,7 @@ async function loadCadastreForView(){
 // Limites communales (IGN)
 async function loadAdminForView(){
   if(!carteMap)return;
-  if(carteMap._popup)return; // ne pas rafraîchir (et donc fermer) un popup en cours de lecture
+  if(popupBelongsToLayer(carteMap, carteLayers.admin))return; // ne pas rafraîchir (et donc fermer) un popup de cette couche en cours de lecture
   const cb=document.getElementById('lyr-admin');
   if(!cb||!cb.checked)return;
   const zoom=carteMap.getZoom();
@@ -694,7 +698,7 @@ async function loadAdminForView(){
     const r=await fetch(url);
     if(!r.ok)return;
     const data=await r.json();
-    if(carteMap._popup)return;
+    if(popupBelongsToLayer(carteMap, carteLayers.admin))return;
     carteLayers.admin.clearLayers();
     if(!data.features)return;
     data.features.forEach(f=>{
