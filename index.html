@@ -604,17 +604,32 @@ function dgacColor(limite,starred){
 }
 
 let currentSpotName=null;
-function demanderInfoVol(){
+function buildDemandeVolText(){
   const lieu=currentSpotName||'cet endroit';
-  const subject=encodeURIComponent(`Vol de drone de loisir — demande d'information (${lieu})`);
-  const body=encodeURIComponent(`Bonjour,\n\nJe suis un particulier, pilote de drone de loisir (hors cadre professionnel), et je prépare un vol à proximité de : ${lieu}.\n\nContexte du vol (à adapter) : [ex. prise de vue / montage vidéo à titre personnel, sans usage commercial — je peux transmettre les images à la mairie/commune si cela peut être utile].\n\nAvant de voler, je souhaitais vérifier auprès de vous s'il existe une contre-indication particulière à cet endroit (et, le cas échéant, à quelle date/heure ce serait envisageable).\n\nJe reste à votre disposition pour tout complément d'information.\n\nCordialement,`);
-  window.location.href=`mailto:?subject=${subject}&body=${body}`;
+  const subject=`Vol de drone de loisir — demande d'information (${lieu})`;
+  const body=`Bonjour,\n\nJe suis un particulier, pilote de drone de loisir (hors cadre professionnel), et je prépare un vol à proximité de : ${lieu}.\n\nContexte du vol (à adapter) : [ex. prise de vue / montage vidéo à titre personnel, sans usage commercial — je peux transmettre les images à la mairie/commune si cela peut être utile].\n\nAvant de voler, je souhaitais vérifier auprès de vous s'il existe une contre-indication particulière à cet endroit (et, le cas échéant, à quelle date/heure ce serait envisageable).\n\nJe reste à votre disposition pour tout complément d'information.\n\nCordialement,`;
+  return {subject, body};
+}
+function demanderInfoVol(){
+  const {subject,body}=buildDemandeVolText();
+  window.location.href=`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+function copierMessageVol(){
+  const {subject,body}=buildDemandeVolText();
+  const fullText=`Objet : ${subject}\n\n${body}`;
+  const done=()=>alert('Message copié ! Ouvre ta messagerie (Orange Mail, Gmail...), clique sur "Nouveau message" et colle (Ctrl+V).');
+  const fail=()=>alert('Copie automatique impossible. Voici le texte à copier à la main :\n\n'+fullText);
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(fullText).then(done).catch(fail);
+  }else{
+    fail();
+  }
 }
 function dgacPopup(limite,starred){
   const c=dgacColor(limite,starred);
   const txt=starred?'Zone habitée (agglomération) — interdiction de survol de l\'espace public levée sous conditions standard (arrêté « Espace »)':(limite||'Restriction UAS — DGAC');
   const caveat=starred?'<div style="font-size:11px;color:#94a3b8;margin-top:4px">⚠️ Une restriction plus large (zone P/R/D/CTR) peut s\'appliquer ici — vérifie les zones colorées ci-dessous.</div>':'';
-  const contact=starred?'<div style="margin-top:6px"><a href="#" onclick="demanderInfoVol();return false;" style="color:#38bdf8;font-size:12px;text-decoration:underline">✉️ Contacter mairie/préfecture (facultatif, hors cadre officiel)</a></div>':'';
+  const contact=starred?'<div style="margin-top:6px"><a href="#" onclick="demanderInfoVol();return false;" style="color:#38bdf8;font-size:12px;text-decoration:underline">✉️ Contacter mairie/préfecture</a> · <a href="#" onclick="copierMessageVol();return false;" style="color:#38bdf8;font-size:12px;text-decoration:underline">📋 Copier le message</a><div style="font-size:10px;color:#94a3b8;margin-top:2px">Facultatif, hors cadre officiel — copie le texte si ta messagerie par défaut n\'est pas la bonne.</div></div>':'';
   return '<div style="border-left:4px solid '+c+';padding-left:8px;max-width:260px"><div style="font-weight:700;font-size:13px;color:'+c+'">'+txt+'</div>'+caveat+contact+'</div>';
 }
 function popupBelongsToLayer(map, layer){
