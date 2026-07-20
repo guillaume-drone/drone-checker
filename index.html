@@ -275,6 +275,10 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
     </div>
     <div style="font-size:11px;color:rgba(255,255,255,0.55);padding:6px 12px">Touche une zone colorée pour voir son nom officiel (P/R/D/CTR) et son statut réglementaire.</div>
   </div>
+  <div class="divider" style="margin:20px 0 10px">📍 Mes lieux à visiter (import Google Maps)</div>
+  <div class="drone-badge">🗺️ Liste importée depuis tes favoris Google Maps ("À visiter"), triée par distance depuis ta position. Statut réglementaire non vérifié pour ces lieux : vérifie toujours l'onglet Zones avant de voler.</div>
+  <button class="map-btn" onclick="localiserMapsAVisiter()" style="margin:10px 0 16px">📍 Trier par distance depuis ma position</button>
+  <div id="maps-a-visiter-list"></div>
   <div class="footer">Sources : offices de tourisme locaux et sites des mairies concernées. Statuts drone à titre indicatif — vérifie toujours cartes.gouv.fr avant de voler.</div>
 </div>
 
@@ -335,6 +339,30 @@ function renderLoisir(){
   document.getElementById('loisir-list').innerHTML=html;
 }
 renderLoisir();
+const MAPS_A_VISITER=[{"name":"Cascade des Baumes","lat":44.05145,"lon":2.89452,"cat":"Chute d'eau"},{"name":"Gorges d'Héric","lat":43.58903,"lon":2.95615,"cat":"Ravin"},{"name":"Citadelle d'Entrevaux","lat":43.95248,"lon":6.81357,"cat":"Forteresse"},{"name":"Château de Pont-Saint-Pierre","lat":49.33378,"lon":1.28488,"cat":"Château"},{"name":"Église de Saint-Nectaire","lat":45.58824,"lon":2.99249,"cat":"Église"},{"name":"Forteresse Royale de Najac","lat":44.21853,"lon":1.97333,"cat":"Forteresse"},{"name":"Chapelle Notre-Dame-du-Château de Saignes","lat":45.33362,"lon":2.48074,"cat":"Chapelle"},{"name":"Chapelle Notre-Dame du Château d'Allauch","lat":43.33656,"lon":5.4863,"cat":"Chapelle"},{"name":"Château-Rocher","lat":46.08914,"lon":2.92807,"cat":"Château"},{"name":"Pont des hirondelles","lat":50.69215,"lon":5.25843,"cat":"Point de vue"},{"name":"Château de Brousse","lat":43.99667,"lon":2.62493,"cat":"Château"},{"name":"Château d'Alleuze","lat":44.95616,"lon":3.09085,"cat":"Château"},{"name":"Lieu enregistré (Tarn)","lat":43.686506,"lon":1.892976,"cat":"Point GPS"},{"name":"Alquézar","lat":42.18019,"lon":0.00135,"cat":"Village"},{"name":"Château du Haut-Kœnigsbourg","lat":48.24938,"lon":7.34394,"cat":"Château"},{"name":"Mémorial de la Ferme de Richemont","lat":44.63032,"lon":-0.63076,"cat":"Mémorial"},{"name":"Château de la Brède","lat":44.67918,"lon":-0.54443,"cat":"Château"},{"name":"Église Saint-André de Viviers-lès-Lavaur","lat":43.63104,"lon":1.80096,"cat":"Église"},{"name":"Église Notre-Dame-de-la-Drèche","lat":43.96958,"lon":2.15417,"cat":"Église"},{"name":"Château de la Mothe Chandeniers","lat":47.09237,"lon":0.03259,"cat":"Château"},{"name":"Château de l'ancienne baronnie de Jenzat","lat":46.16,"lon":3.19619,"cat":"Château"},{"name":"La Malène","lat":44.30218,"lon":3.32016,"cat":"Village"},{"name":"Saint-Chély-du-Tarn","lat":44.33601,"lon":3.38427,"cat":"Village"},{"name":"Castelbouc","lat":44.34045,"lon":3.46398,"cat":"Village"},{"name":"Pointe de Penvins","lat":47.49291,"lon":-2.67983,"cat":"Point de vue"},{"name":"Domaine de Suscinio","lat":47.50061,"lon":-2.74899,"cat":"Château"},{"name":"Château du Bouchet","lat":46.71851,"lon":1.17262,"cat":"Château"},{"name":"Château de Romefort","lat":45.77679,"lon":-0.68256,"cat":"Château"},{"name":"Château du Petit Chevincourt (Château de Monsieur Hugo)","lat":48.70818,"lon":2.08981,"cat":"Château"},{"name":"Chateau de Malavieille","lat":43.63591,"lon":3.26609,"cat":"Château"},{"name":"Château de Lavardens","lat":43.76088,"lon":0.51092,"cat":"Château"},{"name":"Les Cascades de Coo","lat":50.39356,"lon":5.87685,"cat":"Chute d'eau"},{"name":"Forteresse de Crozant","lat":46.39174,"lon":1.62173,"cat":"Forteresse"},{"name":"Chapelle Sainte-Barbe du Faouët","lat":48.04239,"lon":-3.47986,"cat":"Chapelle"},{"name":"Château de Peyrepertuse","lat":42.87081,"lon":2.55547,"cat":"Château"},{"name":"Château de Quéribus","lat":42.8368,"lon":2.62147,"cat":"Château"},{"name":"Château de Bonaguil","lat":44.53827,"lon":1.01424,"cat":"Château"},{"name":"Saint-Guilhem-le-Désert","lat":43.734,"lon":3.54852,"cat":"Village"},{"name":"Château de Lézignac","lat":43.77028,"lon":1.9669,"cat":"Château"},{"name":"Château de Biron","lat":44.63208,"lon":0.87219,"cat":"Château"},{"name":"Château des Tours","lat":45.93433,"lon":4.71899,"cat":"Château"},{"name":"Lac Bleu","lat":42.93522,"lon":0.08042,"cat":"Lac"},{"name":"Château de Fressac","lat":43.99269,"lon":3.91709,"cat":"Château"},{"name":"Phare de Vallières","lat":45.59817,"lon":-1.00802,"cat":"Phare"},{"name":"Basilique Notre-Dame d'Orcival","lat":45.68291,"lon":2.84147,"cat":"Basilique"},{"name":"Église Notre-Dame-des-Oubiels","lat":43.05186,"lon":2.91211,"cat":"Église"},{"name":"Château de Murol","lat":45.57833,"lon":2.94547,"cat":"Château"},{"name":"Torre normanna","lat":40.62041,"lon":16.14721,"cat":"Tour"},{"name":"Punto panoramico Monte Cimo","lat":45.82472,"lon":11.67378,"cat":"Point de vue"},{"name":"Château de Belcastel","lat":44.38894,"lon":2.33596,"cat":"Château"},{"name":"Castillo de Monzón","lat":41.90895,"lon":0.19163,"cat":"Château"},{"name":"Gorges du Gardon","lat":44.16947,"lon":4.04994,"cat":"Gorges"},{"name":"Les Pans de Travassac","lat":45.2241,"lon":1.54797,"cat":"Site géologique"},{"name":"Cascades du Sautadet","lat":44.18777,"lon":4.52672,"cat":"Chute d'eau"},{"name":"Château de Durfort","lat":43.99088,"lon":3.95529,"cat":"Château"},{"name":"Gour de la Sompe","lat":44.47542,"lon":4.42871,"cat":"Site naturel"},{"name":"Château de Naucase","lat":45.46216,"lon":4.24589,"cat":"Château"},{"name":"Château de Montfa (81)","lat":44.13737,"lon":1.22576,"cat":"Château"},{"name":"Eglise Notre-Dame de Lapeyrouse","lat":48.47287,"lon":-2.33906,"cat":"Église"},{"name":"HKB Heuqueville fire post","lat":49.61546,"lon":0.1466,"cat":"Point de vue"},{"name":"Lieu enregistré (secteur Toulouse)","lat":43.1275,"lon":2.898389,"cat":"Point GPS"},{"name":"Château de la Hunaudaye","lat":48.3557,"lon":-2.3631,"cat":"Château"}];
+function renderMapsAVisiter(la,lo){
+  const el=document.getElementById('maps-a-visiter-list');
+  if(!el)return;
+  if(la==null){el.innerHTML='<div class="empty"><span class="empty-icon">📍</span><p>Indique ta position pour trier ces lieux par distance.</p></div>';return;}
+  const sorted=MAPS_A_VISITER.map(l=>Object.assign({},l,{d:dist(la,lo,l.lat,l.lon)})).sort((a,b)=>a.d-b.d);
+  let html='';
+  for(const l of sorted){
+    const dLabel=l.d<1?Math.round(l.d*1000)+' m':l.d.toFixed(1)+' km';
+    html+='<div class="loisir-card"><div class="loisir-top"><div class="loisir-title">'+l.name+'</div><div class="loisir-dist">'+dLabel+'</div></div><span class="loisir-pill" style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.12)">🏷️ '+l.cat+'</span><div class="loisir-desc" style="margin-top:8px">ℹ️ Statut réglementaire non vérifié — consulte l\'onglet Zones avant de voler ici.</div><a class="link-btn" href="#" onclick="openItineraire(\''+l.lat+','+l.lon+'\');return false;">🧭 Itinéraire <span>→</span></a><button class="map-btn" onclick="openLoisirCarte('+l.lat+','+l.lon+',\''+l.name.replace(/'/g,"\\'")+'\')">🗺️ Voir sur la carte</button></div>';
+  }
+  el.innerHTML=html;
+}
+function localiserMapsAVisiter(){
+  if(typeof sharedLoc!=='undefined'&&sharedLoc){renderMapsAVisiter(sharedLoc.lat,sharedLoc.lon);return}
+  if(!navigator.geolocation){alert('GPS non disponible.');return}
+  document.getElementById('maps-a-visiter-list').innerHTML='<div class="loading"><div class="spinner"></div>Localisation...</div>';
+  navigator.geolocation.getCurrentPosition(
+    p=>{sharedLoc={lat:p.coords.latitude,lon:p.coords.longitude,name:'Ma position'};renderMapsAVisiter(p.coords.latitude,p.coords.longitude)},
+    e=>{const msg={1:'Permission refusée — autorise la localisation.',2:'Position indisponible — active le GPS.',3:'Délai dépassé — réessaie.'}[e.code]||'Erreur GPS.';document.getElementById('maps-a-visiter-list').innerHTML='<div class="empty"><span class="empty-icon">🚫</span><p>'+msg+'</p></div>'},
+    {enableHighAccuracy:true,timeout:25000,maximumAge:0}
+  );
+}
+renderMapsAVisiter(null,null);
 let itiDest=null;
 function openItineraire(dest){
   itiDest=dest;
