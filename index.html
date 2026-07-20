@@ -179,7 +179,7 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
 </div>
 <div class="header">
   <div class="header-icon">🚁</div>
-  <div><h1>Drone Checker</h1><p>DJI Air 3S — Bretagne Été 2026</p></div>
+  <div><h1>Drone Checker</h1><p>DJI Air 3S — Été 2026</p></div>
 </div>
 <div class="tabs">
   <button class="tab active" onclick="switchTab('zones')">🗺️ Zones</button>
@@ -194,7 +194,7 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
   <button class="btn-gps" onclick="useGPS('zones')">📍 Ma position GPS</button>
   <div class="divider">ou recherche un lieu</div>
   <div class="search-row">
-    <input type="text" id="zoneInput" placeholder="Cap Fréhel, Lannion, Ploumanac'h..." onkeydown="if(event.key==='Enter')searchZone()"/>
+    <input type="text" id="zoneInput" placeholder="Toulouse, Bordeaux, Cahors..." onkeydown="if(event.key==='Enter')searchZone()"/>
     <button onclick="searchZone()">🔍</button>
   </div>
   <div id="zone-result"><div class="empty"><span class="empty-icon">🗺️</span><p>Indique ta position ou choisis un spot pour voir les restrictions.</p></div></div>
@@ -213,7 +213,7 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
       <div class="clp-close"><button onclick="toggleLayerPanel()">✕</button></div>
       <div class="clp-title">Couches</div>
       <label class="clp-item"><input type="checkbox" id="lyr-dgac" checked onchange="toggleLayer('dgac')"><span class="clp-dot" style="background:#0ea5e9"></span>Restrictions DGAC (France)</label><label class="clp-item"><input type="checkbox" id="lyr-official-tiles" checked onchange="toggleLayer('officialTiles')"><span class="clp-dot" style="background:#fff"></span>Carte officielle DGAC (image IGN)</label>
-      <label class="clp-item"><input type="checkbox" id="lyr-zones" checked onchange="toggleLayer('zones')"><span class="clp-dot" style="background:#ea580c"></span>Zones connues Bretagne</label>
+      <label class="clp-item"><input type="checkbox" id="lyr-zones" checked onchange="toggleLayer('zones')"><span class="clp-dot" style="background:#ea580c"></span>Zones connues</label>
       <label class="clp-item"><input type="checkbox" id="lyr-cadastre" onchange="toggleLayer('cadastre')"><span class="clp-dot" style="background:#a3703a"></span>Parcellaire cadastral</label>
       <label class="clp-item"><input type="checkbox" id="lyr-admin" onchange="toggleLayer('admin')"><span class="clp-dot" style="background:#64748b"></span>Limites communes</label>
       <div class="clp-title" style="margin-top:12px">Zones UAS (France, SIA)</div>
@@ -240,7 +240,7 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
     <span><span class="map-dot red"></span>Interdit / actif</span>
     <span><span class="map-dot orange"></span>Prudence / vérif. requise</span>
   </div>
-  <div class="footer">Carte interactive · Restrictions DGAC en direct (data.geopf.fr) · OpenStreetMap · Zones Bretagne codées en dur</div>
+  <div class="footer">Carte interactive · Restrictions DGAC en direct (data.geopf.fr) · OpenStreetMap · Zones locales codées en dur</div>
 </div>
 </div>
 <!-- MÉTÉO -->
@@ -250,7 +250,7 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
   <button class="btn-gps" onclick="useGPS('meteo')">📍 Météo à ma position</button>
   <div class="divider">ou recherche un lieu</div>
   <div class="search-row">
-    <input type="text" id="meteoInput" placeholder="Cap Fréhel, Lannion, Ploumanac'h..." onkeydown="if(event.key==='Enter')searchMeteo()"/>
+    <input type="text" id="meteoInput" placeholder="Toulouse, Bordeaux, Cahors..." onkeydown="if(event.key==='Enter')searchMeteo()"/>
     <button onclick="searchMeteo()">🔍</button>
   </div>
   <div id="meteo-result"><div class="empty"><span class="empty-icon">🌤️</span><p>Indique ta position pour voir les conditions météo pour ton Air 3S.</p></div></div>
@@ -258,9 +258,9 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
 <!-- LOISIR -->
 <div id="tab-loisir" class="section">
   <br>
-  <div class="drone-badge">🏞️ Sites remarquables — rayon ~80 km autour de Kerlouan</div>
+  <div class="drone-badge">🏞️ Sites remarquables — indique ta position pour voir les spots à proximité</div>
   <div id="loisir-list"></div>
-  <div class="footer">Sources : offices de tourisme du Pays des Abers, du Pays de Landerneau-Daoulas, du Pays d'Iroise, de Roscoff et de Perros-Guirec, et sites des mairies concernées. Statuts drone à titre indicatif — vérifie toujours cartes.gouv.fr avant de voler.</div>
+  <div class="footer">Sources : offices de tourisme locaux et sites des mairies concernées. Statuts drone à titre indicatif — vérifie toujours cartes.gouv.fr avant de voler.</div>
 </div>
 
 
@@ -279,29 +279,8 @@ function switchTab(t){
     loadMeteo(sharedLoc.lat,sharedLoc.lon,sharedLoc.name);
   }
 }
-const ZONES=[
-  {name:"Aéroport de Saint-Brieuc (LFRT)",lat:48.5375,lon:-2.8566,radius:5,status:"orange",emoji:"✈️",altitude:null,title:"Vérification requise — zone aéroport",explain:"Saint-Brieuc (LFRT) n'a <strong>pas de tour de contrôle permanente</strong> (juste un service d'information AFIS), donc pas de vraie CTR. Mais une <strong>géozone de restriction drone</strong> existe autour — vol interdit sans autorisation préalable via AlphaTango. Le rayon exact est à confirmer sur cartes.gouv.fr.",rules:["Vol interdit sans autorisation préalable via AlphaTango","Pour voler ici, contacte l'aéroport : operations@aeroport-saint-brieuc.fr","Radio AFIS sur 118.455 MHz si tu es équipé","Vérifie le rayon exact de la géozone sur cartes.gouv.fr"]},
-  {name:"Aéroport de Lannion (LFRO)",lat:48.7544,lon:-3.4720,radius:5.56,status:"red",emoji:"✈️",altitude:null,title:"Vol interdit — CTR aéroport",explain:"Tu es dans la <strong>CTR de Lannion</strong> — un cercle de 5,56 km de rayon autour de l'aéroport, du sol jusqu'à environ 762 m. Les drones y sont <strong>strictement interdits</strong> sans autorisation, zone active 24h/24.",rules:["Interdiction de voler sans autorisation (CTR 5,56 km)","Demande via alphatango.aviation-civile.gouv.fr","Zone active H24","Au-delà de la CTR, la TMA peut aussi s'appliquer selon l'altitude"]},
-  {name:"Aéroport de Rennes (LFRN)",lat:48.0697,lon:-1.7279,radius:12.04,status:"red",emoji:"✈️",altitude:null,title:"Vol interdit — CTR aéroport",explain:"Tu es dans la <strong>CTR de Rennes-Saint-Jacques</strong> — 12 km de rayon, classe D, active 24h/24, du sol jusqu'à environ 457 m. Les drones y sont interdits sans autorisation. Si tu prévois de voler ici, compte <strong>5 jours minimum</strong> pour la demande d'autorisation.",rules:["Interdiction de voler sans autorisation (CTR 12 km)","Demande à déposer 5 jours minimum à l'avance (alphatango ou clearance.aero)","Zone de classe D, active H24","S'étend du sol à ~457 m"]},
-  {name:"Aéroport de Brest (LFRB)",lat:48.4350,lon:-4.4338,radius:17,status:"red",emoji:"✈️",altitude:null,title:"Vol interdit — CTR Bretagne",explain:"Tu es dans (ou proche de) la <strong>CTR Bretagne</strong> de l'aéroport de Brest — une zone assez grande (environ 33 × 17 km), pas un simple cercle, du sol jusqu'à ~457 m. Les drones y sont interdits sans autorisation. Elle est voisine des CTR militaires de Landivisiau et Lanvéoc.",rules:["Interdiction de voler sans autorisation dans la CTR Bretagne","Zone de classe D, active H24","Demande via alphatango.aviation-civile.gouv.fr","Zone réelle = polygone irrégulier, ce rayon est une approximation"]},
-  {name:"Zone offshore R17 C « CORSEN »",lat:48.6,lon:-4.8,radius:35,status:"orange",emoji:"⚓",altitude:120,title:"Info — couloir côtier libre + zone interdite au large",explain:"<strong>Changement important :</strong> le SUP AIP 165/25 a été remplacé par le <strong>077/26</strong> (valable jusqu'au 30 avril 2027). Depuis la <strong>côte continentale</strong>, tu peux voler <strong>librement jusqu'à 1850 m en mer</strong> (max 120 m d'altitude), sans protocole ARMOR. Au-delà de 1850 m au large (zone R17 C), le vol est <strong>interdit 24h/24</strong>. Attention : les <strong>îles</strong> (Ouessant...) ne bénéficient pas de ce couloir — la zone interdite touche directement leur littoral.",rules:["Depuis la côte continentale : vol libre jusqu'à 1850 m en mer, max 120 m","Au-delà de 1850 m au large : interdit H24 (zone R17 C)","Pas de décollage depuis un bateau","Drones > 900 g : notification AlphaTango obligatoire avant le vol","Les îles ne bénéficient PAS de ce couloir — vérifie au cas par cas"]},
-  {name:"Île de Bréhat",lat:48.846,lon:-2.999,radius:3,status:"orange",emoji:"🏝️",altitude:120,title:"Vérification requise — île classée",explain:"Bréhat est une <strong>île</strong> — elle ne bénéficie <strong>pas</strong> du couloir libre de 1850 m réservé aux côtes continentales. En mer autour de l'île (zone R17 A « AVEL »), le vol est interdit à partir d'1 mille nautique du littoral. Sur l'île elle-même, le vol est possible en catégorie ouverte <strong>sauf arrêté municipal contraire</strong> — renseigne-toi en mairie avant d'y aller.",rules:["Île : pas de couloir libre en mer (contrairement à la côte continentale)","Mer autour de l'île : interdit au-delà d'1 NM (zone R17 A)","Sur l'île : vérifier en mairie qu'aucun arrêté municipal ne limite les drones","Site naturel protégé — respecte la faune (nidification mars–juillet)"]},
-  {name:"Cap Fréhel",lat:48.683,lon:-2.317,radius:2,status:"orange",emoji:"🦅",altitude:30,title:"Prudence — réserve ornithologique",explain:"Le Cap Fréhel abrite une <strong>réserve ornithologique majeure</strong> — plus de 1000 oiseaux marins nichent sur les falaises de février à mi-juillet. Des <strong>arrêtés municipaux de Plévenon</strong> peuvent réglementer ou interdire les vols de drone. La hauteur max sur la géozone peut descendre à <strong>30 m</strong> selon le secteur — bien moins que les 120 m habituels.",rules:["Renseigne-toi en mairie de Plévenon avant tout vol — arrêté municipal possible","Période critique de nidification : février à mi-juillet, évite les falaises","Hauteur max sur la géozone : 30 à 50 m selon le secteur (pas 120 m !)","Grand Site de France — les survols bas perturbent fortement la faune"]},
-  {name:"Côte de Granit Rose — Ploumanac'h",lat:48.833,lon:-3.480,radius:4,status:"orange",emoji:"🪨",altitude:50,title:"Vérification requise — arrêtés municipaux",explain:"La Côte de Granit Rose est couverte par des <strong>arrêtés municipaux</strong> (Perros-Guirec, Trégastel, Ploumanac'h) qui limitent les vols selon les secteurs. La hauteur max varie de <strong>30 à 100 m</strong> selon la géozone. Attention : les <strong>Sept-Îles</strong> (réserve naturelle au large, gérée par la LPO) sont en <strong>interdiction stricte</strong> de survol, sans bénéficier du couloir côtier.",rules:["Arrêtés municipaux à vérifier avant chaque vol — Mairie de Perros-Guirec : 02 96 49 02 49","Mairie de Trégastel : 02 96 15 38 00","Hauteur max variable : 30 à 100 m selon le secteur (cartes.gouv.fr)","Zones de biotope protégé — certaines falaises interdites de survol","Sept-Îles : interdiction stricte de survol — gestionnaire LPO (Station Île Grande) : 02 96 91 91 40, animation.7iles@lpo.fr","Préfecture Côtes-d'Armor (police de l'air, uniquement pour les autorisations de vol — pas pour les réserves naturelles) : pref-policedelair@cotes-darmor.gouv.fr"]},
-  {name:"Cap d'Erquy",lat:48.6453,lon:-2.4891,radius:2,status:"orange",emoji:"🌿",altitude:120,title:"Prudence — Grand Site de France",explain:"Le Cap d'Erquy fait partie du <strong>Grand Site de France « Cap d'Erquy – Cap Fréhel »</strong> — landes, falaises et fonds marins classés. Aucun arrêté préfectoral spécifique aux drones n'a été trouvé pour Erquy, mais des restrictions municipales peuvent exister. Vérifie la géozone précise sur cartes.gouv.fr avant de voler.",rules:["Vérifie la géozone précise sur cartes.gouv.fr avant le vol","Renseigne-toi en mairie d'Erquy pour d'éventuels arrêtés locaux","Évite le survol des falaises en période de nidification (mars–juillet)","Hauteur max probable : 120 m en l'absence de restriction identifiée"]},
-  {name:"Parc naturel régional d'Armorique",lat:48.35,lon:-3.85,radius:18,status:"orange",emoji:"🌳",altitude:120,title:"Vérification requise — parc naturel régional",explain:"Le PNR d'Armorique n'interdit pas lui-même les drones, mais inclut des <strong>réserves naturelles régionales</strong> (ex. Landes et Tourbières du Cragou-Vergam) où toute perturbation de la faune est interdite. La partie ouest du parc chevauche aussi la <strong>CTR Bretagne</strong> (Brest). Pour les zones sensibles, contacte le parc : 02 98 81 90 08.",rules:["Le PNR n'a pas de règle aéronautique propre, mais ses réserves naturelles si","Évite le survol bas des réserves incluses (faune protégée)","Partie ouest dans la CTR Bretagne — autorisation nécessaire","Contact PNRA pour zones sensibles : 02 98 81 90 08"]},
-  {name:"Camp militaire de Coëtquidan (R506A)",lat:47.9534,lon:-2.2089,radius:8,status:"red",emoji:"🪖",altitude:null,title:"Vol interdit pendant activité — zone militaire",explain:"Le camp de Coëtquidan est couvert par la zone réglementée <strong>R506A</strong>, du sol jusqu'à environ 3500 m. Le contournement est <strong>obligatoire pendant l'activité</strong> — en pratique interdit pour les drones civils. Bonne nouvelle : la zone est <strong>inactive le dimanche et les jours fériés</strong>. Pour voler en semaine, contacte le camp.",rules:["Zone réglementée R506A — contournement obligatoire pendant l'activité","Inactive le dimanche et les jours fériés","Pour voler en période d'inactivité : contacter le camp au 02 97 70 77 67","Activités : tirs sol/sol et parachutage — danger réel si activité en cours"]},
-  // --- ZONES VACANCES ÉTÉ 2026 ---
-  {name:"Base aéronavale de Lanvéoc (P112)",lat:48.2972,lon:-4.4503,radius:5,status:"red",emoji:"🪖",altitude:null,title:"Vol INTERDIT — zone P militaire",explain:"Tu es dans (ou proche de) la <strong>zone P112 — Base aéronavale de Lanvéoc-Poulmic</strong>, zone interdite permanente. C'est exactement la zone où un pilote a été convoqué au tribunal en mai 2026 pour survol par négligence. Aucune dérogation possible pour les civils.",rules:["Zone P/ZIT permanente — interdiction absolue H24","Pas de demande d'autorisation possible — zone fermée aux civils","Risque : jusqu'à 6 mois de prison + 15 000 € d'amende","Évite tout survol même à distance — la zone est plus grande qu'elle n'y paraît"]},
-  {name:"Le Conquet — CTR Brest",lat:48.3614,lon:-4.7783,radius:10,status:"red",emoji:"✈️",altitude:null,title:"Vol interdit — CTR Brest à proximité",explain:"Le Conquet est situé à environ 20 km à l'ouest de Brest, dans ou très proche de la <strong>CTR Bretagne</strong> (aéroport de Brest LFRB). Cette zone couvre un large périmètre et les drones y sont interdits sans autorisation. La présence de la base navale de Brest renforce les restrictions.",rules:["CTR Bretagne (Brest LFRB) — interdiction sans autorisation","Présence de la base navale de Brest à proximité","Demande via alphatango.aviation-civile.gouv.fr (délai minimum 5 jours)","Vérifie la carte officielle cartes.gouv.fr avant tout vol ici"]},
-  {name:"Île d'Ouessant — Zone interdite",lat:48.4608,lon:-5.0997,radius:8,status:"red",emoji:"🚫",altitude:null,title:"Vol interdit — île + réserve + zone militaire",explain:"Ouessant cumule <strong>trois restrictions majeures</strong> : (1) c'est une île, donc pas de couloir côtier libre en mer, (2) elle est entourée de zones militaires R17 qui touchent directement son littoral, (3) elle est classée <strong>Réserve de biosphère UNESCO</strong> avec des zones naturelles protégées. Le vol de drone y est <strong>extrêmement réglementé</strong> voire interdit dans la plupart des secteurs.",rules:["Île : pas de couloir libre de 1850 m (réservé à la côte continentale)","Zones militaires R17 touchent directement le littoral de l'île","Réserve de biosphère UNESCO — faune strictement protégée","Avant tout vol : contacter la mairie d'Ouessant ET vérifier AlphaTango"]},
-  {name:"P42 Kerlouan — Zone interdite militaire",lat:48.63818,lon:-4.35083,radius:7,status:"red",emoji:"🪖",altitude:null,title:"Vol INTERDIT — zone P permanente (Brignogan / Pontusval)",explain:"Tu es dans (ou proche de) la <strong>zone P42 Kerlouan</strong>, zone interdite permanente au profit d'un site militaire (sol → 610 m / 2000 ft, active H24). Elle couvre notamment Brignogan-Plage, le Phare de Pontusval et le hameau de Meneham. Contrairement à une CTR classique, il n'y a <strong>pas d'autorisation AlphaTango possible</strong> ici : la seule voie est une Lettre d'Accord + dérogation (ADV) auprès du bureau Survols du CECLANT — une démarche réservée aux exploitants professionnels (assurance, brevet DGAC, drone à ID électronique), délai minimum 20 jours ouvrés, et depuis 09/2023 plus aucune dérogation accordée pour un usage privé/promotionnel. En pratique : zone fermée pour un pilote loisir. <strong>Note :</strong> ce rayon de 7 km est une approximation cercle — le contour réel (polygone) doit être vérifié sur cartes.gouv.fr, en particulier pour les points en bordure comme Grève de Goulven (~5,2 km du centre) qui pourraient être en réalité hors zone.",rules:["Zone P permanente — interdiction absolue H24 (sol à 610 m)","Pas d'autorisation AlphaTango possible dans cette zone","Dérogation réservée aux pros (LOA + ADV) — CECLANT bureau Survols : ceclant-survols.resp.fct@intradef.gouv.fr","Depuis sept. 2023 : plus de dérogation pour usage privé/promotionnel — fermé en pratique au loisir","Couvre Brignogan-Plage, le Phare de Pontusval et Meneham — vérifie bien avant de voler","Rayon 7 km = approximation cercle, pas le vrai contour polygonal — clique le contour magenta sur cartes.gouv.fr pour les points en bordure","Mairie de Kerlouan (infos générales) : 02 98 83 93 13"]},
-];
-// NOTAMs et restrictions temporaires actives
-const NOTAMS=[
-  {ref:"SUP AIP 099/26",desc:"Exercice militaire « Personal Recovery 2026 » — 19 zones temporaires activées en Bretagne le 16, 17 et 18 juin 2026, de 12h00 à 16h30. Évite de voler en Bretagne sur ces créneaux.",from:"2026-06-16",until:"2026-06-18",urgent:false},
-  {ref:"SUP AIP 077/26",desc:"Remplace le SUP AIP 165/25. Depuis le littoral continental, vol drone en vue autorisé jusqu'à 1850 m de la côte (1 mille nautique) et 120 m de hauteur max, sans protocole avec ARMOR — mais notification obligatoire via AlphaTango pour les drones de plus de 900 g. 7 ZRT au large (LF-R17 : AVEL, BATZ, CORSEN, DOLMEN, ECKMUHL, FOUESNANT, GUERANDE) activables H24 par la Marine ; zones LF-D18 A1/A2 mises en sommeil. Valable jusqu'au 30 avril 2027.",from:"2026-05-01",until:"2027-04-30",urgent:false},
-];
+const ZONES=[];
+const NOTAMS=[];
 function checkNotams(){
   const today=new Date(); today.setHours(0,0,0,0);
   let html='';
@@ -319,23 +298,12 @@ function checkNotams(){
   if(c2)c2.innerHTML=html;
 }
 checkNotams();
-// Onglet Loisir — sites remarquables (rayon ~80 km autour de Kerlouan), sources : offices de tourisme locaux + mairies
-const LOISIR=[
-  {name:"Phare de l'Île Vierge",lat:48.6388517,lon:-4.5675014,dist:"~14 km",desc:"Le plus haut phare d'Europe en pierre de taille (82,5 m), à Plouguerneau. Accessible à pied par le sentier des douaniers ou en bateau selon la marée.",status:"green",note:"Côte continentale — couloir libre jusqu'à 1850 m en mer / 120 m d'altitude (SUP AIP 077/26). Aucune zone P ou CTR identifiée ici. Vérifie tout de même cartes.gouv.fr avant de décoller.",src:"Office de tourisme Pays des Abers"},
-  {name:"Aber Wrac'h",lat:48.5969163,lon:-4.5615188,dist:"~20 km",desc:"Estuaire encaissé à Landéda, port de plaisance, sentier des douaniers (GR34), dunes de Sainte-Marguerite et plage de la Palue.",status:"green",note:"Côte continentale — couloir libre jusqu'à 1850 m en mer / 120 m d'altitude. Pas de restriction identifiée.",src:"Office de tourisme Pays des Abers"},
-  {name:"Aber Benoît",lat:48.5525800,lon:-4.5424917,dist:"~22 km",desc:"Deuxième aber du Pays des Abers (Tréglonou / Lannilis), chapelle Notre-Dame de Traon, sentiers le long de la rivière.",status:"green",note:"Zone rurale, aucune restriction aéronautique identifiée. Vérifie cartes.gouv.fr par précaution.",src:"Office de tourisme Pays des Abers"},
-  {name:"Portsall",lat:48.5578742,lon:-4.6982378,dist:"~28 km",desc:"Port typique de Ploudalmézeau, mémorial du naufrage de l'Amoco Cadiz (1978), longues plages de sable fin.",status:"green",note:"Côte continentale — couloir libre jusqu'à 1850 m en mer / 120 m d'altitude.",src:"Office de tourisme Pays d'Iroise"},
-  {name:"Argenton",lat:48.5254921,lon:-4.7564159,dist:"~30 km",desc:"Petit port pittoresque de la Côte des Légendes (Landunvez), chaos rocheux et îlot accessible à marée basse.",status:"green",note:"Côte continentale — couloir libre jusqu'à 1850 m en mer / 120 m d'altitude.",src:"Office de tourisme Pays d'Iroise"},
-  {name:"Roscoff",lat:48.7255816,lon:-3.9828983,dist:"~32 km",desc:"Vieux port et maisons d'armateurs, chapelle Sainte-Barbe, jardin exotique, départ des vedettes vers l'Île de Batz.",status:"green",note:"Côte continentale — couloir libre en mer. Vérifie un éventuel arrêté municipal en cœur de ville avant de décoller au-dessus des habitations.",src:"Office de tourisme Roscoff-Baie de Morlaix"},
-  {name:"Saint-Pol-de-Léon",lat:48.6849601,lon:-3.9868641,dist:"~30 km",desc:"Cathédrale et clocher « Kreisker », ville historique du Léon, halles et marchés anciens.",status:"green",note:"Zone urbaine — vol possible en catégorie ouverte en dehors des rassemblements de personnes, pas de restriction aéronautique identifiée.",src:"Office de tourisme Roscoff-Baie de Morlaix"},
-  {name:"Île de Batz",lat:48.7446500,lon:-4.0131095,dist:"~35 km (via Roscoff)",desc:"Jardin exotique Georges Delaselle, phare, plages de sable blanc — se visite à pied ou à vélo depuis Roscoff.",status:"orange",note:"Île — ne bénéficie pas du couloir continental de 1850 m. Vérifie cartes.gouv.fr avant tout vol, en particulier autour du phare.",src:"Office de tourisme Roscoff-Baie de Morlaix"},
-  {name:"Pointe de Corsen",lat:48.4145803,lon:-4.7950894,dist:"~35 km",desc:"Point le plus occidental de la France continentale (Plouarzel), sémaphore, vue sur Ouessant et le rail d'Ouessant, l'un des plus fréquentés au monde.",status:"orange",note:"En limite de la zone offshore R17 CORSEN — le couloir de 1850 m s'applique côté continental, mais vérifie le contour exact avant de voler vers le large.",src:"Office de tourisme Pays d'Iroise"},
-  {name:"Pointe Saint-Mathieu",lat:48.3306410,lon:-4.7737256,dist:"~48 km",desc:"Phare et abbaye en ruines côte à côte (Plougonvelin) — l'un des sites les plus photographiés du Finistère, vue sur le Four et Ouessant.",status:"red",note:"Exception à la règle du couloir côtier (SUP AIP 077/26) : ici la zone R17 touche directement la côte, sans couloir libre. Vol drone interdit sans autorisation.",src:"Office de tourisme Pays d'Iroise"},
-  {name:"Le Conquet",lat:48.3605295,lon:-4.7709059,dist:"~43 km",desc:"Un des plus jolis ports du Finistère, ruelles de granit, départs de bateaux vers Ouessant et Molène.",status:"red",note:"CTR Bretagne (Brest) à proximité immédiate — vol drone interdit sans autorisation AlphaTango. Visite à pied uniquement.",src:"Office de tourisme Pays d'Iroise"},
-];
+// Onglet Loisir — sites remarquables à proximité, sources : offices de tourisme locaux + mairies
+const LOISIR=[];
 function loisirBadge(s){return s==='green'?{icon:'✅',label:'Vol drone libre'}:s==='orange'?{icon:'⚠️',label:'Vérifier avant de voler'}:{icon:'🚫',label:'Vol drone interdit — à pied uniquement'}}
 function renderLoisir(){
   let html='';
+  if(!LOISIR.length){document.getElementById('loisir-list').innerHTML='<div class="empty"><span class="empty-icon">🏞️</span><p>Pas encore de spots enregistrés pour ta zone actuelle.</p></div>';return;}
   for(const l of LOISIR){
     const b=loisirBadge(l.status);
     html+=`<div class="loisir-card">
@@ -368,16 +336,7 @@ function openWith(app){
   window.location.href=url;
   closeItiModal();
 }
-const SEASONAL={
-  "cap fréhel":{months:[3,4,5,6,7],bad:"🦅 <strong>Période de nidification active</strong> — Les oiseaux nichent dans les falaises en ce moment. Vol déconseillé et potentiellement interdit par arrêté.",ok:"Les oiseaux ont quitté les falaises pour cet hiver. Vol possible — vérifie quand même Géoportail pour toute restriction temporaire."},
-  "île de bréhat":{months:[3,4,5,6,7],bad:"🐦 <strong>Période de reproduction (mars–juillet)</strong> — Faune protégée particulièrement sensible. L'autorisation préfectorale est encore plus importante en ce moment.",ok:"Hors période de reproduction. L'autorisation préfectorale reste recommandée avant tout vol."},
-  "ploumanac":{months:[3,4,5,6,7],bad:"🪨 <strong>Période de nidification (mars–juillet)</strong> — Faune locale protégée. Arrêté préfectoral possible en zone Natura 2000.",ok:"Hors saison sensible. Vérifie quand même les arrêtés préfectoraux en vigueur."},
-  "erquy":{months:[3,4,5,6,7],bad:"🌿 <strong>Période sensible (mars–juillet)</strong> — Landes et falaises en zone protégée. Vol déconseillé pendant la nidification.",ok:"Hors saison sensible. Zone ouverte — vol possible avec ta certification AlphaTango."},
-  "tréguastel":{months:[3,4,5,6,7],bad:"🪨 <strong>Période de nidification (mars–juillet)</strong> — Côte de Granit Rose, faune protégée. Vérifie les arrêtés municipaux.",ok:"Hors saison sensible. Vérifie les arrêtés municipaux de Trégastel avant de voler."},
-  "ouessant":{months:[1,2,3,4,5,6,7,8,9,10,11,12],bad:"🚫 <strong>Zone très réglementée toute l'année</strong> — Île + réserve UNESCO + zones militaires. Contacte la mairie avant tout vol.",ok:"🚫 <strong>Zone très réglementée toute l'année</strong> — Île + réserve UNESCO + zones militaires. Contacte la mairie avant tout vol."},
-  "goulven":{months:[3,4,5,6,7],bad:"🐦 <strong>Baie de Goulven / Dunes de Keremma — Natura 2000</strong> (mars–juillet) — site d'oiseaux nicheurs et migrateurs. Reste sur les chemins/parkings, évite les zones de nidification des dunes.",ok:"Hors principale période de nidification. Site Natura 2000 (Baie de Goulven-Dunes de Keremma) — reste prudent près des dunes et des oiseaux."},
-  "meneham":{months:[3,4,5,6,7],bad:"🏘️ Hameau habité + falaises côtières — période de nidification (mars–juillet) sur le secteur, en plus de la restriction militaire ci-dessus.",ok:"Hors principale période de nidification, mais la restriction militaire P42 s'applique toute l'année, indépendamment de la saison."},
-};
+const SEASONAL={};
 function dist(la1,lo1,la2,lo2){const R=6371,dL=(la2-la1)*Math.PI/180,dO=(lo2-lo1)*Math.PI/180,a=Math.sin(dL/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dO/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))}
 function seasonNote(locName){
   const m=new Date().getMonth()+1,n=locName.toLowerCase();
@@ -434,7 +393,7 @@ function renderZone(lat,lon,locName,placeInfo=null){
   let inside=[],nearest=null,minD=Infinity;
   for(const z of ZONES){const d=dist(lat,lon,z.lat,z.lon);if(d<z.radius)inside.push({...z});if(d<minD){minD=d;nearest=z}}
   minD=Math.round(minD*10)/10;
-  const nearestTxt = minD<=80 ? ` Zone restrictive listée la plus proche : <strong>${nearest.name}</strong> à <strong>${minD} km</strong>.` : ` Les zones surveillées par cette appli sont concentrées en Bretagne — aucune n'est pertinente ici, vérifie cartes.gouv.fr pour ta région.`;
+  const nearestTxt = minD<=80 ? ` Zone restrictive listée la plus proche : <strong>${nearest.name}</strong> à <strong>${minD} km</strong>.` : ` Les zones surveillées par cette appli sont limitées aux infos locales enregistrées — aucune n'est encore disponible ici, vérifie cartes.gouv.fr pour ta région.`;
   const geo=`https://cartes.gouv.fr/explorer-les-cartes?c=${lon},${lat}&z=14&l=GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN25TOUR$GEOPORTAIL:OGC:WMTS(1;1;1;0),TRANSPORTS.DRONES.RESTRICTIONS$GEOPORTAIL:OGC:WMTS(2;0.55;1;0)&permalink=yes`;
   const ai=aggloInfo(placeInfo);
   let html='';
@@ -1034,15 +993,7 @@ async function reverseGeo(lat,lon){
 }
 async function searchZone(){const q=document.getElementById('zoneInput').value.trim();if(!q)return;loading('zone-result','Recherche...');const l=await geo(q);l?renderZone(l.lat,l.lon,l.name,l):document.getElementById('zone-result').innerHTML='<div class="empty"><span class="empty-icon">🔍</span><p>Lieu introuvable.</p></div>'}
 async function searchMeteo(){const q=document.getElementById('meteoInput').value.trim();if(!q)return;loading('meteo-result','Recherche...');const l=await geo(q);l?loadMeteo(l.lat,l.lon,l.name):document.getElementById('meteo-result').innerHTML='<div class="empty"><span class="empty-icon">🔍</span><p>Lieu introuvable.</p></div>'}
-const SPOT_INFO={
-  "Île Callot · Carantec":{alt:0,note:"⛔ <strong>Vol interdit — CTR Bretagne (Brest)</strong>. Toute la zone autour de Carantec est dans la CTR Brest. Autorisation préalable obligatoire via AlphaTango (délai minimum 5 jours)."},
-  "Plage de Tahiti":{alt:0,note:"⛔ <strong>Vol interdit — CTR Bretagne (Brest)</strong>. La Rade de Morlaix et ses abords sont dans la CTR Brest. Château du Taureau également interdit. Autorisation préalable obligatoire via AlphaTango."},
-  "Tréguastel":{alt:120,note:"🌊 <strong>Vol possible uniquement depuis les rochers côtiers vers la mer</strong> — pas depuis l'agglomération (vol interdit). Les îlots (Île Renote, Île de Costaèrès) sont accessibles. Décollage depuis le GR34 sur les rochers, hors zone habitée. Évite le sable ! En cas de doute, Mairie de Trégastel : 02 96 15 38 00."},
-  "Brignogan-Plage":{alt:0,note:"⛔ <strong>Vol interdit — zone militaire P42 Kerlouan</strong>. Brignogan est à proximité immédiate de la zone interdite permanente P42 (sol → 610 m, H24) — pas simplement la CTR Bretagne, bien plus loin (~27 km). Aucune autorisation AlphaTango possible ici : la dérogation (CECLANT, ceclant-survols.resp.fct@intradef.gouv.fr) est réservée aux exploitants professionnels, pas au loisir. Mairie de Kerlouan : 02 98 83 93 13."},
-  "Phare de Pontusval":{alt:0,note:"⛔ <strong>Vol interdit — zone militaire P42 Kerlouan</strong>. Le phare et ses abords (terre ET mer) sont dans la zone interdite permanente P42 (sol → 610 m, H24) — pas la CTR Bretagne, bien plus loin (~27 km). Aucune autorisation AlphaTango possible ici : la dérogation (CECLANT, ceclant-survols.resp.fct@intradef.gouv.fr) est réservée aux exploitants professionnels, pas au loisir. Mairie de Kerlouan : 02 98 83 93 13."},
-  "Meneham":{alt:0,note:"⛔ <strong>Vol interdit — zone militaire P42 Kerlouan</strong>. Le hameau se situe à environ 1,5 km du centre de la zone interdite permanente P42 (sol → 610 m, H24), largement à l'intérieur du rayon de 7 km retenu par cette appli. Aucune autorisation AlphaTango possible ici. Avant de renoncer complètement, vérifie le contour exact (polygone) sur cartes.gouv.fr — un rayon de 7 km est une approximation et le vrai contour du P42 n'a pas pu être confirmé précisément. Mairie de Kerlouan : 02 98 83 93 13."},
-  "Grève de Goulven":{alt:120,note:"⚠️ <strong>Zone à vérifier — en bordure de l'approximation P42</strong>. La Grève de Goulven / Dunes de Keremma est à environ 5,2 km du centre de la zone militaire P42 Kerlouan, donc à l'intérieur du rayon-cercle de 7 km utilisé par cette appli (qui se déclenchera en rouge), mais le vrai contour du P42 est un polygone, probablement plus resserré vers la côte — ce point est peut-être en réalité hors zone. Site Natura 2000 (Baie de Goulven-Dunes de Keremma) par ailleurs — reste sur les chemins/parkings, évite le survol bas des dunes en période de nidification (mars-juillet). <strong>Vérifie impérativement le contour magenta réel sur cartes.gouv.fr avant d'y voler.</strong>"},
-};
+const SPOT_INFO={};
 </script>
 </body>
 </html>
