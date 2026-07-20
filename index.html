@@ -260,6 +260,12 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
   <br>
   <div class="drone-badge">🏞️ Sites remarquables — indique ta position pour voir les spots à proximité</div>
   <div id="loisir-list"></div>
+  <div id="loisir-map-panel" class="loisir-map-panel" style="display:none;margin-bottom:1rem">
+    <div class="carte-toolbar">
+      <button class="layer-toggle-btn" onclick="closeLoisirCarte()">✕ Fermer la carte</button>
+    </div>
+    <div id="loisir-map-inner" style="width:100%;height:320px;border-radius:var(--rs);overflow:hidden;background:#0c1a2e"></div>
+  </div>
   <div class="footer">Sources : offices de tourisme locaux et sites des mairies concernées. Statuts drone à titre indicatif — vérifie toujours cartes.gouv.fr avant de voler.</div>
 </div>
 
@@ -279,7 +285,10 @@ function switchTab(t){
     loadMeteo(sharedLoc.lat,sharedLoc.lon,sharedLoc.name);
   }
 }
-function openLoisirCarte(lat,lon,name){switchTab('zones');toggleFullMap(lat,lon,name);}const ZONES=[];
+function openLoisirCarte(lat,lon,name){switchTab('loisir');const panel=document.getElementById('loisir-map-panel');if(panel)panel.style.display='block';setTimeout(()=>{if(loisirMap){loisirMap.remove();loisirMap=null;}loisirMap=L.map('loisir-map-inner').setView([lat,lon],14);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19}).addTo(loisirMap);L.circleMarker([lat,lon],{radius:8,color:'#0ea5e9',fillColor:'#0ea5e9',fillOpacity:0.9,weight:2}).addTo(loisirMap).bindPopup(name).openPopup();loisirMap.invalidateSize();},100);if(panel)panel.scrollIntoView({behavior:'smooth',block:'start'});}
+function closeLoisirCarte(){const panel=document.getElementById('loisir-map-panel');if(panel)panel.style.display='none';if(loisirMap){loisirMap.remove();loisirMap=null;}}
+let loisirMap=null;
+const ZONES=[];
 const NOTAMS=[];
 function checkNotams(){
   const today=new Date(); today.setHours(0,0,0,0);
