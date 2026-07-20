@@ -186,7 +186,12 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
   <button class="tab" onclick="switchTab('meteo')">🌤️ Météo drone</button>
   <button class="tab" onclick="switchTab('loisir')">🏞️ Loisir</button><button class="tab" onclick="switchTab('supplements')">📎 Suppléments</button>
 </div>
-<div class="content"><div id="tab-supplements" class="section"><br><div class="drone-badge">📎 Suppléments</div><div class="loisir-card"><div class="loisir-top"><div class="loisir-title">Chapelle Saint-Honoré</div><div class="loisir-dist">Plogastel-Saint-Germain</div></div><div class="loisir-desc">Ruines de chapelle (17e siècle), en zone CTR Quimper (LFRQ) - plafond drone 30 m à cet endroit (catégorie Ouverte, cartes.gouv.fr).</div><a class="link-btn" href="#" onclick="openItineraire('47.944363,-4.233224');return false;">🧭 Itinéraire <span>→</span></a></div></div>
+<div class="content"><div id="tab-supplements" class="section"><br><div class="drone-badge">📎 Suppléments</div><div class="loisir-card"><div class="loisir-top"><div class="loisir-title">Chapelle Saint-Honoré</div><div class="loisir-dist">Plogastel-Saint-Germain</div></div><div class="loisir-desc">Ruines de chapelle (17e siècle), en zone CTR Quimper (LFRQ) - plafond drone 30 m à cet endroit (catégorie Ouverte, cartes.gouv.fr).</div><a class="link-btn" href="#" onclick="openItineraire('47.944363,-4.233224');return false;">🧭 Itinéraire <span>→</span></a></div>
+  <div class="divider" style="margin:20px 0 10px">📍 Mes lieux à visiter (import Google Maps)</div>
+  <div class="drone-badge">🗺️ Liste importée depuis tes favoris Google Maps ("À visiter"), triée par distance depuis ta position. Statut réglementaire non vérifié pour ces lieux : vérifie toujours l'onglet Zones avant de voler.</div>
+  <button class="map-btn" onclick="localiserMapsAVisiter()" style="margin:10px 0 16px">📍 Trier par distance depuis ma position</button>
+  <div id="maps-a-visiter-list"></div>
+</div>
 <!-- ZONES -->
 <div id="tab-zones" class="section active">
   <br>
@@ -275,10 +280,6 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
     </div>
     <div style="font-size:11px;color:rgba(255,255,255,0.55);padding:6px 12px">Touche une zone colorée pour voir son nom officiel (P/R/D/CTR) et son statut réglementaire.</div>
   </div>
-  <div class="divider" style="margin:20px 0 10px">📍 Mes lieux à visiter (import Google Maps)</div>
-  <div class="drone-badge">🗺️ Liste importée depuis tes favoris Google Maps ("À visiter"), triée par distance depuis ta position. Statut réglementaire non vérifié pour ces lieux : vérifie toujours l'onglet Zones avant de voler.</div>
-  <button class="map-btn" onclick="localiserMapsAVisiter()" style="margin:10px 0 16px">📍 Trier par distance depuis ma position</button>
-  <div id="maps-a-visiter-list"></div>
   <div class="footer">Sources : offices de tourisme locaux et sites des mairies concernées. Statuts drone à titre indicatif — vérifie toujours cartes.gouv.fr avant de voler.</div>
 </div>
 
