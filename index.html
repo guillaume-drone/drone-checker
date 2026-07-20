@@ -265,9 +265,11 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
   <br>
   <div class="drone-badge">🏞️ Sites remarquables — indique ta position pour voir les spots à proximité</div>
   <div id="loisir-list"></div>
-  <div id="loisir-map-panel" class="loisir-map-panel" style="display:none;margin-bottom:1rem">
+  <div class="footer">Sources : offices de tourisme locaux et sites des mairies concernées. Statuts drone à titre indicatif — vérifie toujours cartes.gouv.fr avant de voler.</div>
+</div>
+<div id="loisir-map-panel" class="loisir-map-panel" style="display:none;margin-bottom:1rem">
     <div class="carte-toolbar">
-      <button class="layer-toggle-btn" onclick="closeLoisirCarte()">✕ Fermer la carte</button>
+      <button class="layer-toggle-btn" onclick="closeLoisirCarte()">✥ Fermer la carte</button>
     </div>
     <div class="carte-wrap" style="margin-bottom:0">
       <div id="loisir-map-inner" class="carte-inner" style="height:320px"></div>
@@ -279,8 +281,6 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
       <span><span class="map-dot orange"></span>Prudence / vérif. requise</span>
     </div>
     <div style="font-size:11px;color:rgba(255,255,255,0.55);padding:6px 12px">Touche une zone colorée pour voir son nom officiel (P/R/D/CTR) et son statut réglementaire.</div>
-  </div>
-  <div class="footer">Sources : offices de tourisme locaux et sites des mairies concernées. Statuts drone à titre indicatif — vérifie toujours cartes.gouv.fr avant de voler.</div>
 </div>
 
 
@@ -299,7 +299,7 @@ function switchTab(t){
     loadMeteo(sharedLoc.lat,sharedLoc.lon,sharedLoc.name);
   }
 }
-function openLoisirCarte(lat,lon,name){currentSpotName=name;currentSpotLat=lat;currentSpotLon=lon;switchTab('loisir');const panel=document.getElementById('loisir-map-panel');if(panel)panel.style.display='block';setTimeout(()=>{if(loisirMap){loisirMap.remove();loisirMap=null;}loisirMap=L.map('loisir-map-inner').setView([lat,lon],14);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19}).addTo(loisirMap);loisirOfficialTiles=L.tileLayer('https://data.geopf.fr/wmts?SERVICE=WMTS&VERSION=1.0.0&REQUEST=GetTile&LAYER=TRANSPORTS.DRONES.RESTRICTIONS&STYLE=normal&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/png',{opacity:0.75,maxZoom:19,attribution:'IGN/DGAC'}).addTo(loisirMap);loisirDgacLayer=L.layerGroup().addTo(loisirMap);loisirUasLayer=L.layerGroup().addTo(loisirMap);loadUasZonesOnMap(loisirMap,loisirUasLayer,['p','r','d','ctr']);L.circleMarker([lat,lon],{radius:8,color:'#0ea5e9',fillColor:'#0ea5e9',fillOpacity:0.9,weight:2}).addTo(loisirMap).bindPopup(name).openPopup();loisirMap.invalidateSize();loisirMap.on('moveend',()=>{clearTimeout(loisirDgacDebounce);loisirDgacDebounce=setTimeout(()=>loadDgacRestrictions(loisirMap,loisirDgacLayer,'loisir-zoom-hint',null),400);});loadDgacRestrictions(loisirMap,loisirDgacLayer,'loisir-zoom-hint',null);},100);if(panel)panel.scrollIntoView({behavior:'smooth',block:'start'});}
+function openLoisirCarte(lat,lon,name){currentSpotName=name;currentSpotLat=lat;currentSpotLon=lon;const panel=document.getElementById('loisir-map-panel');if(panel)panel.style.display='block';setTimeout(()=>{if(loisirMap){loisirMap.remove();loisirMap=null;}loisirMap=L.map('loisir-map-inner').setView([lat,lon],14);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19}).addTo(loisirMap);loisirOfficialTiles=L.tileLayer('https://data.geopf.fr/wmts?SERVICE=WMTS&VERSION=1.0.0&REQUEST=GetTile&LAYER=TRANSPORTS.DRONES.RESTRICTIONS&STYLE=normal&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/png',{opacity:0.75,maxZoom:19,attribution:'IGN/DGAC'}).addTo(loisirMap);loisirDgacLayer=L.layerGroup().addTo(loisirMap);loisirUasLayer=L.layerGroup().addTo(loisirMap);loadUasZonesOnMap(loisirMap,loisirUasLayer,['p','r','d','ctr']);L.circleMarker([lat,lon],{radius:8,color:'#0ea5e9',fillColor:'#0ea5e9',fillOpacity:0.9,weight:2}).addTo(loisirMap).bindPopup(name).openPopup();loisirMap.invalidateSize();loisirMap.on('moveend',()=>{clearTimeout(loisirDgacDebounce);loisirDgacDebounce=setTimeout(()=>loadDgacRestrictions(loisirMap,loisirDgacLayer,'loisir-zoom-hint',null),400);});loadDgacRestrictions(loisirMap,loisirDgacLayer,'loisir-zoom-hint',null);},100);if(panel)panel.scrollIntoView({behavior:'smooth',block:'start'});}
 function closeLoisirCarte(){const panel=document.getElementById('loisir-map-panel');if(panel)panel.style.display='none';if(loisirMap){loisirMap.remove();loisirMap=null;}loisirDgacLayer=null;loisirOfficialTiles=null;loisirUasLayer=null;clearTimeout(loisirDgacDebounce);}
 let loisirMap=null, loisirDgacLayer=null, loisirOfficialTiles=null, loisirDgacDebounce=null, loisirUasLayer=null;
 const ZONES=[];
