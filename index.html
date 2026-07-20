@@ -611,6 +611,7 @@ function dgacPopup(limite,starred){
 }
 async function loadDgacRestrictions(map, layer, hintElId, checkboxId){
   if(!map||!layer)return;
+  if(map._popup)return; // ne pas rafraîchir (et donc fermer) un popup en cours de lecture
   const hint=hintElId?document.getElementById(hintElId):null;
   const zoom=map.getZoom();
   if(zoom<8){
@@ -630,6 +631,7 @@ async function loadDgacRestrictions(map, layer, hintElId, checkboxId){
     const r=await fetch(url);
     if(!r.ok)return;
     const data=await r.json();
+    if(map._popup)return; // le fetch a pu durer assez longtemps pour qu'un popup s'ouvre entre-temps
     layer.clearLayers();
     if(!data.features)return;
     data.features.forEach(f=>{
@@ -638,7 +640,7 @@ async function loadDgacRestrictions(map, layer, hintElId, checkboxId){
       const limite=raw.replace(/\*/g,'').trim();
       const style={color:dgacColor(limite,starred),weight:2,fillOpacity:starred?0.22:0.4};
       try{
-        L.geoJSON(f.geometry,{style}).bindPopup(dgacPopup(limite,starred)).addTo(layer);
+        L.geoJSON(f.geometry,{style}).bindPopup(dgacPopup(limite,starred),{autoPan:false}).addTo(layer);
       }catch(e){}
     });
   }catch(e){
@@ -652,6 +654,7 @@ async function loadDGACForView(){
 // Parcellaire cadastral (IGN) — utile seulement très zoomé (parcelles minuscules)
 async function loadCadastreForView(){
   if(!carteMap)return;
+  if(carteMap._popup)return; // ne pas rafraîchir (et donc fermer) un popup en cours de lecture
   const cb=document.getElementById('lyr-cadastre');
   if(!cb||!cb.checked)return;
   const zoom=carteMap.getZoom();
@@ -663,13 +666,14 @@ async function loadCadastreForView(){
     const r=await fetch(url);
     if(!r.ok)return;
     const data=await r.json();
+    if(carteMap._popup)return;
     carteLayers.cadastre.clearLayers();
     if(!data.features)return;
     data.features.forEach(f=>{
       const p=f.properties||{};
       const label=`Parcelle ${p.idu||''}${p.contenance?(' — '+p.contenance+' m²'):''}`;
       try{
-        L.geoJSON(f.geometry,{style:{color:'#a3703a',weight:1,fillOpacity:0.03}}).bindPopup(label).addTo(carteLayers.cadastre);
+        L.geoJSON(f.geometry,{style:{color:'#a3703a',weight:1,fillOpacity:0.03}}).bindPopup(label,{autoPan:false}).addTo(carteLayers.cadastre);
       }catch(e){}
     });
   }catch(e){}
@@ -678,6 +682,7 @@ async function loadCadastreForView(){
 // Limites communales (IGN)
 async function loadAdminForView(){
   if(!carteMap)return;
+  if(carteMap._popup)return; // ne pas rafraîchir (et donc fermer) un popup en cours de lecture
   const cb=document.getElementById('lyr-admin');
   if(!cb||!cb.checked)return;
   const zoom=carteMap.getZoom();
@@ -689,13 +694,14 @@ async function loadAdminForView(){
     const r=await fetch(url);
     if(!r.ok)return;
     const data=await r.json();
+    if(carteMap._popup)return;
     carteLayers.admin.clearLayers();
     if(!data.features)return;
     data.features.forEach(f=>{
       const p=f.properties||{};
       const label=`${p.nom_officiel||'Commune'} (${p.code_insee||''})`;
       try{
-        L.geoJSON(f.geometry,{style:{color:'#64748b',weight:1.5,fillOpacity:0,dashArray:'4,3'}}).bindPopup(label).addTo(carteLayers.admin);
+        L.geoJSON(f.geometry,{style:{color:'#64748b',weight:1.5,fillOpacity:0,dashArray:'4,3'}}).bindPopup(label,{autoPan:false}).addTo(carteLayers.admin);
       }catch(e){}
     });
   }catch(e){}
