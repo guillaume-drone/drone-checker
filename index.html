@@ -264,7 +264,15 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
     <div class="carte-toolbar">
       <button class="layer-toggle-btn" onclick="closeLoisirCarte()">✕ Fermer la carte</button>
     </div>
-    <div id="loisir-map-inner" style="width:100%;height:320px;border-radius:var(--rs);overflow:hidden;background:#0c1a2e"></div>
+    <div class="carte-wrap" style="margin-bottom:0">
+      <div id="loisir-map-inner" class="carte-inner" style="height:320px"></div>
+      <div id="loisir-zoom-hint" class="carte-zoom-hint" style="display:none">Zoome pour charger les restrictions DGAC ici</div>
+    </div>
+    <div class="map-legend">
+      <span><span class="map-dot you"></span>Lieu</span>
+      <span><span class="map-dot red"></span>Interdit / actif</span>
+      <span><span class="map-dot orange"></span>Prudence / vérif. requise</span>
+    </div>
   </div>
   <div class="footer">Sources : offices de tourisme locaux et sites des mairies concernées. Statuts drone à titre indicatif — vérifie toujours cartes.gouv.fr avant de voler.</div>
 </div>
@@ -285,9 +293,9 @@ function switchTab(t){
     loadMeteo(sharedLoc.lat,sharedLoc.lon,sharedLoc.name);
   }
 }
-function openLoisirCarte(lat,lon,name){switchTab('loisir');const panel=document.getElementById('loisir-map-panel');if(panel)panel.style.display='block';setTimeout(()=>{if(loisirMap){loisirMap.remove();loisirMap=null;}loisirMap=L.map('loisir-map-inner').setView([lat,lon],14);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19}).addTo(loisirMap);L.circleMarker([lat,lon],{radius:8,color:'#0ea5e9',fillColor:'#0ea5e9',fillOpacity:0.9,weight:2}).addTo(loisirMap).bindPopup(name).openPopup();loisirMap.invalidateSize();},100);if(panel)panel.scrollIntoView({behavior:'smooth',block:'start'});}
-function closeLoisirCarte(){const panel=document.getElementById('loisir-map-panel');if(panel)panel.style.display='none';if(loisirMap){loisirMap.remove();loisirMap=null;}}
-let loisirMap=null;
+function openLoisirCarte(lat,lon,name){switchTab('loisir');const panel=document.getElementById('loisir-map-panel');if(panel)panel.style.display='block';setTimeout(()=>{if(loisirMap){loisirMap.remove();loisirMap=null;}loisirMap=L.map('loisir-map-inner').setView([lat,lon],14);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19}).addTo(loisirMap);loisirOfficialTiles=L.tileLayer('https://data.geopf.fr/wmts?SERVICE=WMTS&VERSION=1.0.0&REQUEST=GetTile&LAYER=TRANSPORTS.DRONES.RESTRICTIONS&STYLE=normal&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/png',{opacity:0.75,maxZoom:19,attribution:'IGN/DGAC'}).addTo(loisirMap);loisirDgacLayer=L.layerGroup().addTo(loisirMap);L.circleMarker([lat,lon],{radius:8,color:'#0ea5e9',fillColor:'#0ea5e9',fillOpacity:0.9,weight:2}).addTo(loisirMap).bindPopup(name).openPopup();loisirMap.invalidateSize();loisirMap.on('moveend',()=>{clearTimeout(loisirDgacDebounce);loisirDgacDebounce=setTimeout(()=>loadDgacRestrictions(loisirMap,loisirDgacLayer,'loisir-zoom-hint',null),400);});loadDgacRestrictions(loisirMap,loisirDgacLayer,'loisir-zoom-hint',null);},100);if(panel)panel.scrollIntoView({behavior:'smooth',block:'start'});}
+function closeLoisirCarte(){const panel=document.getElementById('loisir-map-panel');if(panel)panel.style.display='none';if(loisirMap){loisirMap.remove();loisirMap=null;}loisirDgacLayer=null;loisirOfficialTiles=null;clearTimeout(loisirDgacDebounce);}
+let loisirMap=null, loisirDgacLayer=null, loisirOfficialTiles=null, loisirDgacDebounce=null;
 const ZONES=[];
 const NOTAMS=[];
 function checkNotams(){
@@ -599,26 +607,28 @@ function dgacPopup(limite,starred){
   const txt=starred?'Zone habitée — vol autorisé sous conditions standard (arrêté « Espace »)':(limite||'Restriction UAS — DGAC');
   return '<div style="border-left:4px solid '+c+';padding-left:8px;max-width:220px"><div style="font-weight:700;font-size:13px;color:'+c+'">'+txt+'</div></div>';
 }
-async function loadDGACForView(){
-  if(!carteMap)return;
-  const hint=document.getElementById('carte-zoom-hint');
-  const zoom=carteMap.getZoom();
+async function loadDgacRestrictions(map, layer, hintElId, checkboxId){
+  if(!map||!layer)return;
+  const hint=hintElId?document.getElementById(hintElId):null;
+  const zoom=map.getZoom();
   if(zoom<8){
     if(hint)hint.style.display='block';
-    carteLayers.dgac.clearLayers();
+    layer.clearLayers();
     return;
   }
   if(hint)hint.style.display='none';
-  const cb=document.getElementById('lyr-dgac');
-  if(!cb||!cb.checked)return;
-  const b=carteMap.getBounds();
+  if(checkboxId){
+    const cb=document.getElementById(checkboxId);
+    if(!cb||!cb.checked)return;
+  }
+  const b=map.getBounds();
   const bbox=`${b.getWest()},${b.getSouth()},${b.getEast()},${b.getNorth()},EPSG:4326`;
   const url=`https://data.geopf.fr/wfs/ows?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=TRANSPORTS.DRONES.RESTRICTIONS:carte_restriction_drones_lf&OUTPUTFORMAT=application/json&SRSNAME=EPSG:4326&BBOX=${bbox}&COUNT=600`;
   try{
     const r=await fetch(url);
     if(!r.ok)return;
     const data=await r.json();
-    carteLayers.dgac.clearLayers();
+    layer.clearLayers();
     if(!data.features)return;
     data.features.forEach(f=>{
       const raw=(f.properties&&f.properties.limite)?f.properties.limite.toString():'';
@@ -626,12 +636,15 @@ async function loadDGACForView(){
       const limite=raw.replace(/\*/g,'').trim();
       const style={color:dgacColor(limite,starred),weight:2,fillOpacity:starred?0.22:0.4};
       try{
-        L.geoJSON(f.geometry,{style}).bindPopup(dgacPopup(limite,starred)).addTo(carteLayers.dgac);
+        L.geoJSON(f.geometry,{style}).bindPopup(dgacPopup(limite,starred)).addTo(layer);
       }catch(e){}
     });
   }catch(e){
     // Silencieux : CORS, réseau ou format inattendu — la carte continue de fonctionner
   }
+}
+async function loadDGACForView(){
+  return loadDgacRestrictions(carteMap, carteLayers.dgac, 'carte-zoom-hint', 'lyr-dgac');
 }
 
 // Parcellaire cadastral (IGN) — utile seulement très zoomé (parcelles minuscules)
