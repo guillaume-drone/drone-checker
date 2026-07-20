@@ -299,7 +299,7 @@ function checkNotams(){
 }
 checkNotams();
 // Onglet Loisir — sites remarquables à proximité, sources : offices de tourisme locaux + mairies
-const LOISIR=[];
+const LOISIR=[{name:'Saint-Émilion',dist:'~45 km',desc:'Cité médiévale UNESCO au cœur du vignoble bordelais, ruelles pavées et monolithe roman.',status:'orange',note:'Terrain ULM à ~12 km (Libourne-Artigues) : vérifie le NFZ précis de ton point de décollage sur cartes.gouv.fr avant de voler.',src:'Office de tourisme Saint-Émilion',lat:44.8916,lon:-0.1553},{name:'Brontôme-en-Périgord',dist:'~58 km',desc:'Venise du Périgord : abbaye bénédictine et rivière Dronne, vues aériennes superbes.',status:'green',note:'Aucune restriction connue lors de la vérification sommaire (07/2026) ; reconfirme sur cartes.gouv.fr avant le vol.',src:'Office de tourisme Périgord Dronne Belle',lat:45.3625,lon:0.6472},{name:'Abbaye de Cadouin',dist:'~45 km',desc:'Abbaye cistercienne classée UNESCO (chemins de Compostelle), cloître et village préservé.',status:'green',note:'Aucune restriction connue lors de la vérification sommaire (07/2026) ; reconfirme sur cartes.gouv.fr avant le vol.',src:'Mairie de Cadouin',lat:44.7994,lon:0.8622}];
 function loisirBadge(s){return s==='green'?{icon:'✅',label:'Vol drone libre'}:s==='orange'?{icon:'⚠️',label:'Vérifier avant de voler'}:{icon:'🚫',label:'Vol drone interdit — à pied uniquement'}}
 function renderLoisir(){
   let html='';
