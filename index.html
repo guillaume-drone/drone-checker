@@ -273,6 +273,7 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
       <span><span class="map-dot red"></span>Interdit / actif</span>
       <span><span class="map-dot orange"></span>Prudence / vérif. requise</span>
     </div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.55);padding:6px 12px">Touche une zone colorée pour voir son nom officiel (P/R/D/CTR) et son statut réglementaire.</div>
   </div>
   <div class="footer">Sources : offices de tourisme locaux et sites des mairies concernées. Statuts drone à titre indicatif — vérifie toujours cartes.gouv.fr avant de voler.</div>
 </div>
@@ -293,9 +294,9 @@ function switchTab(t){
     loadMeteo(sharedLoc.lat,sharedLoc.lon,sharedLoc.name);
   }
 }
-function openLoisirCarte(lat,lon,name){switchTab('loisir');const panel=document.getElementById('loisir-map-panel');if(panel)panel.style.display='block';setTimeout(()=>{if(loisirMap){loisirMap.remove();loisirMap=null;}loisirMap=L.map('loisir-map-inner').setView([lat,lon],14);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19}).addTo(loisirMap);loisirOfficialTiles=L.tileLayer('https://data.geopf.fr/wmts?SERVICE=WMTS&VERSION=1.0.0&REQUEST=GetTile&LAYER=TRANSPORTS.DRONES.RESTRICTIONS&STYLE=normal&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/png',{opacity:0.75,maxZoom:19,attribution:'IGN/DGAC'}).addTo(loisirMap);loisirDgacLayer=L.layerGroup().addTo(loisirMap);L.circleMarker([lat,lon],{radius:8,color:'#0ea5e9',fillColor:'#0ea5e9',fillOpacity:0.9,weight:2}).addTo(loisirMap).bindPopup(name).openPopup();loisirMap.invalidateSize();loisirMap.on('moveend',()=>{clearTimeout(loisirDgacDebounce);loisirDgacDebounce=setTimeout(()=>loadDgacRestrictions(loisirMap,loisirDgacLayer,'loisir-zoom-hint',null),400);});loadDgacRestrictions(loisirMap,loisirDgacLayer,'loisir-zoom-hint',null);},100);if(panel)panel.scrollIntoView({behavior:'smooth',block:'start'});}
-function closeLoisirCarte(){const panel=document.getElementById('loisir-map-panel');if(panel)panel.style.display='none';if(loisirMap){loisirMap.remove();loisirMap=null;}loisirDgacLayer=null;loisirOfficialTiles=null;clearTimeout(loisirDgacDebounce);}
-let loisirMap=null, loisirDgacLayer=null, loisirOfficialTiles=null, loisirDgacDebounce=null;
+function openLoisirCarte(lat,lon,name){switchTab('loisir');const panel=document.getElementById('loisir-map-panel');if(panel)panel.style.display='block';setTimeout(()=>{if(loisirMap){loisirMap.remove();loisirMap=null;}loisirMap=L.map('loisir-map-inner').setView([lat,lon],14);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19}).addTo(loisirMap);loisirOfficialTiles=L.tileLayer('https://data.geopf.fr/wmts?SERVICE=WMTS&VERSION=1.0.0&REQUEST=GetTile&LAYER=TRANSPORTS.DRONES.RESTRICTIONS&STYLE=normal&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/png',{opacity:0.75,maxZoom:19,attribution:'IGN/DGAC'}).addTo(loisirMap);loisirDgacLayer=L.layerGroup().addTo(loisirMap);loisirUasLayer=L.layerGroup().addTo(loisirMap);loadUasZonesOnMap(loisirMap,loisirUasLayer,['p','r','d','ctr']);L.circleMarker([lat,lon],{radius:8,color:'#0ea5e9',fillColor:'#0ea5e9',fillOpacity:0.9,weight:2}).addTo(loisirMap).bindPopup(name).openPopup();loisirMap.invalidateSize();loisirMap.on('moveend',()=>{clearTimeout(loisirDgacDebounce);loisirDgacDebounce=setTimeout(()=>loadDgacRestrictions(loisirMap,loisirDgacLayer,'loisir-zoom-hint',null),400);});loadDgacRestrictions(loisirMap,loisirDgacLayer,'loisir-zoom-hint',null);},100);if(panel)panel.scrollIntoView({behavior:'smooth',block:'start'});}
+function closeLoisirCarte(){const panel=document.getElementById('loisir-map-panel');if(panel)panel.style.display='none';if(loisirMap){loisirMap.remove();loisirMap=null;}loisirDgacLayer=null;loisirOfficialTiles=null;loisirUasLayer=null;clearTimeout(loisirDgacDebounce);}
+let loisirMap=null, loisirDgacLayer=null, loisirOfficialTiles=null, loisirDgacDebounce=null, loisirUasLayer=null;
 const ZONES=[];
 const NOTAMS=[];
 function checkNotams(){
@@ -604,8 +605,9 @@ function dgacColor(limite,starred){
 
 function dgacPopup(limite,starred){
   const c=dgacColor(limite,starred);
-  const txt=starred?'Zone habitée — vol autorisé sous conditions standard (arrêté « Espace »)':(limite||'Restriction UAS — DGAC');
-  return '<div style="border-left:4px solid '+c+';padding-left:8px;max-width:220px"><div style="font-weight:700;font-size:13px;color:'+c+'">'+txt+'</div></div>';
+  const txt=starred?'Zone habitée (agglomération) — interdiction de survol de l\'espace public levée sous conditions standard (arrêté « Espace »)':(limite||'Restriction UAS — DGAC');
+  const caveat=starred?'<div style="font-size:11px;color:#94a3b8;margin-top:4px">⚠️ Une restriction plus large (zone P/R/D/CTR) peut s\'appliquer ici — vérifie les zones colorées ci-dessous.</div>':'';
+  return '<div style="border-left:4px solid '+c+';padding-left:8px;max-width:260px"><div style="font-weight:700;font-size:13px;color:'+c+'">'+txt+'</div>'+caveat+'</div>';
 }
 async function loadDgacRestrictions(map, layer, hintElId, checkboxId){
   if(!map||!layer)return;
@@ -854,6 +856,34 @@ function toggleUasLayer(cat){
     loadUasLayer(cat);
   }else if(uasLayerCache[cat]){
     carteMap.removeLayer(uasLayerCache[cat]);
+  }
+}
+
+// Version générique de loadUasLayer(), utilisable sur n'importe quelle carte (ex: carte Loisir), sans checkbox/cache partagé avec carteMap.
+async function loadUasZonesOnMap(map, layer, categories){
+  if(!map||!layer)return;
+  const UAS_LABELS={PROHIBITED:'Vol interdit',REQ_AUTHORISATION:'Autorisation requise',CONDITIONAL:'Conditionnel'};
+  for(const cat of categories){
+    try{
+      const r=await fetch(UAS_URLS[cat]);
+      if(!r.ok)continue;
+      const items=await r.json();
+      items.forEach(it=>{
+        const color=UAS_COLOR[it.restriction]||'#94a3b8';
+        const restrLabel=UAS_LABELS[it.restriction]||it.restriction;
+        const popup=`<div style="border-left:4px solid ${color};padding-left:8px;max-width:240px"><div style="font-weight:700;font-size:13px;color:${color}">${restrLabel}</div><div style="font-weight:600;font-size:13px;margin:4px 0">${it.name}</div>${it.msg?`<div style="font-size:12px;color:#444">${it.msg}</div>`:''}${it.link?`<div style="margin-top:6px"><a href="${it.link}" target="_blank" rel="noopener" style="color:#38bdf8;font-size:12px;text-decoration:underline">📄 Bulletin SIA officiel (PDF)</a></div>`:''}<div style="margin-top:6px"><a href="https://sofia-briefing.aviation-civile.gouv.fr/sofia/pages/prepavol.html" target="_blank" rel="noopener" style="color:#f97316;font-size:12px;text-decoration:underline">🪁 Vérifier les NOTAM (SOFIA)</a>${sofiaNote(it.geom)}</div></div>`;
+        (it.geom||[]).forEach(g=>{
+          try{
+            if(g.t==='poly'){
+              const latlngs=g.c.map(ring=>ring.map(pt=>[pt[1],pt[0]]));
+              L.polygon(latlngs,{color,weight:1.5,fillOpacity:0.12}).bindPopup(popup).addTo(layer);
+            }else if(g.t==='circ'){
+              L.circle([g.c[1],g.c[0]],{radius:g.r,color,weight:1.5,fillOpacity:0.12}).bindPopup(popup).addTo(layer);
+            }
+          }catch(e){}
+        });
+      });
+    }catch(e){}
   }
 }
 
