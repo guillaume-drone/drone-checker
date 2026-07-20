@@ -349,9 +349,12 @@ function renderMapsAVisiter(la,lo){
   let html='';
   for(const l of sorted){
     const dLabel=l.d<1?Math.round(l.d*1000)+' m':l.d.toFixed(1)+' km';
-    html+='<div class="loisir-card"><div class="loisir-top"><div class="loisir-title">'+l.name+'</div><div class="loisir-dist">'+dLabel+'</div></div><span class="loisir-pill" style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.12)">🏷️ '+l.cat+'</span><div class="loisir-desc" style="margin-top:8px">ℹ️ Statut réglementaire non vérifié — consulte l\'onglet Zones avant de voler ici.</div><a class="link-btn" href="#" onclick="openItineraire(\''+l.lat+','+l.lon+'\');return false;">🧭 Itinéraire <span>→</span></a><button class="map-btn" onclick="openLoisirCarte('+l.lat+','+l.lon+',\''+l.name.replace(/'/g,"\\'")+'\')">🗺️ Voir sur la carte</button></div>';
+    html+='<div class="loisir-card"><div class="loisir-top"><div class="loisir-title">'+l.name+'</div><div class="loisir-dist">'+dLabel+'</div></div><span class="loisir-pill" style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.12)">🏷️ '+l.cat+'</span><div class="loisir-desc" style="margin-top:8px">ℹ️ Statut réglementaire non vérifié — consulte l\'onglet Zones avant de voler ici.</div><a class="link-btn" href="#" onclick="openItineraire(\''+l.lat+','+l.lon+'\');return false;">🧭 Itinéraire <span>→</span></a><button class="map-btn" onclick="openLoisirCarte('+l.lat+','+l.lon+',\''+l.name.replace(/'/g,"\\'")+'\')">🗺️ Voir sur la carte</button><button class="map-btn" onclick="ouvrirCarteOfficielle('+l.lat+','+l.lon+')">🛰️ Carte officielle cartes.gouv.fr</button></div>';
   }
   el.innerHTML=html;
+}
+function ouvrirCarteOfficielle(lat,lon){
+  window.open('https://cartes.gouv.fr/explorer-les-cartes/embed?c='+lon+','+lat+'&z=15&l=GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN25TOUR$GEOPORTAIL:OGC:WMTS(1;1;1;0),TRANSPORTS.DRONES.RESTRICTIONS$GEOPORTAIL:OGC:WMTS(2;0.55;1;0)&permalinkShare=yes','_blank');
 }
 function localiserMapsAVisiter(){
   if(typeof sharedLoc!=='undefined'&&sharedLoc){renderMapsAVisiter(sharedLoc.lat,sharedLoc.lon);return}
@@ -678,12 +681,16 @@ async function copierMessageVol(){
     fail();
   }
 }
-function dgacPopup(limite,starred){
+function dgacPopup(limite,starred,remarque){
   const c=dgacColor(limite,starred);
-  const txt=starred?'Zone habitée (agglomération) — interdiction de survol de l\'espace public levée sous conditions standard (arrêté « Espace »)':(limite||'Restriction UAS — DGAC');
+  let icon,txt;
+  if(starred){icon='✅';txt='Zone habitée (agglomération) — interdiction de survol de l\'espace public levée sous conditions standard (arrêté « Espace »)';}
+  else if(limite){icon=/interdit/i.test(limite)?'🚫':'⚠️';txt=limite;}
+  else{icon='❓';txt='Restriction imprécise dans les données DGAC pour cette zone — vérifie cartes.gouv.fr avant de voler.';}
   const caveat=starred?'<div style="font-size:11px;color:#94a3b8;margin-top:4px">⚠️ Une restriction plus large (zone P/R/D/CTR) peut s\'appliquer ici — vérifie les zones colorées ci-dessous.</div>':'';
+  const remarqueHtml=remarque?'<div style="font-size:11px;color:#cbd5e1;margin-top:4px">ℹ️ '+remarque.replace(/\n/g,'<br>')+'</div>':'';
   const contact=starred?'<div style="margin-top:6px"><a href="#" onclick="copierMessageVol();return false;" style="color:#38bdf8;font-size:12px;text-decoration:underline">📋 Copier un message pour la mairie</a><div style="font-size:10px;color:#94a3b8;margin-top:2px">Facultatif, hors cadre officiel — recherche automatiquement l\'email de la mairie si disponible.</div></div>':'';
-  return '<div style="border-left:4px solid '+c+';padding-left:8px;max-width:260px"><div style="font-weight:700;font-size:13px;color:'+c+'">'+txt+'</div>'+caveat+contact+'</div>';
+  return '<div style="border-left:4px solid '+c+';padding-left:8px;max-width:260px"><div style="font-weight:700;font-size:13px;color:'+c+'">'+icon+' '+txt+'</div>'+caveat+remarqueHtml+contact+'</div>';
 }
 function popupBelongsToLayer(map, layer){
   if(!map._popup||!layer||!layer.getLayers)return false;
@@ -716,11 +723,12 @@ async function loadDgacRestrictions(map, layer, hintElId, checkboxId){
     if(!data.features)return;
     data.features.forEach(f=>{
       const raw=(f.properties&&f.properties.limite)?f.properties.limite.toString():'';
+      const remarque=(f.properties&&f.properties.remarque)?f.properties.remarque.toString():'';
       const starred=raw.indexOf('*')!==-1;
       const limite=raw.replace(/\*/g,'').trim();
       const style={color:dgacColor(limite,starred),weight:2,fillOpacity:starred?0.22:0.4};
       try{
-        L.geoJSON(f.geometry,{style}).bindPopup(dgacPopup(limite,starred),{autoPan:false}).addTo(layer);
+        L.geoJSON(f.geometry,{style}).bindPopup(dgacPopup(limite,starred,remarque),{autoPan:false}).addTo(layer);
       }catch(e){}
     });
   }catch(e){
@@ -916,7 +924,7 @@ async function loadUasLayer(cat){
       const color=UAS_COLOR[it.restriction]||'#94a3b8';
       const UAS_LABELS={PROHIBITED:'Vol interdit',REQ_AUTHORISATION:'Autorisation requise',CONDITIONAL:'Conditionnel'};
       const restrLabel=UAS_LABELS[it.restriction]||it.restriction;
-      const popup=`<div style="border-left:4px solid ${color};padding-left:8px;max-width:240px"><div style="font-weight:700;font-size:13px;color:${color}">${restrLabel}</div><div style="font-weight:600;font-size:13px;margin:4px 0">${it.name}</div>${it.msg?`<div style="font-size:12px;color:#444">${it.msg}</div>`:''}${it.link?`<div style="margin-top:6px"><a href="${it.link}" target="_blank" rel="noopener" style="color:#38bdf8;font-size:12px;text-decoration:underline">📄 Bulletin SIA officiel (PDF)</a></div>`:''}</div>`;
+      const popup=`<div style="border-left:4px solid ${color};padding-left:8px;max-width:240px"><div style="font-weight:700;font-size:13px;color:${color}">${restrLabel}</div><div style="font-weight:600;font-size:13px;margin:4px 0">${it.name}</div>${it.msg?`<div style="font-size:12px;color:#444">${it.msg}</div>`:''}${restrLabel==='Vol interdit'?`<div style="font-size:11px;color:#94a3b8;margin-top:6px">⏱️ Zone réglementée — vérifie si elle est <b>active maintenant</b> via le bouton AZBA (barre d'outils de la carte) : une zone R n'est pas forcément active en permanence. Une restriction DGAC différente (hauteur, agglomération) peut aussi s'appliquer par-dessus.</div>`:''}${it.link?`<div style="margin-top:6px"><a href="${it.link}" target="_blank" rel="noopener" style="color:#38bdf8;font-size:12px;text-decoration:underline">📄 Bulletin SIA officiel (PDF)</a></div>`:''}</div>`;
       (it.geom||[]).forEach(g=>{
         try{
           if(g.t==='poly'){
@@ -960,7 +968,7 @@ async function loadUasZonesOnMap(map, layer, categories){
       items.forEach(it=>{
         const color=UAS_COLOR[it.restriction]||'#94a3b8';
         const restrLabel=UAS_LABELS[it.restriction]||it.restriction;
-        const popup=`<div style="border-left:4px solid ${color};padding-left:8px;max-width:240px"><div style="font-weight:700;font-size:13px;color:${color}">${restrLabel}</div><div style="font-weight:600;font-size:13px;margin:4px 0">${it.name}</div>${it.msg?`<div style="font-size:12px;color:#444">${it.msg}</div>`:''}${it.link?`<div style="margin-top:6px"><a href="${it.link}" target="_blank" rel="noopener" style="color:#38bdf8;font-size:12px;text-decoration:underline">📄 Bulletin SIA officiel (PDF)</a></div>`:''}</div>`;
+        const popup=`<div style="border-left:4px solid ${color};padding-left:8px;max-width:240px"><div style="font-weight:700;font-size:13px;color:${color}">${restrLabel}</div><div style="font-weight:600;font-size:13px;margin:4px 0">${it.name}</div>${it.msg?`<div style="font-size:12px;color:#444">${it.msg}</div>`:''}${restrLabel==='Vol interdit'?`<div style="font-size:11px;color:#94a3b8;margin-top:6px">⏱️ Zone réglementée — vérifie si elle est <b>active maintenant</b> via le bouton AZBA (barre d'outils de la carte) : une zone R n'est pas forcément active en permanence. Une restriction DGAC différente (hauteur, agglomération) peut aussi s'appliquer par-dessus.</div>`:''}${it.link?`<div style="margin-top:6px"><a href="${it.link}" target="_blank" rel="noopener" style="color:#38bdf8;font-size:12px;text-decoration:underline">📄 Bulletin SIA officiel (PDF)</a></div>`:''}</div>`;
         (it.geom||[]).forEach(g=>{
           try{
             if(g.t==='poly'){
