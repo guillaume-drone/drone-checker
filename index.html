@@ -132,7 +132,9 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
 .forecast-card .fc-wind{font-size:13px;font-weight:600;font-family:'Space Grotesk',sans-serif}
 .forecast-card .fc-rain{font-size:10px;color:var(--g400);margin-top:2px}
 .compass{display:inline-block;transition:transform 0.3s}
-.carte-toolbar{display:flex;gap:8px;margin-bottom:1rem}
+.carte-toolbar{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
+.azba-coord-note{font-size:12px;color:#94a3b8;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:var(--r);padding:8px 12px;margin:-4px 0 1rem 0;line-height:1.5}
+.azba-coord-note b{color:#e2e8f0}
 .layer-toggle-btn{padding:14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:var(--r);color:#fff;font-family:'Inter',sans-serif;font-size:14px;cursor:pointer;white-space:nowrap}
 .layer-toggle-btn:hover{background:rgba(255,255,255,0.1)}
 .carte-wrap{position:relative;border-radius:var(--rs);overflow:hidden;margin-bottom:.75rem;border:1px solid rgba(255,255,255,0.08)}
@@ -203,7 +205,9 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
     <button class="layer-toggle-btn" onclick="toggleLayerPanel()">☰ Couches</button>
     <button class="layer-toggle-btn" onclick="carteGPS()">📍 Ma position</button>
     <button class="layer-toggle-btn" onclick="toggleFullscreen()">⛶ Plein écran</button>
+    <button class="layer-toggle-btn" onclick="openAzba()">🪖 AZBA</button>
   </div>
+  <div id="azba-coord-note" class="azba-coord-note" style="display:none"></div>
   <div class="carte-wrap">
     <div id="carte-layer-panel" class="carte-layer-panel">
       <div class="clp-close"><button onclick="toggleLayerPanel()">✕</button></div>
@@ -728,12 +732,22 @@ function toggleLayer(name){
 }
 
 let carteGpsWatchId=null, carteGpsAccuracyCircle=null;
+function openAzba(){
+  window.open('https://www.sia.aviation-civile.gouv.fr/azbaEx/?lang=fr','_blank');
+}
+function updateAzbaCoord(lat,lon){
+  const el=document.getElementById('azba-coord-note');
+  if(!el)return;
+  el.style.display='block';
+  el.innerHTML='<b>🪖 Carte AZBA</b> — pour te repérer sur leur carte, ta position : <b>'+toDMS5(lat,lon)+'</b>';
+}
 function startCarteGPS(){
   if(!navigator.geolocation)return;
   if(carteGpsWatchId!==null)return;
   carteGpsWatchId=navigator.geolocation.watchPosition(
     p=>{
       const la=p.coords.latitude,lo=p.coords.longitude,acc=p.coords.accuracy||0;
+      updateAzbaCoord(la,lo);
       if(!carteMap)return;
       if(carteGpsMarker)carteMap.removeLayer(carteGpsMarker);
       if(carteGpsAccuracyCircle)carteMap.removeLayer(carteGpsAccuracyCircle);
