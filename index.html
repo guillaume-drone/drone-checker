@@ -375,7 +375,7 @@ function renderMapsAVisiter(la,lo){
   el.innerHTML=html;
 }
 function ouvrirCarteOfficielle(lat,lon){
-  window.open('https://cartes.gouv.fr/explorer-les-cartes/embed?c='+lon+','+lat+'&z=15&l=GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN25TOUR$GEOPORTAIL:OGC:WMTS(1;1;1;0),TRANSPORTS.DRONES.RESTRICTIONS$GEOPORTAIL:OGC:WMTS(2;0.55;1;0)&permalinkShare=yes','_blank');
+  window.open('https://cartes.gouv.fr/explorer-les-cartes?c='+lon+','+lat+'&z=15&l=GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN25TOUR$GEOPORTAIL:OGC:WMTS(1;1;1;0),TRANSPORTS.DRONES.RESTRICTIONS$GEOPORTAIL:OGC:WMTS(2;0.55;1;0)&permalinkShare=yes','_blank');
 }
 function localiserMapsAVisiter(){
   if(typeof sharedLoc!=='undefined'&&sharedLoc){renderMapsAVisiter(sharedLoc.lat,sharedLoc.lon);return}
