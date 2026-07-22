@@ -521,14 +521,17 @@ async function queryDGACWFS(lat,lon){
     if(!r.ok)return;
     const data=await r.json();
     if(!data.features||!data.features.length)return;
-    const limites=new Set();
+    const pairs=new Map();
     data.features.forEach(f=>{
       const v=f.properties&&f.properties.limite;
-      if(v)limites.add(v.toString().trim());
+      if(!v)return;
+      const rq=(f.properties&&f.properties.remarque)?f.properties.remarque.toString().trim():'';
+      const key=v.toString().trim()+'|'+rq;
+      if(!pairs.has(key))pairs.set(key,{raw:v.toString().trim(),remarque:rq});
     });
-    if(!limites.size)return;
-    const items=[...limites].map(raw=>{
-      const starred=raw.indexOf('*')!==-1;
+    if(!pairs.size)return;
+    const items=[...pairs.values()].map(({raw,remarque})=>{
+      const starred=/agglom/i.test(remarque);
       const l=raw.replace(/\*/g,'').trim();
       const isInterdit=l.toLowerCase().includes('interdit')&&!starred;
       const dotClass=starred?'red':(isInterdit?'red':heightDotClass(l));
@@ -747,7 +750,7 @@ async function loadDgacRestrictions(map, layer, hintElId, checkboxId){
     data.features.forEach(f=>{
       const raw=(f.properties&&f.properties.limite)?f.properties.limite.toString():'';
       const remarque=(f.properties&&f.properties.remarque)?f.properties.remarque.toString():'';
-      const starred=raw.indexOf('*')!==-1;
+      const starred=/agglom/i.test(remarque);
       const limite=raw.replace(/\*/g,'').trim();
       const style={color:dgacColor(limite,starred),weight:2,fillOpacity:starred?0.22:0.4};
       try{
