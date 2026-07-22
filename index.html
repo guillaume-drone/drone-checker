@@ -988,7 +988,9 @@ function sofiaNote(geom){
   }
   return base+steps+'</div>';
 }
-async function loadUasLayer(cat){
+const RTBA_R_CODES=new Set(['45','46','56','57','69','139','142','143','144','145','147','149','152','165','166','191','193','589','590','591','592','593']);
+  function isRtbaZone(name){ if(!name) return false; const m=name.match(/\[R\s*(\d+)/); return m ? RTBA_R_CODES.has(m[1]) : false; }
+  async function loadUasLayer(cat){
   if(!carteMap)return;
   if(uasLayerCache[cat]){ carteMap.addLayer(uasLayerCache[cat]); return; }
   const cb=document.getElementById('lyr-uas-'+cat);
@@ -1002,7 +1004,7 @@ async function loadUasLayer(cat){
       const color=UAS_COLOR[it.restriction]||'#94a3b8';
       const UAS_LABELS={PROHIBITED:'Vol interdit',REQ_AUTHORISATION:'Autorisation requise',CONDITIONAL:'Conditionnel'};
       const restrLabel=UAS_LABELS[it.restriction]||it.restriction;
-      const popup=`<div style="border-left:4px solid ${color};padding-left:8px;max-width:240px"><div style="font-weight:700;font-size:13px;color:${color}">${restrLabel}</div><div style="font-weight:600;font-size:13px;margin:4px 0">${it.name}</div>${it.msg?`<div style="font-size:12px;color:#444">${it.msg}</div>`:''}${restrLabel==='Vol interdit'?`<div style="font-size:11px;color:#94a3b8;margin-top:6px">⏱️ Zone réglementée — vérifie si elle est <b>active maintenant</b> via le bouton AZBA (barre d'outils de la carte) : une zone R n'est pas forcément active en permanence. Une restriction DGAC différente (hauteur, agglomération) peut aussi s'appliquer par-dessus.</div>`:''}${it.link?`<div style="margin-top:6px"><a href="${it.link}" target="_blank" rel="noopener" style="color:#38bdf8;font-size:12px;text-decoration:underline">📄 Bulletin SIA officiel (PDF)</a></div>`:''}</div>`;
+      const popup=`<div style="border-left:4px solid ${color};padding-left:8px;max-width:240px"><div style="font-weight:700;font-size:13px;color:${color}">${restrLabel}</div><div style="font-weight:600;font-size:13px;margin:4px 0">${it.name}</div>${it.msg?`<div style="font-size:12px;color:#444">${it.msg}</div>`:''}${restrLabel==='Vol interdit'?(isRtbaZone(it.name)?`<div style="font-size:11px;color:#94a3b8;margin-top:6px">⏱️ Zone RTBA — vérifie si elle est <b>active maintenant</b> via le bouton AZBA (barre d'outils de la carte) : une zone RTBA n'est pas forcément active en permanence. Une restriction DGAC différente (hauteur, agglomération) peut aussi s'appliquer par-dessus.</div>`:`<div style="font-size:11px;color:#94a3b8;margin-top:6px">🪖 Zone réglementée permanente (hors réseau RTBA) — <b>n'apparaît pas sur AZBA</b>. Vérifie les conditions de pénétration (accord du gestionnaire de zone, souvent requis) via la publication d'information aéronautique (SIA) avant de voler ici.</div>`):''}${it.link?`<div style="margin-top:6px"><a href="${it.link}" target="_blank" rel="noopener" style="color:#38bdf8;font-size:12px;text-decoration:underline">📄 Bulletin SIA officiel (PDF)</a></div>`:''}</div>`;
       (it.geom||[]).forEach(g=>{
         try{
           if(g.t==='poly'){
@@ -1046,7 +1048,7 @@ async function loadUasZonesOnMap(map, layer, categories){
       items.forEach(it=>{
         const color=UAS_COLOR[it.restriction]||'#94a3b8';
         const restrLabel=UAS_LABELS[it.restriction]||it.restriction;
-        const popup=`<div style="border-left:4px solid ${color};padding-left:8px;max-width:240px"><div style="font-weight:700;font-size:13px;color:${color}">${restrLabel}</div><div style="font-weight:600;font-size:13px;margin:4px 0">${it.name}</div>${it.msg?`<div style="font-size:12px;color:#444">${it.msg}</div>`:''}${restrLabel==='Vol interdit'?`<div style="font-size:11px;color:#94a3b8;margin-top:6px">⏱️ Zone réglementée — vérifie si elle est <b>active maintenant</b> via le bouton AZBA (barre d'outils de la carte) : une zone R n'est pas forcément active en permanence. Une restriction DGAC différente (hauteur, agglomération) peut aussi s'appliquer par-dessus.</div>`:''}${it.link?`<div style="margin-top:6px"><a href="${it.link}" target="_blank" rel="noopener" style="color:#38bdf8;font-size:12px;text-decoration:underline">📄 Bulletin SIA officiel (PDF)</a></div>`:''}</div>`;
+        const popup=`<div style="border-left:4px solid ${color};padding-left:8px;max-width:240px"><div style="font-weight:700;font-size:13px;color:${color}">${restrLabel}</div><div style="font-weight:600;font-size:13px;margin:4px 0">${it.name}</div>${it.msg?`<div style="font-size:12px;color:#444">${it.msg}</div>`:''}${restrLabel==='Vol interdit'?(isRtbaZone(it.name)?`<div style="font-size:11px;color:#94a3b8;margin-top:6px">⏱️ Zone RTBA — vérifie si elle est <b>active maintenant</b> via le bouton AZBA (barre d'outils de la carte) : une zone RTBA n'est pas forcément active en permanence. Une restriction DGAC différente (hauteur, agglomération) peut aussi s'appliquer par-dessus.</div>`:`<div style="font-size:11px;color:#94a3b8;margin-top:6px">🪖 Zone réglementée permanente (hors réseau RTBA) — <b>n'apparaît pas sur AZBA</b>. Vérifie les conditions de pénétration (accord du gestionnaire de zone, souvent requis) via la publication d'information aéronautique (SIA) avant de voler ici.</div>`):''}${it.link?`<div style="margin-top:6px"><a href="${it.link}" target="_blank" rel="noopener" style="color:#38bdf8;font-size:12px;text-decoration:underline">📄 Bulletin SIA officiel (PDF)</a></div>`:''}</div>`;
         (it.geom||[]).forEach(g=>{
           try{
             if(g.t==='poly'){
