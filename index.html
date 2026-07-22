@@ -1169,6 +1169,21 @@ async function reverseGeo(lat,lon){
 async function searchZone(){const q=document.getElementById('zoneInput').value.trim();if(!q)return;loading('zone-result','Recherche...');const l=await geo(q);l?renderZone(l.lat,l.lon,l.name,l):document.getElementById('zone-result').innerHTML='<div class="empty"><span class="empty-icon">🔍</span><p>Lieu introuvable.</p></div>'}
 async function searchMeteo(){const q=document.getElementById('meteoInput').value.trim();if(!q)return;loading('meteo-result','Recherche...');const l=await geo(q);l?loadMeteo(l.lat,l.lon,l.name):document.getElementById('meteo-result').innerHTML='<div class="empty"><span class="empty-icon">🔍</span><p>Lieu introuvable.</p></div>'}
 const SPOT_INFO={};
+// Filet de securite : si le clic est relache hors de la carte (changement de fenetre, alt-tab...), Leaflet peut rester bloque en mode glissement (curseur main fige, clics sur zones impossibles). On reinitialise le mode glissement dans ces cas.
+function resetStuckMapDragging(){
+  [loisirMap, carteMap].forEach(m=>{
+    try{
+      if(m && m.dragging && m._container && m._container.classList.contains('leaflet-dragging')){
+        m.dragging.disable();
+        m.dragging.enable();
+      }
+    }catch(e){}
+  });
+}
+window.addEventListener('blur', resetStuckMapDragging);
+document.addEventListener('visibilitychange', resetStuckMapDragging);
+document.addEventListener('mouseup', ()=>setTimeout(resetStuckMapDragging, 60));
+document.addEventListener('mouseleave', resetStuckMapDragging);
 </script>
 </body>
 </html>
