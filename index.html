@@ -720,7 +720,16 @@ function dgacPopup(limite,starred,remarque){
 }
 function popupBelongsToLayer(map, layer){
   if(!map._popup||!layer||!layer.getLayers)return false;
-  return layer.getLayers().some(l=>l.getPopup&&l.getPopup()===map._popup);
+  const belongs=layer.getLayers().some(l=>l.getPopup&&l.getPopup()===map._popup);
+  if(!belongs)return false;
+  // Ne bloque le rafraichissement que si le popup ouvert est encore visible a l'ecran.
+  // Sinon (carte deplacee loin), on autorise le rafraichissement : la couche cliquable
+  // restait sinon figee indefiniment sur l'ancienne zone tant que ce popup n'etait pas ferme manuellement.
+  try{
+    const ll=map._popup.getLatLng?map._popup.getLatLng():null;
+    if(ll&&!map.getBounds().contains(ll))return false;
+  }catch(e){}
+  return true;
 }
 async function loadDgacRestrictions(map, layer, hintElId, checkboxId){
   if(!map||!layer)return;
