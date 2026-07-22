@@ -184,7 +184,7 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
 <div class="tabs">
   <button class="tab active" onclick="switchTab('zones')">🗺️ Zones</button>
   <button class="tab" onclick="switchTab('meteo')">🌤️ Météo drone</button>
-  <button class="tab" onclick="switchTab('loisir')">🏞️ Loisir</button><button class="tab" onclick="switchTab('supplements')">📎 Suppléments</button>
+  <button class="tab" onclick="switchTab('loisir')">🏞️ Loisir</button><button class="tab" onclick="switchTab('spotdrone')">📌 Spot Drone</button><button class="tab" onclick="switchTab('supplements')">📎 Suppléments</button>
 </div>
 <div class="content"><div id="tab-supplements" class="section"><br><div class="drone-badge">📎 Suppléments</div>
   <div class="divider" style="margin:20px 0 10px">📍 Mes lieux à visiter (import Google Maps)</div>
@@ -301,13 +301,26 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
 
 
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+
+  <!-- SPOT DRONE -->
+  <div id="tab-spotdrone" class="section">
+    <br>
+    <div class="drone-badge">📌 Spots repérés via la communauté (drone-spot.tech), triés par région puis département — hauteurs vérifiées sur la couche DGAC officielle.</div>
+    <p class="spots-title">Régions</p>
+    <div class="spots-grid" id="spotdrone-region-grid"></div>
+    <p class="spots-title" id="spotdrone-dept-title" style="display:none">Départements</p>
+    <div class="spots-grid" id="spotdrone-dept-grid"></div>
+    <div id="spotdrone-list"></div>
+    <div class="footer">Source : drone-spot.tech (fiches communautaires) · Hauteurs vérifiées sur la couche officielle DGAC · Vérifie toujours cartes.gouv.fr avant de voler.</div>
+  </div>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 function switchTab(t){
-  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',(i===0&&t==='zones')||(i===1&&t==='meteo')||(i===2&&t==='loisir')||(i===3&&t==='supplements')));
+  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',(i===0&&t==='zones')||(i===1&&t==='meteo')||(i===2&&t==='loisir')||(i===3&&t==='spotdrone')||(i===4&&t==='supplements')));
   document.getElementById('tab-zones').classList.toggle('active',t==='zones');
   document.getElementById('tab-meteo').classList.toggle('active',t==='meteo');
-  document.getElementById('tab-loisir').classList.toggle('active',t==='loisir');document.getElementById('tab-supplements').classList.toggle('active',t==='supplements');
+  document.getElementById('tab-loisir').classList.toggle('active',t==='loisir');document.getElementById('tab-spotdrone').classList.toggle('active',t==='spotdrone');document.getElementById('tab-supplements').classList.toggle('active',t==='supplements');
   if(t==='meteo'&&sharedLoc&&meteoLoadedFor!==(sharedLoc.name+'|'+sharedLoc.lat+'|'+sharedLoc.lon)){
     const mi=document.getElementById('meteoInput');
     if(mi)mi.value=sharedLoc.name;
@@ -388,6 +401,36 @@ function localiserMapsAVisiter(){
   );
 }
 renderMapsAVisiter(null,null);
+  // Onglet Spot Drone - spots communautaires (drone-spot.tech), organises par region > departement
+  const SPOTS_DRONE=[{name:"Saint-Antonin-Noble-Val & Roc d'Anglars",lat:44.1442,lon:1.7674,dept:"82",deptName:"Tarn-et-Garonne",region:"Occitanie",type:"Village medieval / falaise",plafond:120,desc:"Village classe niche dans les gorges de l'Aveyron ; point de vue depuis le Roc d'Anglars sur les falaises qui surplombent le village.",verif:"Zone verte confirmee sur la carte DGAC (decoller a l'ecart du village, qui lui est en zone rouge).",src:"drone-spot.tech (fiches fusionnees)"},{name:"Pente d'eau de Montech",lat:43.9718,lon:1.2263,dept:"82",deptName:"Tarn-et-Garonne",region:"Occitanie",type:"Ouvrage technique insolite",plafond:50,desc:"Plan incline a bateaux, unique en Europe, sur le canal lateral a la Garonne.",verif:"Zone orange confirmee = plafond 50 m, coherent avec la fiche source.",src:"drone-spot.tech (fiches fusionnees)"},{name:"Pont de Bourret",lat:43.9498,lon:1.1706,dept:"82",deptName:"Tarn-et-Garonne",region:"Occitanie",type:"Insolite - pont abandonne",plafond:120,desc:"Ancien pont a l'abandon sur la Garonne, tres photogenique, bons retours pilotes.",verif:"Zone neutre confirmee, aucune restriction identifiee.",src:"drone-spot.tech"},{name:"Pont suspendu de Bourret",lat:43.9515,lon:1.1749,dept:"82",deptName:"Tarn-et-Garonne",region:"Occitanie",type:"Insolite - pont",plafond:120,desc:"Second pont (suspendu), a environ 500 m du Pont de Bourret.",verif:"Zone neutre mais en bordure d'un Espace Naturel Sensible - a verifier sur place. Fiche source avec un bug d'altitude (-99999 m, a ignorer).",src:"drone-spot.tech"},{name:"Moulin a eau de la Theoule",lat:43.9906,lon:1.1157,dept:"82",deptName:"Tarn-et-Garonne",region:"Occitanie",type:"Patrimoine",plafond:120,desc:"Moulin a eau historique pres de Cordes Tolosannes.",verif:"Zone neutre confirmee, aucune restriction identifiee.",src:"drone-spot.tech"}];
+  function spotDroneBadge(plafond){if(plafond<120)return'<div class="note-card orange"><div class="note-header orange">Hauteur max ici : '+plafond+' m</div>Inferieure a la limite standard de 120 m.</div>';return'';}
+  function renderSpotDroneRegions(){
+      const regions=[];
+      SPOTS_DRONE.forEach(s=>{if(regions.indexOf(s.region)===-1)regions.push(s.region);});
+      let html='';
+      regions.forEach(r=>{html+='<button class="spot-btn" onclick="renderSpotDroneDepts(\''+r+'\')">'+r+'</button>';});
+      document.getElementById('spotdrone-region-grid').innerHTML=html;
+  }
+  function renderSpotDroneDepts(region){
+      const depts=[];
+      SPOTS_DRONE.forEach(s=>{if(s.region===region){const key=s.dept+'|'+s.deptName;if(depts.indexOf(key)===-1)depts.push(key);}});
+      document.getElementById('spotdrone-dept-title').style.display='block';
+      let html='';
+      depts.forEach(d=>{const parts=d.split('|');html+='<button class="spot-btn" onclick="renderSpotDroneList(\''+parts[0]+'\')">'+parts[1]+' ('+parts[0]+')</button>';});
+      document.getElementById('spotdrone-dept-grid').innerHTML=html;
+      document.getElementById('spotdrone-list').innerHTML='';
+  }
+  function renderSpotDroneList(deptCode){
+      const spots=SPOTS_DRONE.filter(s=>s.dept===deptCode);
+      let html='';
+      spots.forEach(s=>{
+            const safeName=s.name.replace(/'/g,"\\'");
+            html+='<div class="loisir-card"><div class="loisir-top"><div class="loisir-title">'+s.name+'</div><div class="loisir-dist">'+s.deptName+'</div></div><span class="loisir-pill" style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.12)">'+s.type+'</span><div class="loisir-desc" style="margin-top:8px">'+s.desc+'</div>'+spotDroneBadge(s.plafond)+'<div class="loisir-desc" style="margin-top:6px">'+s.verif+'</div><div class="loisir-dist">Source : '+s.src+'</div><a class="link-btn" href="#" onclick="openItineraire(\''+s.lat+','+s.lon+'\');return false;">Itineraire</a><button class="map-btn" onclick="openLoisirCarte('+s.lat+','+s.lon+',\''+safeName+'\')">Voir sur la carte</button></div>';
+      });
+      document.getElementById('spotdrone-list').innerHTML=html;
+  }
+  renderSpotDroneRegions();
+  
 let itiDest=null;
 function openItineraire(dest){
   itiDest=dest;
