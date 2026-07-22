@@ -1176,6 +1176,7 @@ function resetStuckMapDragging(){
       if(m && m.dragging && m._container && m._container.classList.contains('leaflet-dragging')){
         m.dragging.disable();
         m.dragging.enable();
+        m._container.classList.remove('leaflet-dragging');
       }
     }catch(e){}
   });
