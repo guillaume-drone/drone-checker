@@ -57,7 +57,7 @@ body{font-family:'Inter',sans-serif;background:var(--g900);color:#fff;min-height
 .rule-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px;line-height:1.5;color:rgba(255,255,255,0.7)}
 .rule-item:last-child{border-bottom:none}
 .rule-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:6px}
-.rule-dot.green{background:#4ade80}.rule-dot.orange{background:#fb923c}.rule-dot.red{background:#f87171}
+.rule-dot.green{background:#4ade80}.rule-dot.orange{background:#fb923c}.rule-dot.red{background:#f87171}.rule-dot.h30{background:#f43f5e}.rule-dot.h50{background:#fb923c}.rule-dot.h60{background:#f59e0b}.rule-dot.h100{background:#facc15}
 .meteo-score{border-radius:var(--r);padding:1.25rem;margin-bottom:1rem;display:flex;align-items:center;gap:16px}
 .meteo-score.green{background:rgba(22,163,74,0.15);border:1px solid rgba(22,163,74,0.25)}
 .meteo-score.orange{background:rgba(234,88,12,0.15);border:1px solid rgba(234,88,12,0.25)}
@@ -511,6 +511,7 @@ function reloadOfficialMap(){
   const iframe=document.getElementById('official-iframe');
   if(currentOfficialMapUrl)iframe.src=currentOfficialMapUrl+'&t='+Date.now();
 }
+function heightDotClass(l){const m=l.match(/(\d+)\s*m/);if(!m)return'orange';const h=parseInt(m[1],10);if(h<=30)return'h30';if(h<=50)return'h50';if(h<=60)return'h60';return'h100';}
 async function queryDGACWFS(lat,lon){
   const d=0.01;
   const bbox=`${lon-d},${lat-d},${lon+d},${lat+d},EPSG:4326`;
@@ -530,8 +531,8 @@ async function queryDGACWFS(lat,lon){
       const starred=raw.indexOf('*')!==-1;
       const l=raw.replace(/\*/g,'').trim();
       const isInterdit=l.toLowerCase().includes('interdit')&&!starred;
-      const dotClass=starred?'green':(isInterdit?'red':'orange');
-      const text=starred?'Zone habitée — vol autorisé sous conditions standard (arrêté « Espace »)':l;
+      const dotClass=starred?'red':(isInterdit?'red':heightDotClass(l));
+      const text=starred?'Zone habitée — vol interdit en loisir sans conditions spécifiques vérifiées (arrêté « Espace »)':l;
       return`<div class="rule-item"><div class="rule-dot ${dotClass}"></div>${text}</div>`;
     }).join('');
     const html=`<div class="result-card" style="margin-top:.75rem"><div class="status-banner orange" style="padding:1rem 1.25rem 0.5rem"><div class="s-emoji">🔬</div><div><div class="s-title orange" style="font-size:15px">Donnée officielle DGAC en direct</div><div class="s-loc">Couche cartes.gouv.fr — TRANSPORTS.DRONES.RESTRICTIONS</div></div></div><div class="rules-list">${items}</div></div>`;
@@ -643,8 +644,9 @@ function loadLayersForView(){
 // Charge la couche officielle DGAC (data.geopf.fr) sur la zone actuellement affichée.
 // Volontairement limitée à partir d'un certain niveau de zoom pour ne pas surcharger le WFS sur la France entière.
 function dgacColor(limite,starred){
+  if(starred)return '#dc2626';
   if(!limite)return '#0ea5e9';
-  if(/interdit/i.test(limite))return starred?'#4ade80':'#dc2626';
+  if(/interdit/i.test(limite))return '#dc2626';
   const m=limite.match(/(\d+)\s*m/);
   if(m){
     const h=parseInt(m[1],10);
@@ -705,7 +707,7 @@ async function copierMessageVol(){
 function dgacPopup(limite,starred,remarque){
   const c=dgacColor(limite,starred);
   let icon,txt;
-  if(starred){icon='✅';txt='Zone habitée (agglomération) — interdiction de survol de l\'espace public levée sous conditions standard (arrêté « Espace »)';}
+  if(starred){icon='🚫';txt='Zone habitée (agglomération) — vol interdit en loisir sans conditions spécifiques vérifiées (arrêté « Espace »)';}
   else if(limite){icon=/interdit/i.test(limite)?'🚫':'⚠️';txt=limite;}
   else{icon='❓';txt='Restriction imprécise dans les données DGAC pour cette zone — vérifie cartes.gouv.fr avant de voler.';}
   const caveat=starred?'<div style="font-size:11px;color:#94a3b8;margin-top:4px">⚠️ Une restriction plus large (zone P/R/D/CTR) peut s\'appliquer ici — vérifie les zones colorées ci-dessous.</div>':'';
