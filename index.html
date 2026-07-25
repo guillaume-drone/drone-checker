@@ -755,7 +755,7 @@ function dgacPopup(limite,starred,remarque){
   let icon,txt;
   if(starred){icon='🚫';txt='Zone habitée (agglomération) — vol interdit en loisir sans conditions spécifiques vérifiées (arrêté « Espace »)';}
   else if(limite){icon=/interdit/i.test(limite)?'🚫':'⚠️';txt=limite;}
-  else{icon='❓';txt='Restriction imprécise dans les données DGAC pour cette zone — vérifie cartes.gouv.fr avant de voler.';}
+  else{if(remarque&&/900\s?g/.test(remarque)&&!/interdit/i.test(remarque)){icon='✅';txt="Pas de hauteur plafonnée ici. Notification préalable requise uniquement pour les drones de plus de 900\u00a0g — le DJI Air 3S (724\u00a0g) n'est pas concerné.";}else{icon='❓';txt='Restriction imprécise dans les données DGAC pour cette zone — vérifie cartes.gouv.fr avant de voler.';}}
   const caveat=starred?'<div style="font-size:11px;color:#94a3b8;margin-top:4px">⚠️ Une restriction plus large (zone P/R/D/CTR) peut s\'appliquer ici — vérifie les zones colorées ci-dessous.</div>':'';
   const remarqueHtml=remarque?'<div style="font-size:11px;color:#cbd5e1;margin-top:4px">ℹ️ '+remarque.replace(/\n/g,'<br>')+'</div>':'';
   const contact=starred?'<div style="margin-top:6px"><a href="#" onclick="copierMessageVol();return false;" style="color:#38bdf8;font-size:12px;text-decoration:underline">📋 Copier un message pour la mairie</a><div style="font-size:10px;color:#94a3b8;margin-top:2px">Facultatif, hors cadre officiel — recherche automatiquement l\'email de la mairie si disponible.</div></div>':'';
